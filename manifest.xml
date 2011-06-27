@@ -6,7 +6,7 @@ The pluginlib package provides tools for writing and dynamically loading plugins
 Pluginlib includes parts of Poco from pocoproject.org
   </description>
   <author>Tully Foote and Eitan Marder-Eppstein</author>
-  <license>BSD, Boost Software License (Poco)</license>
+  <license>BSD, Boost Software License</license>
   <review status="doc reviewed" notes="http://www.ros.org/wiki/pluginlib/Reviews/2009-10-06_Doc_Review"/>
   <url>http://ros.org/wiki/pluginlib</url>
 
