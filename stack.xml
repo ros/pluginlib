@@ -8,7 +8,6 @@
   <license>BSD,Boost Software License</license>  
   <review status="doc reviewed" notes=""/>
   <url>http://ros.org/wiki/pluginlib</url>
-  <depend stack="common" /> <!-- tinyxml -->
   <depend stack="ros" /> <!-- roslib -->
   <depend stack="ros_comm" /> <!-- rosconsole -->
 
