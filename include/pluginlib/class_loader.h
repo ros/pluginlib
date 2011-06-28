@@ -35,7 +35,7 @@
 
 #include "Poco/ClassLoader.h"
 #include "ros/package.h"
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 #include <vector>
 #include <map>
 
