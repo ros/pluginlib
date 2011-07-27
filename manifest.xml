@@ -16,7 +16,7 @@ Pluginlib includes parts of Poco from pocoproject.org
   <rosdep name="tinyxml"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include -I${prefix} `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpoco_lite -lboost_fs_wrapper"/>
+    <cpp cflags="-I${prefix}/include -I${prefix} `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpoco_lite -lboost_fs_wrapper -ltinyxml"/>
     <pluginlib plugin="${prefix}/test/test_plugins.xml" />
   </export>
 
