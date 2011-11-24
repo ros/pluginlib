@@ -66,6 +66,16 @@ namespace pluginlib
   };
 
   /**
+   * @class LibraryUnloadException
+   * @brief An exception class thrown when pluginlib is unable to unload the library associated with a given plugin
+   */
+  class LibraryUnloadException: public PluginlibException
+  {
+    public:
+      LibraryUnloadException(const std::string error_desc) : PluginlibException(error_desc) {}
+  };
+
+  /**
    * @class CreateClassException
    * @brief An exception class thrown when pluginlib is unable to create the class associated with a given plugin
    */
@@ -94,6 +104,7 @@ namespace pluginlib
          * @param package The package containing the base class
          * @param base_class The type of the base class for classes to be loaded
          * @param attrib_name The attribute to search for in manifext.xml files, defaults to "plugin"
+         * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
          */
         ClassLoader(std::string package, std::string base_class, std::string attrib_name = std::string("plugin"));
 
@@ -107,6 +118,12 @@ namespace pluginlib
          * @return A vector of strings corresponding to the names of all available classes
          */
         std::vector<std::string> getDeclaredClasses();
+
+        /**
+         * @brief  Refreshs the list of all available classes for this ClassLoader's base class type
+         * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
+         */
+        void refreshDeclaredClasses();
 
         /**
          * @brief  Strips the package name off of a lookup name
@@ -150,6 +167,13 @@ namespace pluginlib
         std::string getClassPackage(const std::string& lookup_name);
 
         /**
+         * @brief  Given the name of a class, returns the path of the associated plugin manifest
+         * @param lookup_name The name of the class
+         * @return The path of the associated plugin manifest
+         */
+        std::string getPluginManifestPath(const std::string& lookup_name);
+
+        /**
          * @brief  Creates an instance of a desired class, optionally loading the associated library automatically if necessary
          * @param  lookup_name The name of the class to load
          * @param  auto_load Specifies whether or not to automatically load the library containing the class, set to true by default
@@ -174,12 +198,19 @@ namespace pluginlib
         void loadLibraryForClass(const std::string & lookup_name);
 
         /**
+         * @brief  Attempts to unload a class with a given name
+         * @param lookup_name The lookup name of the class to unload
+         * @exception pluginlib::LibraryUnloadException Thrown if the library for the class cannot be unloaded
+         * @return The number of pending unloads until the library is removed from memory
+         */
+        int unloadLibraryForClass(const std::string& lookup_name);
+
+        /**
          * @brief  Returns the libraries that are registered and can be loaded
          * @return A vector of strings corresponding to the names of registered libraries
          */
         std::vector<std::string> getRegisteredLibraries();
 
-      private:
         /**
          * @brief  Given the name of a class, returns the path to its associated library
          * @param lookup_name The name of the class 
@@ -187,6 +218,7 @@ namespace pluginlib
          */
         std::string getClassLibraryPath(const std::string& lookup_name);
 
+      private:
         /**
          * @brief  Unloads a previously dynamically loaded lobrary
          * @param library_path The library to unload
@@ -221,13 +253,36 @@ namespace pluginlib
          */
         void loadClassLibraryInternal(const std::string& library_path, const std::string& list_name_arg = std::string(""));
 
+        /**
+         * @brief  Helper function for unloading a shared library
+         * @param  library_path The path to the library to unload
+         * @return The number of pending unloads until the library is removed from memory
+         */
+        int unloadClassLibraryInternal(const std::string& library_path);
+
+        /**
+         * @brief  Returns the available classes
+         * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
+         * @return A map of class names and the corresponding descriptions
+         */
+        std::map<std::string, ClassDesc> determineAvailableClasses();
+
+        /**
+         * @brief  Returns an error message for an unknown class
+         * @param lookup_name The name of the class 
+         * @return The error message
+         */
+        std::string getErrorStringForUnknownClass(const std::string& lookup_name);
+
         //used for proper unloading of automatically loaded libraries
         LibraryCountMap loaded_libraries_;
 
         // map from library to class's descriptions  
         // This is all available classes found in xml
         std::map<std::string, ClassDesc> classes_available_;
+        std::string package_;
         std::string base_class_;
+        std::string attrib_name_;
 
         Poco::ClassLoader<T> poco_class_loader_;  
     };
