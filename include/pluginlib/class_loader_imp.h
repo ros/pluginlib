@@ -91,9 +91,9 @@ namespace pluginlib {
       std::string library_path = it->second.library_path_;
       library_path.append(Poco::SharedLibrary::suffix());
       ROS_DEBUG("Attempting to unload library %s for class %s",
-                it->second.library_path_.c_str(), lookup_name.c_str());
+                library_path.c_str(), lookup_name.c_str());
 
-      return unloadClassLibraryInternal(it->second.library_path_);
+      return unloadClassLibraryInternal(library_path);
     } else {
       throw LibraryUnloadException(getErrorStringForUnknownClass(lookup_name));
     }
