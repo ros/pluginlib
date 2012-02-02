@@ -40,6 +40,7 @@
 #ifndef PLUGINLIB_CLASS_LOADER_IMP_H_
 #define PLUGINLIB_CLASS_LOADER_IMP_H_
 
+#include "boost/bind.hpp"
 #include <list>
 #include <stdexcept>
 
@@ -244,6 +245,35 @@ namespace pluginlib {
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.displayText();
       throw CreateClassException(error_string);
     }
+  }
+
+  template <class T>
+  boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
+  {
+    loadLibraryForClass(lookup_name);
+
+    T* instance = 0;
+    try{
+      instance = poco_class_loader_.create(getClassType(lookup_name));
+    }
+    catch(const Poco::RuntimeException& ex){
+      std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.displayText();
+      // call unload library to keep load/unload counting consistent
+      unloadLibraryForClass(lookup_name);
+      throw CreateClassException(error_string);
+    }
+    return boost::shared_ptr<T>(instance, boost::bind(&ClassLoader<T>::garbageInstance, this, _1, lookup_name));
+  }
+
+  template <class T>
+  void ClassLoader<T>::garbageInstance(T* p, const std::string& lookup_name)
+  {
+    if (p)
+    {
+      delete p;
+      p = 0;
+    }
+    unloadLibraryForClass(lookup_name);
   }
 
   template <class T>

@@ -89,7 +89,7 @@ namespace pluginlib
    * Pure virtual base class of pluginlib::ClassLoader which is not
    * templated.  This allows the writing of non-templated manager code
    * which can call all the administrative functions of ClassLoaders -
-   * everything except createClassInstance().
+   * everything except createClassInstance() and createInstance().
    */
   class ClassLoaderBase
   {
@@ -290,8 +290,18 @@ namespace pluginlib
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
+         * @deprecated use createInstance() returning a boost shared pointer.
          */
-        T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
+        __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
+
+        /**
+         * @brief  Creates an instance of a desired class, loading the associated library, unloading the library when shared pointer runs out of scope
+         * @param  lookup_name The name of the class to load
+         * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
+         * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+         * @return An instance of the class
+         */
+        boost::shared_ptr<T> createInstance(const std::string& lookup_name);
 
         /**
          * @brief Checks if a given class is currently loaded
@@ -329,6 +339,13 @@ namespace pluginlib
         std::string getClassLibraryPath(const std::string& lookup_name);
 
       private:
+        /**
+          * Deleter for boost shared pointer.
+          * @param p The instance
+          * @param lookup_name The name of the class
+          */
+        void garbageInstance(T* p, const std::string& lookup_name);
+
         /**
          * @brief  Unloads a previously dynamically loaded lobrary
          * @param library_path The library to unload
