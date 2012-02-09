@@ -89,7 +89,8 @@ namespace pluginlib
    * Pure virtual base class of pluginlib::ClassLoader which is not
    * templated.  This allows the writing of non-templated manager code
    * which can call all the administrative functions of ClassLoaders -
-   * everything except createClassInstance() and createInstance().
+   * everything except createClassInstance(), createManagedInstance()
+   * and createInstance().
    */
   class ClassLoaderBase
   {
@@ -290,18 +291,28 @@ namespace pluginlib
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
-         * @deprecated use createInstance() returning a boost shared pointer.
+         * @deprecated use either createManagedInstance() or createInstance().
          */
         __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
-
+        
         /**
-         * @brief  Creates an instance of a desired class, loading the associated library, unloading the library when shared pointer runs out of scope
+         * @brief  Creates an instance of a desired class, always loading the associated library. Deleting the instance and unloading the library is automatically handled by the shared pointer.
          * @param  lookup_name The name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
          */
-        boost::shared_ptr<T> createInstance(const std::string& lookup_name);
+        boost::shared_ptr<T> createManagedInstance(const std::string& lookup_name);
+        
+        /**
+         * @brief  Creates an instance of a desired class, always loading the associated library.
+         * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass().
+         * @param  lookup_name The name of the class to load
+         * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
+         * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+         * @return An instance of the class
+         */
+        T* createInstance(const std::string& lookup_name);
 
         /**
          * @brief Checks if a given class is currently loaded

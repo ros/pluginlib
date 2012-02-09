@@ -246,9 +246,16 @@ namespace pluginlib {
       throw CreateClassException(error_string);
     }
   }
+  
+  template <class T>
+  boost::shared_ptr<T> ClassLoader<T>::createManagedInstance(const std::string& lookup_name)
+  {
+    T* instance = createInstance(lookup_name);
+    return boost::shared_ptr<T>(instance, boost::bind(&ClassLoader<T>::garbageInstance, this, _1, lookup_name));
+  }
 
   template <class T>
-  boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
+  T* ClassLoader<T>::createInstance(const std::string& lookup_name)
   {
     loadLibraryForClass(lookup_name);
 
@@ -262,7 +269,7 @@ namespace pluginlib {
       unloadLibraryForClass(lookup_name);
       throw CreateClassException(error_string);
     }
-    return boost::shared_ptr<T>(instance, boost::bind(&ClassLoader<T>::garbageInstance, this, _1, lookup_name));
+    return instance;
   }
 
   template <class T>
