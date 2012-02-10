@@ -10,6 +10,7 @@ Pluginlib includes parts of Poco from pocoproject.org
   <review status="doc reviewed" notes="http://www.ros.org/wiki/pluginlib/Reviews/2009-10-06_Doc_Review"/>
   <url>http://ros.org/wiki/pluginlib</url>
 
+  <depend package="rosbuild"/>
   <depend package="roslib"/>
   <depend package="rosconsole"/>
 
@@ -17,6 +18,7 @@ Pluginlib includes parts of Poco from pocoproject.org
 
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix} `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpoco_lite -lboost_fs_wrapper -ltinyxml"/>
+    <rosbuild cmake_directory="${prefix}/cmake"/>
     <pluginlib plugin="${prefix}/test/test_plugins.xml" />
   </export>
 
