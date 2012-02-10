@@ -89,8 +89,8 @@ namespace pluginlib
    * Pure virtual base class of pluginlib::ClassLoader which is not
    * templated.  This allows the writing of non-templated manager code
    * which can call all the administrative functions of ClassLoaders -
-   * everything except createClassInstance(), createManagedInstance()
-   * and createInstance().
+   * everything except createClassInstance(), createInstance()
+   * and createUnmanagedInstance().
    */
   class ClassLoaderBase
   {
@@ -291,7 +291,7 @@ namespace pluginlib
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
-         * @deprecated use either createManagedInstance() or createInstance().
+         * @deprecated use either createInstance() or createUnmanagedInstance().
          */
         __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
         
@@ -302,7 +302,7 @@ namespace pluginlib
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
          */
-        boost::shared_ptr<T> createManagedInstance(const std::string& lookup_name);
+        boost::shared_ptr<T> createInstance(const std::string& lookup_name);
         
         /**
          * @brief  Creates an instance of a desired class, always loading the associated library.
@@ -312,7 +312,7 @@ namespace pluginlib
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
          * @return An instance of the class
          */
-        T* createInstance(const std::string& lookup_name);
+        T* createUnmanagedInstance(const std::string& lookup_name);
 
         /**
          * @brief Checks if a given class is currently loaded

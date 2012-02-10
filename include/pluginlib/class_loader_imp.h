@@ -248,14 +248,14 @@ namespace pluginlib {
   }
   
   template <class T>
-  boost::shared_ptr<T> ClassLoader<T>::createManagedInstance(const std::string& lookup_name)
+  boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
   {
-    T* instance = createInstance(lookup_name);
+    T* instance = createUnmanagedInstance(lookup_name);
     return boost::shared_ptr<T>(instance, boost::bind(&ClassLoader<T>::garbageInstance, this, _1, lookup_name));
   }
 
   template <class T>
-  T* ClassLoader<T>::createInstance(const std::string& lookup_name)
+  T* ClassLoader<T>::createUnmanagedInstance(const std::string& lookup_name)
   {
     loadLibraryForClass(lookup_name);
 

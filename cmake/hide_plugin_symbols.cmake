@@ -14,7 +14,7 @@ macro(pluginlib_hide_plugin_symbols package_name class_name)
     };"
   )
   # checks if the linker supports version script
-  include(${CMAKE_ROOT}/Modules/TestCXXAcceptsFlag.cmake)
+  include(TestCXXAcceptsFlag)
   check_cxx_accepts_flag("-Wl,--version-script,\"${CMAKE_BINARY_DIR}/${_version_script}\"" LD_ACCEPTS_VERSION_SCRIPT)
   if(LD_ACCEPTS_VERSION_SCRIPT)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-version-script=\"${CMAKE_BINARY_DIR}/${_version_script}\"")
