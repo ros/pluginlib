@@ -296,7 +296,7 @@ namespace pluginlib
         __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
         
         /**
-         * @brief  Creates an instance of a desired class, always loading the associated library. Deleting the instance and unloading the library is automatically handled by the shared pointer.
+         * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter). Deleting the instance and calling unloadLibraryForClass() is automatically handled by the shared pointer.
          * @param  lookup_name The name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
@@ -305,8 +305,8 @@ namespace pluginlib
         boost::shared_ptr<T> createInstance(const std::string& lookup_name);
         
         /**
-         * @brief  Creates an instance of a desired class, always loading the associated library.
-         * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass().
+         * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
+         * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass() (in order to decrement the associated library counter and unloading it if it is no more used).
          * @param  lookup_name The name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
@@ -322,14 +322,14 @@ namespace pluginlib
         bool isClassLoaded(const std::string& lookup_name);
 
         /**
-         * @brief  Attempts to load a class with a given name
+         * @brief  Attempts to load the library containing a class with a given name and increments a counter for the library
          * @param lookup_name The lookup name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown if the library for the class cannot be loaded
          */
         void loadLibraryForClass(const std::string & lookup_name);
 
         /**
-         * @brief  Attempts to unload a class with a given name
+         * @brief  Decrements the counter for the library containing a class with a given name and attempts to unload it if the counter reaches zero
          * @param lookup_name The lookup name of the class to unload
          * @exception pluginlib::LibraryUnloadException Thrown if the library for the class cannot be unloaded
          * @return The number of pending unloads until the library is removed from memory
