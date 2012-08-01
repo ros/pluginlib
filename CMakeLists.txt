@@ -1,31 +1,65 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8)
+project(pluginlib)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+find_package(catkin REQUIRED)
+find_package(ROS REQUIRED COMPONENTS
+  cpp_common rosconsole roslib rostime
+)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 
-rosbuild_init()
-rosbuild_make_distribution(1.8.0)
+catkin_stack()
+catkin_project(${PROJECT_NAME}
+  INCLUDE_DIRS include
+)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include ${ROS_INCLUDE_DIRS})
 
-rosbuild_add_boost_directories()
-
-rosbuild_add_library(poco_lite src/Exception.cpp src/File.cpp src/Manifest.cpp src/Mutex.cpp src/Path.cpp src/SharedLibrary.cpp src/StringTokenizer.cpp src/Timestamp.cpp src/UnicodeConverter.cpp src/AtomicCounter.cpp src/UTF16Encoding.cpp src/UTF8Encoding.cpp src/TextEncoding.cpp src/ASCIIEncoding.cpp src/Latin1Encoding.cpp src/Latin9Encoding.cpp src/Windows1252Encoding.cpp src/RWLock.cpp src/DirectoryIterator.cpp src/Bugcheck.cpp src/Environment.cpp src/TextIterator.cpp src/Debugger.cpp src/TextConverter.cpp)
+set(${PROJECT_NAME}_SRCS
+  src/ASCIIEncoding.cpp
+  src/AtomicCounter.cpp
+  src/Bugcheck.cpp
+  src/Debugger.cpp
+  src/DirectoryIterator.cpp
+  src/Environment.cpp
+  src/Exception.cpp
+  src/File.cpp
+  src/Latin1Encoding.cpp
+  src/Latin9Encoding.cpp
+  src/Manifest.cpp
+  src/Mutex.cpp
+  src/Path.cpp
+  src/RWLock.cpp
+  src/SharedLibrary.cpp
+  src/StringTokenizer.cpp
+  src/TextConverter.cpp
+  src/TextEncoding.cpp
+  src/TextIterator.cpp
+  src/Timestamp.cpp
+  src/UnicodeConverter.cpp
+  src/UTF8Encoding.cpp
+  src/UTF16Encoding.cpp
+  src/Windows1252Encoding.cpp
+)
+add_library(poco_lite SHARED ${${PROJECT_NAME}_SRCS})
 target_link_libraries(poco_lite dl tinyxml)
 
-rosbuild_add_library(boost_fs_wrapper src/boost_fs_wrapper.cpp)
-rosbuild_link_boost(boost_fs_wrapper system filesystem) 
+add_library(boost_fs_wrapper SHARED src/boost_fs_wrapper.cpp)
+target_link_libraries(boost_fs_wrapper ${Boost_LIBRARIES}) 
 
-rosbuild_add_library(test_plugins test/test_plugins.cpp)
+add_library(test_plugins SHARED test/test_plugins.cpp)
 target_link_libraries(test_plugins boost_fs_wrapper poco_lite)
-rosbuild_add_gtest(utest test/utest.cpp)
-target_link_libraries(utest boost_fs_wrapper poco_lite)
+add_gtest(utest test/utest.cpp)
+target_link_libraries(utest boost_fs_wrapper poco_lite ${ROS_LIBRARIES})
+
+install(FILES stack.xml
+        DESTINATION share/${PROJECT_NAME})
+install(FILES manifest.xml
+        DESTINATION share/${PROJECT_NAME})
+install(FILES cmake/hide_plugin_symbols.cmake
+        DESTINATION share/${PROJECT_NAME}/cmake)
+install(TARGETS boost_fs_wrapper poco_lite
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+install(DIRECTORY include/
+        DESTINATION include
+        FILES_MATCHING PATTERN "*.h")
