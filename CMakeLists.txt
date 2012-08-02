@@ -10,6 +10,8 @@ find_package(Boost REQUIRED COMPONENTS filesystem system)
 catkin_stack()
 catkin_project(${PROJECT_NAME}
   INCLUDE_DIRS include
+  LIBRARIES poco_lite boost_fs_wrapper
+  DEPENDS rosconsole
 )
 
 include_directories(include ${ROS_INCLUDE_DIRS})
