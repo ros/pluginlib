@@ -15,8 +15,8 @@
   <rosdep name="tinyxml"/>
 
   <export>
-    <cpp cflags="`PKG_CONFIG_PATH=${prefix}/../../lib/pkgconfig pkg-config --cflags pluginlib`"
-         lflags="`PKG_CONFIG_PATH=${prefix}/../../lib/pkgconfig pkg-config --libs pluginlib`"/>
+    <cpp cflags="`pkg-config --cflags pluginlib`"
+         lflags="`pkg-config --libs pluginlib`"/>
     <pluginlib plugin="${prefix}/test/test_plugins.xml" />
   </export>
 
