@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(pluginlib)
 
-find_package(catkin REQUIRED)
-find_package(ROS REQUIRED COMPONENTS
+find_package(catkin REQUIRED COMPONENTS
   cpp_common rosconsole roslib rostime
 )
 find_package(Boost REQUIRED COMPONENTS filesystem system)
@@ -14,7 +13,7 @@ catkin_project(${PROJECT_NAME}
   DEPENDS rosconsole
 )
 
-include_directories(include ${ROS_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 set(${PROJECT_NAME}_SRCS
   src/ASCIIEncoding.cpp
@@ -50,15 +49,15 @@ target_link_libraries(boost_fs_wrapper ${Boost_LIBRARIES})
 
 add_library(test_plugins SHARED test/test_plugins.cpp)
 target_link_libraries(test_plugins boost_fs_wrapper poco_lite)
-add_gtest(utest test/utest.cpp)
-target_link_libraries(utest boost_fs_wrapper poco_lite ${ROS_LIBRARIES})
+catkin_add_gtest(utest test/utest.cpp)
+target_link_libraries(utest boost_fs_wrapper poco_lite ${catkin_LIBRARIES})
 
 install(FILES stack.xml
-        DESTINATION share/${PROJECT_NAME})
+        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
 install(FILES manifest.xml
-        DESTINATION share/${PROJECT_NAME})
+        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
 install(FILES cmake/hide_plugin_symbols.cmake
-        DESTINATION share/${PROJECT_NAME}/cmake)
+        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/cmake)
 install(TARGETS boost_fs_wrapper poco_lite
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
