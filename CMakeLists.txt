@@ -1,66 +1,38 @@
-cmake_minimum_required(VERSION 2.8)
-project(pluginlib)
+cmake_minimum_required(VERSION 2.4.6)
+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-find_package(catkin REQUIRED COMPONENTS
-  cpp_common rosconsole roslib rostime
-)
-find_package(Boost REQUIRED COMPONENTS filesystem system)
+# Set the build type.  Options are:
+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
+#  Debug          : w/ debug symbols, w/o optimization
+#  Release        : w/o debug symbols, w/ optimization
+#  RelWithDebInfo : w/ debug symbols, w/ optimization
+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
+#set(ROS_BUILD_TYPE RelWithDebInfo)
 
-catkin_stack()
-catkin_project(${PROJECT_NAME}
-  INCLUDE_DIRS include
-  LIBRARIES poco_lite boost_fs_wrapper tinyxml
-  DEPENDS rosconsole
-)
+rosbuild_init()
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+#set the default path for built executables to the "bin" directory
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+#set the default path for built libraries to the "lib" directory
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-set(${PROJECT_NAME}_SRCS
-  src/ASCIIEncoding.cpp
-  src/AtomicCounter.cpp
-  src/Bugcheck.cpp
-  src/Debugger.cpp
-  src/DirectoryIterator.cpp
-  src/Environment.cpp
-  src/Exception.cpp
-  src/File.cpp
-  src/Latin1Encoding.cpp
-  src/Latin9Encoding.cpp
-  src/Manifest.cpp
-  src/Mutex.cpp
-  src/Path.cpp
-  src/RWLock.cpp
-  src/SharedLibrary.cpp
-  src/StringTokenizer.cpp
-  src/TextConverter.cpp
-  src/TextEncoding.cpp
-  src/TextIterator.cpp
-  src/Timestamp.cpp
-  src/UnicodeConverter.cpp
-  src/UTF8Encoding.cpp
-  src/UTF16Encoding.cpp
-  src/Windows1252Encoding.cpp
-)
-add_library(poco_lite SHARED ${${PROJECT_NAME}_SRCS})
-target_link_libraries(poco_lite dl tinyxml)
+#uncomment if you have defined messages
+#rosbuild_genmsg()
+#uncomment if you have defined services
+#rosbuild_gensrv()
 
-add_library(boost_fs_wrapper SHARED src/boost_fs_wrapper.cpp)
-target_link_libraries(boost_fs_wrapper ${Boost_LIBRARIES}) 
+#common commands for building c++ executables and libraries
+#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+#target_link_libraries(${PROJECT_NAME} another_library)
+#rosbuild_add_boost_directories()
+#rosbuild_link_boost(${PROJECT_NAME} thread)
+#rosbuild_add_executable(example examples/example.cpp)
+#target_link_libraries(example ${PROJECT_NAME})
 
-add_library(test_plugins SHARED test/test_plugins.cpp)
-target_link_libraries(test_plugins boost_fs_wrapper poco_lite)
-catkin_add_gtest(utest test/utest.cpp)
-target_link_libraries(utest boost_fs_wrapper poco_lite ${catkin_LIBRARIES})
 
-install(FILES stack.xml
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
-install(FILES manifest.xml
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
-install(FILES cmake/hide_plugin_symbols.cmake
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/cmake)
-install(TARGETS boost_fs_wrapper poco_lite
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib)
-install(DIRECTORY include/
-        DESTINATION include
-        FILES_MATCHING PATTERN "*.h")
+rosbuild_add_boost_directories()
+rosbuild_add_library(boost_fs_wrapper src/boost_fs_wrapper.cpp)
+rosbuild_add_library(test_plugins test/test_plugins.cpp)
+target_link_libraries(test_plugins boost_fs_wrapper)
+rosbuild_add_gtest(pluginlib_utest test/utest.cpp)
+target_link_libraries(pluginlib_utest boost_fs_wrapper tinyxml)

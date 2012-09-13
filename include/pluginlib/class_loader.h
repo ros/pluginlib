@@ -31,17 +31,14 @@
 
 #include "ros/console.h"
 
+#include "pluginlib/boost_fs_wrapper.h"
 #include "pluginlib/class_desc.h"
-
-#include "Poco/ClassLoader.h"
+#include "boost/algorithm/string.hpp"
 #include "ros/package.h"
 #include "tinyxml.h"
 #include <vector>
 #include <map>
-
-
-#include "boost/algorithm/string.hpp"
-#include "pluginlib/boost_fs_wrapper.h"
+#include <class_loader.h> //From plugins
 
 namespace pluginlib
 {
@@ -422,7 +419,7 @@ namespace pluginlib
         std::string base_class_;
         std::string attrib_name_;
 
-        Poco::ClassLoader<T> poco_class_loader_;  
+        plugins::ClassLoader plugins_class_loader_;  
     };
 
 };
