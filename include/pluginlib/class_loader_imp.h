@@ -32,7 +32,6 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Eitan Marder-Eppstein
 *********************************************************************/
 
 //NOTE: this should really never be included on its own, but just in case someone is bad we'll guard
@@ -44,11 +43,21 @@
 #include <list>
 #include <stdexcept>
 
+/*
+mas - I made notes on how to refactor this class. It's a little hokey in it's current state. I'm trying to modify this class
+in the most minimal fashion while utilizing as much of the functionality already built into "plugins". The workflow and
+functionality of this classloader is different from ours:
+--pluginlib::ClassLoader can open multiple libraries with the same base class interface in a single ClassLoader, whereas
+plugins::ClassLoader is bound to only a single library. We can get around this by implementing MultiLibraryClassLoader
+--This ClassLoader already does some reference counting. If you call "loadLibraryForClass" or "loadClassLibrary", you are
+expected to call the corrseponding unloads.
+*/
+
 namespace pluginlib {
   template <class T>
   ClassLoader<T>::ClassLoader(std::string package, std::string base_class, std::string attrib_name) : package_(package), base_class_(base_class), attrib_name_(attrib_name)
   {
-    classes_available_ = determineAvailableClasses();
+    classes_available_ = determineAvailableClasses(); //mas - This is purely ROS build system, no mods needed
   }
 
   template <class T>
@@ -63,7 +72,7 @@ namespace pluginlib {
     {
       throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
     }
-    library_path.append(Poco::SharedLibrary::suffix());
+    library_path.append(Poco::SharedLibrary::suffix()); //mas - call our version
     try
     {
       ROS_DEBUG("Attempting to load library %s for class %s",
@@ -71,12 +80,12 @@ namespace pluginlib {
       
       loadClassLibraryInternal(library_path, lookup_name);
     }
-    catch (Poco::LibraryLoadException &ex)
+    catch (Poco::LibraryLoadException &ex) //mas - change exception type
     {
       std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.displayText();
       throw LibraryLoadException(error_string);
     }
-    catch (Poco::NotFoundException &ex)
+    catch (Poco::NotFoundException &ex) //mas - change exception type
     {
       std::string error_string = "Failed to find library " + library_path + ". Are you sure that the library you need has been built? Error string: " + ex.displayText();
       throw LibraryLoadException(error_string);
@@ -90,22 +99,24 @@ namespace pluginlib {
     if (it != classes_available_.end())
     {
       std::string library_path = it->second.library_path_;
-      library_path.append(Poco::SharedLibrary::suffix());
+      library_path.append(Poco::SharedLibrary::suffix()); //mas - call our version
       ROS_DEBUG("Attempting to unload library %s for class %s",
                 library_path.c_str(), lookup_name.c_str());
 
       return unloadClassLibraryInternal(library_path);
-    } else {
+    }
+    else
+    {
       throw LibraryUnloadException(getErrorStringForUnknownClass(lookup_name));
     }
   }
 
   template <class T>
   ClassLoader<T>::~ClassLoader()
-  {
+  {    
     for (LibraryCountMap::iterator it = loaded_libraries_.begin(); it != loaded_libraries_.end(); ++it)
     {
-      if ( it->second > 0)
+      if (it->second > 0)
         unloadClassLibrary(it->first);
     }
   }
@@ -116,9 +127,9 @@ namespace pluginlib {
   {
     try
     {
-      return poco_class_loader_.canCreate(getClassType(lookup_name));
+      return poco_class_loader_.canCreate(getClassType(lookup_name)); //mas - may need to add additional method into plugins and call that instead
     }
-    catch (Poco::RuntimeException &ex)
+    catch (Poco::RuntimeException &ex) //mas - change exception type
     {
       return false;
     }
@@ -143,7 +154,7 @@ namespace pluginlib {
     for (std::map<std::string, ClassDesc>::const_iterator it = classes_available_.begin(); it != classes_available_.end(); it++)
     {
       std::string library_path = it->second.library_path_;
-      library_path.append(Poco::SharedLibrary::suffix());
+      library_path.append(Poco::SharedLibrary::suffix()); //mas - change to our call
       if (loaded_libraries_.find(library_path) == loaded_libraries_.end() || loaded_libraries_[library_path] == 0)
       {
         remove_classes.push_back(it->first);
@@ -239,9 +250,10 @@ namespace pluginlib {
       loadLibraryForClass(lookup_name);
 
     try{
-      return poco_class_loader_.create(getClassType(lookup_name));
+      return poco_class_loader_.create(getClassType(lookup_name)); //mas - change this to our call
     }
-    catch(const Poco::RuntimeException& ex){
+    catch(const Poco::RuntimeException& ex) //mas - change exception type here
+    {
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.displayText();
       throw CreateClassException(error_string);
     }
@@ -250,6 +262,9 @@ namespace pluginlib {
   template <class T>
   boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
   {
+    //mas - not sure about this here. just return boost shared pointer version from our class loader? the
+    //problem is that if we don't bind the destroy function here, the ref counting done by this class through
+    //its loadLibraryForClass() and unloadLibraryForClass() methods won't occur and they won't balance each other.
     T* instance = createUnmanagedInstance(lookup_name);
     return boost::shared_ptr<T>(instance, boost::bind(&ClassLoader<T>::garbageInstance, this, _1, lookup_name));
   }
@@ -263,7 +278,8 @@ namespace pluginlib {
     try{
       instance = poco_class_loader_.create(getClassType(lookup_name));
     }
-    catch(const Poco::RuntimeException& ex){
+    catch(const Poco::RuntimeException& ex) //mas - change exception type here
+    {
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.displayText();
       // call unload library to keep load/unload counting consistent
       unloadLibraryForClass(lookup_name);
@@ -275,6 +291,7 @@ namespace pluginlib {
   template <class T>
   void ClassLoader<T>::garbageInstance(T* p, const std::string& lookup_name)
   {
+    //mas - this callback method is needed for the unload at the end (See comment in createInstance())
     if (p)
     {
       delete p;
@@ -295,7 +312,7 @@ namespace pluginlib {
     else if (it-> second > 1)
       (it->second)--;
     else
-      poco_class_loader_.unloadLibrary(library_path);
+      poco_class_loader_.unloadLibrary(library_path); //mas - this needs to be changed here.
 
     return true;
 
@@ -307,11 +324,11 @@ namespace pluginlib {
     {
       loadClassLibraryInternal(library_path);
     }
-    catch (Poco::LibraryLoadException &ex)
+    catch (Poco::LibraryLoadException &ex) //mas - change exception type here
     {
       return false;
     }
-    catch (Poco::NotFoundException &ex)
+    catch (Poco::NotFoundException &ex) //mas - change exception type here
     {
       return false;
     }
@@ -319,11 +336,14 @@ namespace pluginlib {
   }
 
   template <class T>
-  void ClassLoader<T>::loadClassLibraryInternal(const std::string& library_path, const std::string& list_name_arg) {
+  void ClassLoader<T>::loadClassLibraryInternal(const std::string& library_path, const std::string& list_name_arg)
+   {
+    //mas - this method is problematic as plugins::classloader is bound to a single library, we would require multiple
+    //classloaders to handle this...might want to implement plugins::MultiClassLoader
     std::string list_name = list_name_arg;
     boost::replace_first(list_name, "/", "__"); 
 
-    poco_class_loader_.loadLibrary(library_path, list_name);
+    poco_class_loader_.loadLibrary(library_path, list_name); //mas - note redundant calls to poco has no effect like our version
     LibraryCountMap::iterator it = loaded_libraries_.find(library_path);
     if (it == loaded_libraries_.end())
       loaded_libraries_[library_path] = 1;  //for correct destruction and access
@@ -338,7 +358,7 @@ namespace pluginlib {
     {
       loaded_libraries_[library_path]--;
       if (loaded_libraries_[library_path] == 0)
-        poco_class_loader_.unloadLibrary(library_path);
+        poco_class_loader_.unloadLibrary(library_path); //mas - this needs to change
       return loaded_libraries_[library_path];
     }
     else
@@ -353,7 +373,9 @@ namespace pluginlib {
   {
     std::vector<std::string> lookup_names;
 
-
+    //mas - this method should just call plugins::ClassLoader::getAvailableClasses()...actually
+    //this is problematic because the interface wants classes from a library, need to add methods
+    //to expose more of plugins_private
     const Poco::Manifest<T> * manifest = poco_class_loader_.findManifest(library_path);
     if (manifest == NULL)
       return lookup_names;
@@ -370,6 +392,9 @@ namespace pluginlib {
   template <class T>
   std::vector<std::string> ClassLoader<T>::getRegisteredLibraries()
   {
+    //mas - this method is interesting as it's public whereas getLoadedLibraries() is not
+    //The registered libs are determined by inspecting the library paths within ClassDesc
+    //objects in the classes_available_ vector. Repeats are removed.
     std::vector<std::string> library_names;
     for (ClassMapIterator it = classes_available_.begin(); it != classes_available_.end(); it++){
       bool duplicate = false;
@@ -388,14 +413,6 @@ namespace pluginlib {
   {
     std::vector<std::string> library_names;
 
-    /*
-       \todo find a way to get ths out of poco
-       for (typename Poco::ClassLoader<T>::Iterator it = poco_class_loader_.begin(); it != poco_class_loader_.end(); ++it)
-       {
-       library_names.push_back(it->second->className());
-       }
-       return library_names;
-       */
     LibraryCountMap::iterator it;
     for (it = loaded_libraries_.begin(); it != loaded_libraries_.end(); it++)
     {

@@ -38,7 +38,7 @@
 #include "tinyxml.h"
 #include <vector>
 #include <map>
-#include <class_loader.h> //From plugins
+#include <class_loader.h> //mas - From plugins
 
 namespace pluginlib
 {

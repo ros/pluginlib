@@ -32,11 +32,13 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Eitan Marder-Eppstein
 *********************************************************************/
+
 #ifndef PLUGINLIB_CLASS_LIST_MACROS_H_
 #define PLUGINLIB_CLASS_LIST_MACROS_H_
-#include "Poco/ClassLibrary.h"
+
+//include "Poco/ClassLibrary.h"
+#include <plugins.h> 
 
 inline __attribute__((deprecated)) void PLUGINLIB_REGISTER_CLASS (){
 // "You are using a deprecated version of the PLUGINLIB_REGISTER_CLASS macro. Please switch to the new version PLUGINLIB_DECLARE_CLASS. For further information, see http://ros.org/wiki/pluginlib"
@@ -49,9 +51,14 @@ inline __attribute__((deprecated)) void PLUGINLIB_REGISTER_CLASS (){
   PLUGINLIB_REGISTER_CLASS();   \
   POCO_END_MANIFEST             
 
+/*
 #define PLUGINLIB_DECLARE_CLASS(pkg, class_name, class_type, base_class_type) \
   POCO_BEGIN_NAMED_MANIFEST(pkg##__##class_name, base_class_type) \
   POCO_EXPORT_CLASS(class_type) \
   POCO_END_MANIFEST
+*/
+
+#define PLUGINLIB_DECLARE_CLASS(pkg, class_name, class_type, base_class_type) \
+  PLUGINS_REGISTER_CLASS(class_type, base_class_type)
 
 #endif
