@@ -38,7 +38,7 @@
 #include "tinyxml.h"
 #include <vector>
 #include <map>
-#include <class_loader.h> //mas - From plugins
+#include <multi_library_class_loader.h> //mas - From plugins
 
 namespace pluginlib
 {
@@ -348,13 +348,6 @@ namespace pluginlib
 
       private:
         /**
-          * Deleter for boost shared pointer.
-          * @param p The instance
-          * @param lookup_name The name of the class
-          */
-        void garbageInstance(T* p, const std::string& lookup_name);
-
-        /**
          * @brief  Unloads a previously dynamically loaded lobrary
          * @param library_path The library to unload
          * @return True if the library was successfully unloaded, false otherwise
@@ -367,13 +360,6 @@ namespace pluginlib
          * @return True if the library was successfully loaded, false otherwise
          */
         bool loadClassLibrary(const std::string& library_path);
-
-        /**
-         * @brief  Returns the names of the classes that are available in a given library
-         * @param  library_path The path to the library
-         * @return A vector of strings corresponding to the names of the classes in the library
-         */
-        std::vector<std::string> getClassesInLibrary(const std::string & library_path);
 
         /**
          * @brief  Returns the libraries that are currently loaded
@@ -419,7 +405,8 @@ namespace pluginlib
         std::string base_class_;
         std::string attrib_name_;
 
-        plugins::ClassLoader plugins_class_loader_;  
+        // the underlying classloader
+        plugins::MultiLibraryClassLoader plugins_class_loader_;
     };
 
 };
