@@ -29,10 +29,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-#needed for console bridge - temporary for now until i can figure out how to export dependencies of non-ROS package console_bridge from plugins
-find_package(console_bridge REQUIRED)
-include_directories(${console_bridge_INCLUDE_DIRS})
-
 rosbuild_add_boost_directories()
 rosbuild_add_library(boost_fs_wrapper src/boost_fs_wrapper.cpp)
 rosbuild_add_library(test_plugins test/test_plugins.cpp)
