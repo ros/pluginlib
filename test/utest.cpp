@@ -83,6 +83,10 @@ TEST(PluginlibTest, brokenPlugin)
     SUCCEED();
     return;
   }
+  catch(plugins::PluginException& ex)
+  {
+    FAIL() << "Plugins exception instead of pluginlib, argh. " << ex.what() << "\n";
+  }
   catch(...)
   {
     FAIL() << "Uncaught exception";

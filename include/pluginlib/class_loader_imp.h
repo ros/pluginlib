@@ -77,6 +77,7 @@ namespace pluginlib {
     {
       throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
     }
+
     library_path.append(plugins::systemLibrarySuffix()); //mas - call our version (DONE)
     try
     {
@@ -241,13 +242,27 @@ namespace pluginlib {
     if(auto_load && !isClassLoaded(lookup_name))
       loadLibraryForClass(lookup_name);
 
-    return plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+    try
+    {
+      return plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+    }
+    catch(const plugins::CreateClassException& ex)
+    {
+      throw(pluginlib::CreateClassException(ex.what()));
+    }
   }
   
   template <class T>
   boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
   {
-    return plugins_class_loader_.createInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+    try
+    {
+      return plugins_class_loader_.createInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+    }
+    catch(const plugins::CreateClassException& ex)
+    {
+      throw(pluginlib::CreateClassException(ex.what()));
+    }
   }
 
   template <class T>
@@ -260,7 +275,7 @@ namespace pluginlib {
     {
       instance = plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
     }
-    catch(const plugins::PluginException& ex) //mas - change exception type here (DONE)
+    catch(const plugins::CreateClassException& ex) //mas - change exception type here (DONE)
     {
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.what();
       // call unload library to keep load/unload counting consistent
