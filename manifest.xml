@@ -1,14 +1,13 @@
 <package>
   <description brief="pluginlib">
-
      pluginlib
 
   </description>
-  <author>Mirza Shah</author>
+  <maintainer>Mirza Shah</maintainer>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/pluginlib</url>
-  <depend package="plugins"/>
+  <depend package="class_loader"/>
   <depend package="rosbuild"/>
   <depend package="roslib"/>
   <depend package="rosconsole"/>

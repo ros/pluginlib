@@ -38,7 +38,7 @@
 #include "tinyxml.h"
 #include <vector>
 #include <map>
-#include <multi_library_class_loader.h> //mas - From plugins
+#include <class_loader/multi_library_class_loader.h> //mas - From class_loader
 
 namespace pluginlib
 {
@@ -406,7 +406,7 @@ namespace pluginlib
         std::string attrib_name_;
 
         // the underlying classloader
-        plugins::MultiLibraryClassLoader plugins_class_loader_;
+        class_loader::MultiLibraryClassLoader plugins_class_loader_;
     };
 
 };

@@ -42,14 +42,14 @@
 #include "boost/bind.hpp"
 #include <list>
 #include <stdexcept>
-#include <plugins.h>
+#include <class_loader/class_loader.h>
 
 /*
 mas - I made notes on how to refactor this class. It's a little hokey in it's current state. I'm trying to modify this class
 in the most minimal fashion while utilizing as much of the functionality already built into "plugins". The workflow and
 functionality of this classloader is different from ours:
 --pluginlib::ClassLoader can open multiple libraries with the same base class interface in a single ClassLoader, whereas
-plugins::ClassLoader is bound to only a single library. We can get around this by implementing MultiLibraryClassLoader
+class_loader::ClassLoader is bound to only a single library. We can get around this by implementing MultiLibraryClassLoader
 --This ClassLoader already does some reference counting. If you call "loadLibraryForClass" or "loadClassLibrary", you are
 expected to call the corrseponding unloads.
 */
@@ -78,7 +78,7 @@ namespace pluginlib {
       throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
     }
 
-    library_path.append(plugins::systemLibrarySuffix()); //mas - call our version (DONE)
+    library_path.append(class_loader::systemLibrarySuffix()); //mas - call our version (DONE)
     try
     {
       ROS_DEBUG("Attempting to load library %s for class %s",
@@ -86,7 +86,7 @@ namespace pluginlib {
       
       loadClassLibraryInternal(library_path, lookup_name);
     }
-    catch (plugins::LibraryLoadException& ex) //mas - change exception type (DONE)
+    catch (class_loader::LibraryLoadException& ex) //mas - change exception type (DONE)
     {
       std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
       throw pluginlib::LibraryLoadException(error_string);
@@ -100,7 +100,7 @@ namespace pluginlib {
     if (it != classes_available_.end())
     {
       std::string library_path = it->second.library_path_;
-      library_path.append(plugins::systemLibrarySuffix()); //mas - call our version (DONE)
+      library_path.append(class_loader::systemLibrarySuffix()); //mas - call our version (DONE)
       ROS_DEBUG("Attempting to unload library %s for class %s",
                 library_path.c_str(), lookup_name.c_str());
 
@@ -146,7 +146,7 @@ namespace pluginlib {
     for (std::map<std::string, ClassDesc>::const_iterator it = classes_available_.begin(); it != classes_available_.end(); it++)
     {
       std::string library_path = it->second.library_path_;
-      library_path.append(plugins::systemLibrarySuffix()); //mas - change to our call (DONE)
+      library_path.append(class_loader::systemLibrarySuffix()); //mas - change to our call (DONE)
       if (loaded_libraries_.find(library_path) == loaded_libraries_.end() || loaded_libraries_[library_path] == 0)
       {
         remove_classes.push_back(it->first);
@@ -246,7 +246,7 @@ namespace pluginlib {
     {
       return plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
     }
-    catch(const plugins::CreateClassException& ex)
+    catch(const class_loader::CreateClassException& ex)
     {
       throw(pluginlib::CreateClassException(ex.what()));
     }
@@ -259,7 +259,7 @@ namespace pluginlib {
     {
       return plugins_class_loader_.createInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
     }
-    catch(const plugins::CreateClassException& ex)
+    catch(const class_loader::CreateClassException& ex)
     {
       throw(pluginlib::CreateClassException(ex.what()));
     }
@@ -275,7 +275,7 @@ namespace pluginlib {
     {
       instance = plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
     }
-    catch(const plugins::CreateClassException& ex) //mas - change exception type here (DONE)
+    catch(const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
     {
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.what();
       // call unload library to keep load/unload counting consistent
@@ -309,7 +309,7 @@ namespace pluginlib {
     {
       loadClassLibraryInternal(library_path);
     }
-    catch (plugins::LibraryLoadException& ex) //mas - change exception type here (DONE)
+    catch (class_loader::LibraryLoadException& ex) //mas - change exception type here (DONE)
     {
       return false;
     }
