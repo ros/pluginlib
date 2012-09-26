@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2009, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -118,21 +118,21 @@ namespace pluginlib
 
       /**
        * @brief  Checks if the class associated with a plugin name is available to be loaded
-       * @param lookup_name The name of the plugin 
+       * @param lookup_name The name of the plugin
        * @return True if the plugin is available, false otherwise
        */
       virtual bool isClassAvailable(const std::string& lookup_name) = 0;
 
       /**
        * @brief  Given the lookup name of a class, returns the type of the derived class associated with it
-       * @param lookup_name The name of the class 
+       * @param lookup_name The name of the class
        * @return The name of the associated derived class
        */
       virtual std::string getClassType(const std::string& lookup_name) = 0;
 
       /**
        * @brief  Given the lookup name of a class, returns its description
-       * @param lookup_name The lookup name of the class 
+       * @param lookup_name The lookup name of the class
        * @return The description of the class
        */
       virtual std::string getClassDescription(const std::string& lookup_name) = 0;
@@ -145,7 +145,7 @@ namespace pluginlib
 
       /**
        * @brief  Given the name of a class, returns name of the containing package
-       * @param lookup_name The name of the class 
+       * @param lookup_name The name of the class
        * @return The name of the containing package
        */
       virtual std::string getClassPackage(const std::string& lookup_name) = 0;
@@ -187,7 +187,7 @@ namespace pluginlib
 
       /**
        * @brief  Given the name of a class, returns the path to its associated library
-       * @param lookup_name The name of the class 
+       * @param lookup_name The name of the class
        * @return The path to the associated library
        */
       virtual std::string getClassLibraryPath(const std::string& lookup_name) = 0;
@@ -217,7 +217,7 @@ namespace pluginlib
         ClassLoader(std::string package, std::string base_class, std::string attrib_name = std::string("plugin"));
 
         /**
-         * @brief  Destructor for ClassLoader 
+         * @brief  Destructor for ClassLoader
          */
         ~ClassLoader();
 
@@ -231,55 +231,55 @@ namespace pluginlib
          * @brief  Refreshs the list of all available classes for this ClassLoader's base class type
          * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
          */
-        void refreshDeclaredClasses();
+        virtual void refreshDeclaredClasses();
 
         /**
          * @brief  Strips the package name off of a lookup name
          * @param lookup_name The name of the plugin
          * @return The name of the plugin stripped of the package name
          */
-        std::string getName(const std::string& lookup_name);
+        virtual std::string getName(const std::string& lookup_name);
 
         /**
          * @brief  Checks if the class associated with a plugin name is available to be loaded
-         * @param lookup_name The name of the plugin 
+         * @param lookup_name The name of the plugin
          * @return True if the plugin is available, false otherwise
          */
-        bool isClassAvailable(const std::string& lookup_name);
+        virtual bool isClassAvailable(const std::string& lookup_name);
 
         /**
          * @brief  Given the lookup name of a class, returns the type of the derived class associated with it
-         * @param lookup_name The name of the class 
+         * @param lookup_name The name of the class
          * @return The name of the associated derived class
          */
-        std::string getClassType(const std::string& lookup_name);
+        virtual std::string getClassType(const std::string& lookup_name);
 
         /**
          * @brief  Given the lookup name of a class, returns its description
-         * @param lookup_name The lookup name of the class 
+         * @param lookup_name The lookup name of the class
          * @return The description of the class
          */
-        std::string getClassDescription(const std::string& lookup_name);
+        virtual std::string getClassDescription(const std::string& lookup_name);
 
         /**
          * @brief  Given the lookup name of a class, returns the type of the associated base class
          * @return The type of the associated base class
          */
-        std::string getBaseClassType() const;
+        virtual std::string getBaseClassType() const;
 
         /**
          * @brief  Given the name of a class, returns name of the containing package
-         * @param lookup_name The name of the class 
+         * @param lookup_name The name of the class
          * @return The name of the containing package
          */
-        std::string getClassPackage(const std::string& lookup_name);
+        virtual std::string getClassPackage(const std::string& lookup_name);
 
         /**
          * @brief  Given the name of a class, returns the path of the associated plugin manifest
          * @param lookup_name The name of the class
          * @return The path of the associated plugin manifest
          */
-        std::string getPluginManifestPath(const std::string& lookup_name);
+        virtual std::string getPluginManifestPath(const std::string& lookup_name);
 
         /**
          * @brief  Creates an instance of a desired class, optionally loading the associated library automatically if necessary
@@ -291,7 +291,7 @@ namespace pluginlib
          * @deprecated use either createInstance() or createUnmanagedInstance().
          */
         __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
-        
+
         /**
          * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter). Deleting the instance and calling unloadLibraryForClass() is automatically handled by the shared pointer.
          * @param  lookup_name The name of the class to load
@@ -300,7 +300,7 @@ namespace pluginlib
          * @return An instance of the class
          */
         boost::shared_ptr<T> createInstance(const std::string& lookup_name);
-        
+
         /**
          * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
          * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass() (in order to decrement the associated library counter and unloading it if it is no more used).
@@ -323,7 +323,7 @@ namespace pluginlib
          * @param lookup_name The lookup name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown if the library for the class cannot be loaded
          */
-        void loadLibraryForClass(const std::string & lookup_name);
+        virtual void loadLibraryForClass(const std::string & lookup_name);
 
         /**
          * @brief  Decrements the counter for the library containing a class with a given name and attempts to unload it if the counter reaches zero
@@ -331,52 +331,32 @@ namespace pluginlib
          * @exception pluginlib::LibraryUnloadException Thrown if the library for the class cannot be unloaded
          * @return The number of pending unloads until the library is removed from memory
          */
-        int unloadLibraryForClass(const std::string& lookup_name);
+        virtual int unloadLibraryForClass(const std::string& lookup_name);
 
         /**
          * @brief  Returns the libraries that are registered and can be loaded
          * @return A vector of strings corresponding to the names of registered libraries
          */
-        std::vector<std::string> getRegisteredLibraries();
+        virtual std::vector<std::string> getRegisteredLibraries();
 
         /**
          * @brief  Given the name of a class, returns the path to its associated library
-         * @param lookup_name The name of the class 
+         * @param lookup_name The name of the class
          * @return The path to the associated library
          */
-        std::string getClassLibraryPath(const std::string& lookup_name);
+        virtual std::string getClassLibraryPath(const std::string& lookup_name);
 
       private:
         /**
-         * @brief  Unloads a previously dynamically loaded lobrary
-         * @param library_path The library to unload
-         * @return True if the library was successfully unloaded, false otherwise
-         */
-        bool unloadClassLibrary(const std::string& library_path);
-
-        /**
-         * @brief  Dynamicaly loads a library
-         * @param library_path The library to unload
-         * @return True if the library was successfully loaded, false otherwise
-         */
-        bool loadClassLibrary(const std::string& library_path);
-
-        /**
-         * @brief  Returns the libraries that are currently loaded
-         * @return A vector of strings corresponding to the names of loaded libraries
-         */
-        std::vector<std::string> getLoadedLibraries();
-
-        /**
          * @brief  Helper function for loading a shared library
-         * @param  library_path The path to the library to load
-         * @param  list_name The name of the class list to load
+         * @param  library_name The name of the library to load both WITHOUT full path and extension (.so/.dll).
+         * @return The fully-resolved path to the library.  As the library can be located in multiple places due to our transition from rosbuild to Catkin build system, the call tries multiple places and then returns the path which yields successful.
          */
-        void loadClassLibraryInternal(const std::string& library_path, const std::string& list_name_arg = std::string(""));
+        std::string loadClassLibraryInternal(const std::string& library_name, const std::string& exporting_package_name);
 
         /**
          * @brief  Helper function for unloading a shared library
-         * @param  library_path The path to the library to unload
+         * @param  library_path The exact path to the library to unload
          * @return The number of pending unloads until the library is removed from memory
          */
         int unloadClassLibraryInternal(const std::string& library_path);
@@ -390,15 +370,49 @@ namespace pluginlib
 
         /**
          * @brief  Returns an error message for an unknown class
-         * @param lookup_name The name of the class 
+         * @param lookup_name The name of the class
          * @return The error message
          */
         std::string getErrorStringForUnknownClass(const std::string& lookup_name);
 
-        //used for proper unloading of automatically loaded libraries
-        LibraryCountMap loaded_libraries_;
+      private:
+        /**
+        * Calls a program from command line and returns output to stdout as a string
+        */
+        std::string callCommandLine(const char* cmd);
 
-        // map from library to class's descriptions  
+        /**
+        *Parses a string delimited by newlines into a vector of strings
+        */
+        std::vector<std::string>parseToStringVector(std::string newline_delimited_str);
+
+        /**
+        * Returns the paths where libraries are installed according to the Catkin build system.
+        */
+        std::vector<std::string> getCatkinLibraryPaths();
+
+
+        /**
+        * Gets the path where rosbuild build system thinks plugins are installed
+        */
+        std::string getROSBuildLibraryPath(const std::string& exporting_package_name);
+
+        /**
+        * Gets a list of paths to try to find a library. As we transition from rosbuild to Catkin build systems, plugins can be found in the old rosbuild place (pkg_name/lib usually) or somewhere in the Catkin build space
+        */
+        std::vector<std::string> getAllLibraryPathsToTry(const std::string& library_name, const std::string& exporting_package_name);
+
+        /**
+        * Gets the standard path separator for the native OS (e.g. "/" on *nix, "\" on windows)
+        */
+        std::string getPathSeparator();
+
+        /**
+        * Strips all but the filename from an explicit file path.
+        */
+        std::string stripAllButFileFromPath(const std::string& path);
+
+        // map from library to class's descriptions
         // This is all available classes found in xml
         std::map<std::string, ClassDesc> classes_available_;
         std::string package_;

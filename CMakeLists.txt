@@ -1,37 +1,31 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8)
+project(pluginlib)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+find_package(catkin REQUIRED COMPONENTS
+  class_loader cpp_common rosconsole roslib rostime
+)
+find_package(Boost REQUIRED COMPONENTS thread)
 
-rosbuild_init()
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES boost_fs_wrapper tinyxml
+  DEPENDS class_loader rosconsole
+)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+add_library(boost_fs_wrapper SHARED src/boost_fs_wrapper.cpp)
+target_link_libraries(boost_fs_wrapper ${Boost_LIBRARIES}) 
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
-
-rosbuild_add_boost_directories()
-rosbuild_add_library(boost_fs_wrapper src/boost_fs_wrapper.cpp)
-rosbuild_add_library(test_plugins test/test_plugins.cpp)
+add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
 target_link_libraries(test_plugins boost_fs_wrapper)
-rosbuild_add_gtest(pluginlib_utest test/utest.cpp)
-target_link_libraries(pluginlib_utest boost_fs_wrapper tinyxml)
+catkin_add_gtest(utest test/utest.cpp)
+target_link_libraries(utest boost_fs_wrapper tinyxml ${catkin_LIBRARIES})
+add_dependencies(utest test_plugins)
+
+install(TARGETS boost_fs_wrapper
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+install(DIRECTORY include/pluginlib/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+

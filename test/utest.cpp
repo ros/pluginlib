@@ -109,7 +109,7 @@ TEST(PluginlibTest, workingPlugin)
   }
   catch(pluginlib::PluginlibException& ex)
   {
-    FAIL() << "Throwing exception";
+    FAIL() << "Throwing exception: " << ex.what();
     return;
   }
   catch(...)

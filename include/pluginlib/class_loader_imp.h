@@ -43,16 +43,7 @@
 #include <list>
 #include <stdexcept>
 #include <class_loader/class_loader.h>
-
-/*
-mas - I made notes on how to refactor this class. It's a little hokey in it's current state. I'm trying to modify this class
-in the most minimal fashion while utilizing as much of the functionality already built into "plugins". The workflow and
-functionality of this classloader is different from ours:
---pluginlib::ClassLoader can open multiple libraries with the same base class interface in a single ClassLoader, whereas
-class_loader::ClassLoader is bound to only a single library. We can get around this by implementing MultiLibraryClassLoader
---This ClassLoader already does some reference counting. If you call "loadLibraryForClass" or "loadClassLibrary", you are
-expected to call the corrseponding unloads.
-*/
+#include "boost/filesystem.hpp"
 
 namespace pluginlib {
   template <class T>
@@ -61,49 +52,50 @@ namespace pluginlib {
   base_class_(base_class),
   attrib_name_(attrib_name),
   plugins_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded after last plugin destroyed
+  /***************************************************************************/
   {
     classes_available_ = determineAvailableClasses(); //mas - This is purely ROS build system, no mods needed
   }
 
   template <class T>
-  void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
+  ClassLoader<T>::~ClassLoader()
+  /***************************************************************************/
   {
-    std::string library_path;
-    ClassMapIterator it = classes_available_.find(lookup_name);
-    if (it != classes_available_.end()){
-      library_path = it->second.library_path_;
-    }
-    else
-    {
-      throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
-    }
+  }
 
-    library_path.append(class_loader::systemLibrarySuffix()); //mas - call our version (DONE)
+  template <class T>
+  void ClassLoader<T>::loadLibraryForClass(const std::string& lookup_name)
+  /***************************************************************************/
+  {
+    std::string library_name;
+    ClassMapIterator it = classes_available_.find(lookup_name);
+
+    if (it != classes_available_.end())
+      library_name = it->second.library_name_;
+    else
+      throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
+
     try
     {
-      ROS_DEBUG("Attempting to load library %s for class %s",
-                library_path.c_str(), lookup_name.c_str());
-      
-      loadClassLibraryInternal(library_path, lookup_name);
+      ROS_DEBUG("Attempting to load library %s for class %s",  library_name.c_str(), lookup_name.c_str());
+      it->second.resolved_library_path_ = loadClassLibraryInternal(library_name, it->second.package_);
     }
-    catch (class_loader::LibraryLoadException& ex) //mas - change exception type (DONE)
+    catch (class_loader::LibraryLoadException& ex)
     {
-      std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
+      std::string error_string = "Failed to load library " + library_name + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
       throw pluginlib::LibraryLoadException(error_string);
     }
   }
 
   template <class T>
   int ClassLoader<T>::unloadLibraryForClass(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
-    if (it != classes_available_.end())
+    if (it != classes_available_.end() && it->second.resolved_library_path_ != "UNRESOLVED")
     {
-      std::string library_path = it->second.library_path_;
-      library_path.append(class_loader::systemLibrarySuffix()); //mas - call our version (DONE)
-      ROS_DEBUG("Attempting to unload library %s for class %s",
-                library_path.c_str(), lookup_name.c_str());
-
+      std::string library_path = it->second.resolved_library_path_;
+      ROS_DEBUG("Attempting to unload library %s for class %s", library_path.c_str(), lookup_name.c_str());
       return unloadClassLibraryInternal(library_path);
     }
     else
@@ -112,24 +104,143 @@ namespace pluginlib {
     }
   }
 
+
   template <class T>
-  ClassLoader<T>::~ClassLoader()
-  {    
-    for (LibraryCountMap::iterator it = loaded_libraries_.begin(); it != loaded_libraries_.end(); ++it)
+  std::string ClassLoader<T>::callCommandLine(const char* cmd)
+  /***************************************************************************/
+  {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe)
+      return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe))
     {
-      if (it->second > 0)
-        unloadClassLibrary(it->first);
+      if(fgets(buffer, 128, pipe) != NULL)
+              result += buffer;
     }
+    pclose(pipe);
+    return result;
   }
 
   template <class T>
+  std::vector<std::string> ClassLoader<T>::parseToStringVector(std::string newline_delimited_str)
+  /***************************************************************************/
+  {
+    std::string next;
+    std::vector<std::string> parse_result;
+    for(unsigned int c = 0; c < newline_delimited_str.size(); c++)
+    {
+      char ch = newline_delimited_str.at(c);
+      if(ch == '\n')
+      {
+        parse_result.push_back(next);
+        next = "";
+      }
+      else
+        next.push_back(ch);
+    }
+    return(parse_result);
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::getPathSeparator()
+  /***************************************************************************/
+  {
+    return(boost::filesystem::path("/").native());
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::stripAllButFileFromPath(const std::string& path)
+  /***************************************************************************/
+  {
+    std::string only_file;
+    size_t c = path.find_last_of(getPathSeparator());
+    if(c == std::string::npos)
+      return(path);
+    else
+      return(path.substr(c, path.size()));
+  }
+
+  template <class T>
+  std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
+  /***************************************************************************/
+  {
+    //TODO: This needs to be replaced with an api call
+    return(parseToStringVector(callCommandLine("catkin_find --lib")));
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::getROSBuildLibraryPath(const std::string& exporting_package_name)
+  /***************************************************************************/
+  {
+    return(ros::package::getPath(exporting_package_name));
+  }
+
+  template <class T>
+  std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(const std::string& library_name, const std::string& exporting_package_name)
+  /***************************************************************************/
+  {
+    //Catkin-rosbuild Backwards Compatability Rules - Note library_name may be prefixed with relative path (e.g. "/lib/libFoo")
+    //1. Try catkin library paths (catkin_find --libs) + library_name + extension
+    //2. Try catkin library paths (catkin_find -- libs) + stripAllButFileFromPath(library_name) + extension
+    //3. Try export_pkg/library_name + extension
+
+    std::vector<std::string> all_paths;
+    std::vector<std::string> all_paths_without_extension = getCatkinLibraryPaths();
+    all_paths_without_extension.push_back(getROSBuildLibraryPath(exporting_package_name));
+    std::string library_name_with_extension = library_name + class_loader::systemLibrarySuffix();
+    std::string stripped_library_name_with_extension = stripAllButFileFromPath(library_name) + class_loader::systemLibrarySuffix();
+    const std::string path_separator = getPathSeparator();
+
+    for(unsigned int c = 0; c < all_paths_without_extension.size(); c++)
+    {
+      std::string current_path = all_paths_without_extension.at(c);
+      all_paths.push_back(current_path + path_separator + library_name_with_extension);
+      all_paths.push_back(current_path + path_separator + stripped_library_name_with_extension);
+
+    }
+    return(all_paths);
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::loadClassLibraryInternal(const std::string& library_name, const std::string& exporting_package_name)
+  /***************************************************************************/
+  {
+    std::vector<std::string> paths_to_try = getAllLibraryPathsToTry(library_name, exporting_package_name);
+    for(unsigned int c = 0; c < paths_to_try.size(); c++)
+    {
+      try
+      {
+        std::string library_path = paths_to_try.at(c);
+        plugins_class_loader_.loadLibrary(library_path);
+        return(library_path);
+      }
+      catch(const class_loader::LibraryLoadException& e)
+      {
+      }
+    }
+    throw(pluginlib::LibraryLoadException("Could not find library "));
+  }
+
+  template <class T>
+  int ClassLoader<T>::unloadClassLibraryInternal(const std::string& library_path)
+  /***************************************************************************/
+  {
+    return(plugins_class_loader_.unloadLibrary(library_path));
+  }
+
+
+  template <class T>
   bool ClassLoader<T>::isClassLoaded(const std::string& lookup_name)
+  /***************************************************************************/
   {
     return plugins_class_loader_.isClassAvailable<T>(getClassType(lookup_name)); //mas - (DONE)
   }
 
   template <class T>
   std::vector<std::string> ClassLoader<T>::getDeclaredClasses()
+  /***************************************************************************/
   {
     std::vector<std::string> lookup_names;
     for (ClassMapIterator it = classes_available_.begin(); it != classes_available_.end(); ++it)
@@ -140,18 +251,19 @@ namespace pluginlib {
 
   template <class T>
   void ClassLoader<T>::refreshDeclaredClasses()
+  /***************************************************************************/
   {
     // determine classes not currently loaded for removal
     std::list<std::string> remove_classes;
     for (std::map<std::string, ClassDesc>::const_iterator it = classes_available_.begin(); it != classes_available_.end(); it++)
     {
-      std::string library_path = it->second.library_path_;
-      library_path.append(class_loader::systemLibrarySuffix()); //mas - change to our call (DONE)
-      if (loaded_libraries_.find(library_path) == loaded_libraries_.end() || loaded_libraries_[library_path] == 0)
-      {
+
+      std::string resolved_library_path = it->second.resolved_library_path_;
+      std::vector<std::string> open_libs = plugins_class_loader_.getRegisteredLibraries();
+      if(std::find(open_libs.begin(), open_libs.end(), resolved_library_path) != open_libs.end())
         remove_classes.push_back(it->first);
-      }
     }
+
     while (!remove_classes.empty())
     {
       classes_available_.erase(remove_classes.front());
@@ -163,14 +275,13 @@ namespace pluginlib {
     for (std::map<std::string, ClassDesc>::const_iterator it = updated_classes.begin(); it != updated_classes.end(); it++)
     {
       if (classes_available_.find(it->first) == classes_available_.end())
-      {
         classes_available_.insert(std::pair<std::string, ClassDesc>(it->first, it->second));
-      }
     }
   }
 
   template <class T>
   std::string ClassLoader<T>::getName(const std::string& lookup_name)
+  /***************************************************************************/
   {
     //remove the package name to get the raw plugin name
     std::vector<std::string> split;
@@ -180,12 +291,14 @@ namespace pluginlib {
 
   template <class T>
   bool ClassLoader<T>::isClassAvailable(const std::string& lookup_name)
+  /***************************************************************************/
   {
     return classes_available_.find(lookup_name) != classes_available_.end();
   }
 
   template <class T>
   std::string ClassLoader<T>::getClassType(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
     if (it != classes_available_.end())
@@ -195,6 +308,7 @@ namespace pluginlib {
 
   template <class T>
   std::string ClassLoader<T>::getClassDescription(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
     if (it != classes_available_.end())
@@ -204,21 +318,26 @@ namespace pluginlib {
 
   template <class T>
   std::string ClassLoader<T>::getBaseClassType() const
+  /***************************************************************************/
   {
     return base_class_;
   }
 
   template <class T>
   std::string ClassLoader<T>::getClassLibraryPath(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
-    if (it != classes_available_.end())
-      return it->second.library_path_;
+    if (it != classes_available_.end() && it->second.resolved_library_path_ != "UNRESOLVED")
+    {
+      return it->second.resolved_library_path_;
+    }
     return "";
   }
 
   template <class T>
   std::string ClassLoader<T>::getClassPackage(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
     if (it != classes_available_.end())
@@ -228,6 +347,7 @@ namespace pluginlib {
 
   template <class T>
   std::string ClassLoader<T>::getPluginManifestPath(const std::string& lookup_name)
+  /***************************************************************************/
   {
     ClassMapIterator it = classes_available_.find(lookup_name);
     if (it != classes_available_.end())
@@ -237,6 +357,7 @@ namespace pluginlib {
 
   template <class T>
   T* ClassLoader<T>::createClassInstance(const std::string& lookup_name, bool auto_load)
+  /***************************************************************************/
   {
     //Note: This method is deprecated
     if(auto_load && !isClassLoaded(lookup_name))
@@ -254,6 +375,7 @@ namespace pluginlib {
   
   template <class T>
   boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
+  /***************************************************************************/
   {
     try
     {
@@ -267,6 +389,7 @@ namespace pluginlib {
 
   template <class T>
   T* ClassLoader<T>::createUnmanagedInstance(const std::string& lookup_name)
+  /***************************************************************************/
   {
     loadLibraryForClass(lookup_name);
 
@@ -286,101 +409,15 @@ namespace pluginlib {
   }
 
   template <class T>
-  bool ClassLoader<T>::unloadClassLibrary(const std::string& library_path)
-  {
-    LibraryCountMap::iterator it = loaded_libraries_.find(library_path);
-    if (it == loaded_libraries_.end())
-    {
-      ROS_DEBUG("unable to unload library which is not loaded");
-      return false;
-    }
-    else if (it-> second > 1)
-      (it->second)--;
-    else
-      plugins_class_loader_.unloadLibrary(library_path); //mas - this needs to be changed here. (DONE)
-
-    return true;
-
-  }
-
-  template <class T>
-  bool ClassLoader<T>::loadClassLibrary(const std::string& library_path){
-    try
-    {
-      loadClassLibraryInternal(library_path);
-    }
-    catch (class_loader::LibraryLoadException& ex) //mas - change exception type here (DONE)
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  template <class T>
-  void ClassLoader<T>::loadClassLibraryInternal(const std::string& library_path, const std::string& list_name_arg)
-   {
-    plugins_class_loader_.loadLibrary(library_path); //mas - (DONE)
-    LibraryCountMap::iterator it = loaded_libraries_.find(library_path);
-    if (it == loaded_libraries_.end())
-      loaded_libraries_[library_path] = 1;  //for correct destruction and access
-    else
-      loaded_libraries_[library_path] = loaded_libraries_[library_path] + 1;
-  }
-
-  template <class T>
-  int ClassLoader<T>::unloadClassLibraryInternal(const std::string& library_path)
-  {
-    LibraryCountMap::iterator it = loaded_libraries_.find(library_path);
-    if (it != loaded_libraries_.end() && loaded_libraries_[library_path] > 0)
-    {
-      loaded_libraries_[library_path]--;
-      if (loaded_libraries_[library_path] == 0)
-        plugins_class_loader_.unloadLibrary(library_path); //mas - this needs to change (DONE)
-      return loaded_libraries_[library_path];
-    }
-    else
-    {
-      std::string error_string = "Failed to unload library " + library_path + ". The library was not loaded before or might have already been unloaded.";
-      throw LibraryUnloadException(error_string);
-    }
-  }
-
-  template <class T>
   std::vector<std::string> ClassLoader<T>::getRegisteredLibraries()
+  /***************************************************************************/
   {
-    //mas - this method is interesting as it's public whereas getLoadedLibraries() is not
-    //The registered libs are determined by inspecting the library paths within ClassDesc
-    //objects in the classes_available_ vector. Repeats are removed.
-    std::vector<std::string> library_names;
-    for (ClassMapIterator it = classes_available_.begin(); it != classes_available_.end(); it++){
-      bool duplicate = false;
-      for (unsigned int i=0; i<library_names.size(); i++)
-        if (it->second.library_path_ == library_names[i])
-          duplicate = true;
-      if (!duplicate)
-        library_names.push_back(it->second.library_path_);
-    }
-    return library_names;
-  }
-
-
-  template <class T>
-  std::vector<std::string> ClassLoader<T>::getLoadedLibraries()
-  {
-    std::vector<std::string> library_names;
-
-    LibraryCountMap::iterator it;
-    for (it = loaded_libraries_.begin(); it != loaded_libraries_.end(); it++)
-    {
-      if (it->second > 0)
-        library_names.push_back(it->first);
-    }
-    return library_names;
+    return(plugins_class_loader_.getRegisteredLibraries());
   }
 
   template <class T>
   std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses()
+  /***************************************************************************/
   {
     std::map<std::string, ClassDesc> classes_available;
     //Pull possible files from manifests of packages which depend on this package and export class
@@ -430,8 +467,6 @@ namespace pluginlib {
         if (package_name == "")
           ROS_ERROR("Could not find package name for class %s", it->c_str());
 
-        std::string parent_dir = ros::package::getPath(package_name);
-        std::string full_library_path = joinPaths(parent_dir , library_path);
 
         TiXmlElement* class_element = library->FirstChildElement("class");
         while (class_element)
@@ -451,7 +486,7 @@ namespace pluginlib {
             else
               description_str = "No 'description' tag for this plugin in plugin description file.";
 
-            classes_available.insert(std::pair<std::string, ClassDesc>(lookup_name, ClassDesc(lookup_name, derived_class, base_class_type, package_name, description_str, full_library_path, *it)));
+            classes_available.insert(std::pair<std::string, ClassDesc>(lookup_name, ClassDesc(lookup_name, derived_class, base_class_type, package_name, description_str, library_path, *it)));
             ROS_DEBUG("MATCHED Base type for class with name: %s type: %s base_class_type: %s Expecting base_class_type %s",
                       lookup_name.c_str(), derived_class.c_str(), base_class_type.c_str(), base_class_.c_str());
           }
@@ -472,6 +507,7 @@ namespace pluginlib {
 
   template <class T>
   std::string ClassLoader<T>::getErrorStringForUnknownClass(const std::string& lookup_name)
+  /***************************************************************************/
   {
     std::string declared_types;
     std::vector<std::string> types = getDeclaredClasses();
