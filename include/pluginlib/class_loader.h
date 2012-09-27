@@ -50,9 +50,6 @@ namespace pluginlib
   template <class T>
     class ClassLoader: public ClassLoaderBase
     {
-      private:
-        typedef std::map<std::string, unsigned int> LibraryCountMap;
-
       public:
         typedef typename std::map<std::string, ClassDesc>::iterator ClassMapIterator;
 
@@ -225,40 +222,40 @@ namespace pluginlib
          */
         std::string getErrorStringForUnknownClass(const std::string& lookup_name);
 
-      private:
+      private: //These are additional methods added in to assist with exploring all the potential places libraries can be located as we transition from rosbuild to catkin
         /**
-        * Calls a program from command line and returns output to stdout as a string
-        */
+         * Calls a program from command line and returns output to stdout as a string
+         */
         std::string callCommandLine(const char* cmd);
 
         /**
-        *Parses a string delimited by newlines into a vector of strings
-        */
+         *Parses a string delimited by newlines into a vector of strings
+         */
         std::vector<std::string> parseToStringVector(std::string newline_delimited_str);
 
         /**
-        * Returns the paths where libraries are installed according to the Catkin build system.
-        */
+         * Returns the paths where libraries are installed according to the Catkin build system.
+         */
         std::vector<std::string> getCatkinLibraryPaths();
 
         /**
-        * Gets the path where rosbuild build system thinks plugins are installed
-        */
+         * Gets the path where rosbuild build system thinks plugins are installed
+         */
         std::string getROSBuildLibraryPath(const std::string& exporting_package_name);
 
         /**
-        * Gets a list of paths to try to find a library. As we transition from rosbuild to Catkin build systems, plugins can be found in the old rosbuild place (pkg_name/lib usually) or somewhere in the Catkin build space
-        */
+         * Gets a list of paths to try to find a library. As we transition from rosbuild to Catkin build systems, plugins can be found in the old rosbuild place (pkg_name/lib usually) or somewhere in the Catkin build space
+         */
         std::vector<std::string> getAllLibraryPathsToTry(const std::string& library_name, const std::string& exporting_package_name);
 
         /**
-        * Gets the standard path separator for the native OS (e.g. "/" on *nix, "\" on windows)
-        */
+         * Gets the standard path separator for the native OS (e.g. "/" on *nix, "\" on windows)
+         */
         std::string getPathSeparator();
 
         /**
-        * Strips all but the filename from an explicit file path.
-        */
+         * Strips all but the filename from an explicit file path.
+         */
         std::string stripAllButFileFromPath(const std::string& path);
 
      private:
@@ -266,11 +263,8 @@ namespace pluginlib
         std::string package_;
         std::string base_class_;
         std::string attrib_name_;
-
-        // the underlying classloader
-        class_loader::MultiLibraryClassLoader lowlevel_class_loader_;
+        class_loader::MultiLibraryClassLoader lowlevel_class_loader_; //The underlying classloader
     };
-
 };
 
 #include "class_loader_imp.h"
