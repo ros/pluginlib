@@ -51,7 +51,7 @@ namespace pluginlib {
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
-  plugins_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded after last plugin destroyed
+  lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded after last plugin destroyed
   /***************************************************************************/
   {
     classes_available_ = determineAvailableClasses(); //mas - This is purely ROS build system, no mods needed
@@ -198,7 +198,6 @@ namespace pluginlib {
       std::string current_path = all_paths_without_extension.at(c);
       all_paths.push_back(current_path + path_separator + library_name_with_extension);
       all_paths.push_back(current_path + path_separator + stripped_library_name_with_extension);
-
     }
     return(all_paths);
   }
@@ -213,7 +212,7 @@ namespace pluginlib {
       try
       {
         std::string library_path = paths_to_try.at(c);
-        plugins_class_loader_.loadLibrary(library_path);
+        lowlevel_class_loader_.loadLibrary(library_path);
         return(library_path);
       }
       catch(const class_loader::LibraryLoadException& e)
@@ -227,7 +226,7 @@ namespace pluginlib {
   int ClassLoader<T>::unloadClassLibraryInternal(const std::string& library_path)
   /***************************************************************************/
   {
-    return(plugins_class_loader_.unloadLibrary(library_path));
+    return(lowlevel_class_loader_.unloadLibrary(library_path));
   }
 
 
@@ -235,7 +234,7 @@ namespace pluginlib {
   bool ClassLoader<T>::isClassLoaded(const std::string& lookup_name)
   /***************************************************************************/
   {
-    return plugins_class_loader_.isClassAvailable<T>(getClassType(lookup_name)); //mas - (DONE)
+    return lowlevel_class_loader_.isClassAvailable<T>(getClassType(lookup_name)); //mas - (DONE)
   }
 
   template <class T>
@@ -259,7 +258,7 @@ namespace pluginlib {
     {
 
       std::string resolved_library_path = it->second.resolved_library_path_;
-      std::vector<std::string> open_libs = plugins_class_loader_.getRegisteredLibraries();
+      std::vector<std::string> open_libs = lowlevel_class_loader_.getRegisteredLibraries();
       if(std::find(open_libs.begin(), open_libs.end(), resolved_library_path) != open_libs.end())
         remove_classes.push_back(it->first);
     }
@@ -365,7 +364,7 @@ namespace pluginlib {
 
     try
     {
-      return plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+      return lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
     }
     catch(const class_loader::CreateClassException& ex)
     {
@@ -379,7 +378,7 @@ namespace pluginlib {
   {
     try
     {
-      return plugins_class_loader_.createInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
+      return lowlevel_class_loader_.createInstance<T>(getClassType(lookup_name)); //mas - change this to our call (DONE)
     }
     catch(const class_loader::CreateClassException& ex)
     {
@@ -396,7 +395,7 @@ namespace pluginlib {
     T* instance = 0;
     try
     {
-      instance = plugins_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
+      instance = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
     }
     catch(const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
     {
@@ -412,7 +411,7 @@ namespace pluginlib {
   std::vector<std::string> ClassLoader<T>::getRegisteredLibraries()
   /***************************************************************************/
   {
-    return(plugins_class_loader_.getRegisteredLibraries());
+    return(lowlevel_class_loader_.getRegisteredLibraries());
   }
 
   template <class T>
