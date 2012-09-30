@@ -6,8 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 
-catkin_stack()
-catkin_project(${PROJECT_NAME}
+catkin_package(
   INCLUDE_DIRS include
   LIBRARIES poco_lite boost_fs_wrapper tinyxml
   DEPENDS rosconsole
@@ -52,12 +51,8 @@ target_link_libraries(test_plugins boost_fs_wrapper poco_lite)
 catkin_add_gtest(utest test/utest.cpp)
 target_link_libraries(utest boost_fs_wrapper poco_lite ${catkin_LIBRARIES})
 
-install(FILES stack.xml
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
-install(FILES manifest.xml
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
 install(FILES cmake/hide_plugin_symbols.cmake
-        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/cmake)
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 install(TARGETS boost_fs_wrapper poco_lite
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
