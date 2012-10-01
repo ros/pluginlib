@@ -9,7 +9,7 @@ find_package(Boost REQUIRED COMPONENTS filesystem system)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES poco_lite boost_fs_wrapper tinyxml
-  DEPENDS rosconsole
+  DEPENDS rosconsole roslib
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
