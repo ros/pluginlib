@@ -14,15 +14,26 @@
   <author>Dirk Thomas</author>
   <author>Mirza Shah</author>
 
+  <build_depend>boost</build_depend>
   <build_depend>catkin</build_depend>
   <build_depend>class_loader</build_depend>
-  <build_depend>roslib</build_depend>
-  <build_depend>tinyxml</build_depend>
   <build_depend>rosconsole</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>rostime</build_depend>
+  <build_depend>tinyxml</build_depend>
 
+  <run_depend>boost</run_depend>
   <run_depend>class_loader</run_depend>
+  <run_depend>rosconsole</run_depend>
   <run_depend>roslib</run_depend>
+  <run_depend>rostime</run_depend>
   <run_depend>tinyxml</run_depend>
 
   <test_depend>gtest</test_depend>
+  <test_depend>class_loader</test_depend>
+
+  <export>
+    <pluginlib plugin="${prefix}/test/test_plugins.xml"/>
+  </export>
+
 </package>

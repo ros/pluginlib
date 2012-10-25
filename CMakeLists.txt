@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.3)
 project(pluginlib)
 
 find_package(catkin REQUIRED COMPONENTS
   class_loader cpp_common rosconsole roslib rostime
 )
-find_package(Boost REQUIRED COMPONENTS thread)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 
 catkin_package(
   INCLUDE_DIRS include
