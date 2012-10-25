@@ -29,11 +29,7 @@
   <run_depend>rostime</run_depend>
   <run_depend>tinyxml</run_depend>
 
-  <test_depend>gtest</test_depend>
-  <test_depend>class_loader</test_depend>
-
   <export>
     <pluginlib plugin="${prefix}/test/test_plugins.xml"/>
   </export>
-
 </package>
