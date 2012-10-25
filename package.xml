@@ -1,6 +1,6 @@
 <package>
   <name>pluginlib</name>
-  <version>1.8.3</version>
+  <version>1.9.0</version>
   <description>
     The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure. To work, these tools require plugin providers to register their plugins in the manifest.xml of their package. Pluginlib includes parts of Poco from pocoproject.org
   </description>
