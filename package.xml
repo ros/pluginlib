@@ -2,7 +2,8 @@
   <name>pluginlib</name>
   <version>1.9.1</version>
   <description>
-    The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure. To work, these tools require plugin providers to register their plugins in the manifest.xml of their package. Pluginlib includes parts of Poco from pocoproject.org
+    The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure.
+    To work, these tools require plugin providers to register their plugins in the package.xml of their package.
   </description>
   <maintainer email="mshah@willowgarage.com">Mirza Shah</maintainer>
   <license>BSD</license>
@@ -19,14 +20,12 @@
   <build_depend>class_loader</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>roslib</build_depend>
-  <build_depend>rostime</build_depend>
   <build_depend>tinyxml</build_depend>
 
   <run_depend>boost</run_depend>
   <run_depend>class_loader</run_depend>
   <run_depend>rosconsole</run_depend>
   <run_depend>roslib</run_depend>
-  <run_depend>rostime</run_depend>
   <run_depend>tinyxml</run_depend>
 
   <export>
