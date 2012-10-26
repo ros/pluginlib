@@ -53,7 +53,7 @@ std::string getPackageFromLibraryPath(const std::string & path)
   // figure out the package this class is part of
   while (true)
   {
-    if (boost::filesystem::exists(parent / "manifest.xml"))
+    if ((boost::filesystem::exists(parent / "manifest.xml")) || (boost::filesystem::exists(parent / "package.xml")))
     {
 #if BOOST_FILESYSTEM_VERSION && BOOST_FILESYSTEM_VERSION == 3
       std::string package = parent.filename().string();
