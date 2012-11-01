@@ -390,15 +390,20 @@ namespace pluginlib {
   T* ClassLoader<T>::createUnmanagedInstance(const std::string& lookup_name)
   /***************************************************************************/
   {
+    ROS_ERROR("Attempting to create unmanged instance...\n");
+    ROS_ERROR("Loading library for class %s...\n", lookup_name.c_str());
     loadLibraryForClass(lookup_name);
 
     T* instance = 0;
     try
     {
+      ROS_ERROR("Attempting to create instance through low level multi-library class loader.\n");
       instance = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
+      ROS_DEBUG("Instance created.\n");
     }
     catch(const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
     {
+      ROS_ERROR("Uh oh, we got a problem. class_loader::CreateClassException, forwarding exception up the chain.\n");
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.what();
       // call unload library to keep load/unload counting consistent
       unloadLibraryForClass(lookup_name);
@@ -418,7 +423,10 @@ namespace pluginlib {
   std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses()
   /***************************************************************************/
   {
+    //mas - This method requires major refactoring...not only is it really long and confusing but a lot of the comments do not seem to be correct. With time I keep correcting small things, but a good rewrite is needed. We can also get rid of this libboost_fs_wrapper stuff as well which seems unnecessary.
+  
     std::map<std::string, ClassDesc> classes_available;
+    
     //Pull possible files from manifests of packages which depend on this package and export class
     std::vector<std::string> paths;
     ros::package::getPlugins(package_, attrib_name_, paths);
@@ -428,7 +436,7 @@ namespace pluginlib {
       throw LibraryLoadException(error_string);
     }
 
-    //The poco factory for base class T
+    //Walk the list of all plugin XML files (variable "paths") that are exported by the build system
     for (std::vector<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
     {
       TiXmlDocument document;
@@ -462,10 +470,12 @@ namespace pluginlib {
           continue;
         }
 
+        //mas - getPackageFromLibraryPath is misleading, it takes a path to a plugin XML file, figures
+        //out the parent directory, then looks to see if that directory (which should be the package root)
+        //contains a package.xml or manifest.xml file. 
         std::string package_name = pluginlib::getPackageFromLibraryPath(*it);
         if (package_name == "")
-          ROS_ERROR("Could not find package name for class %s", it->c_str());
-
+          ROS_ERROR("Could not find package manifest (neither package.xml or deprectated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)", it->c_str());
 
         TiXmlElement* class_element = library->FirstChildElement("class");
         while (class_element)
