@@ -44,8 +44,12 @@
 #include <stdexcept>
 #include <class_loader/class_loader.h>
 #include "boost/filesystem.hpp"
+#include "ros/package.h"
 
 namespace pluginlib {
+
+
+
   template <class T>
   ClassLoader<T>::ClassLoader(std::string package, std::string base_class, std::string attrib_name) :
   package_(package),
@@ -470,10 +474,7 @@ namespace pluginlib {
           continue;
         }
 
-        //mas - getPackageFromLibraryPath is misleading, it takes a path to a plugin XML file, figures
-        //out the parent directory, then looks to see if that directory (which should be the package root)
-        //contains a package.xml or manifest.xml file. 
-        std::string package_name = pluginlib::getPackageFromLibraryPath(*it);
+        std::string package_name = getPackageFromPluginXMLFilePath(*it);
         if (package_name == "")
           ROS_ERROR("Could not find package manifest (neither package.xml or deprectated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)", it->c_str());
 
@@ -527,6 +528,55 @@ namespace pluginlib {
     return "According to the loaded plugin descriptions the class " + lookup_name 
       + " with base class type " + base_class_ + " does not exist. Declared types are " + declared_types;
   }
+
+  template <class T>
+  std::string ClassLoader<T>::joinPaths(const std::string& path1, const std::string& path2)
+  /***************************************************************************/
+  {
+    boost::filesystem::path p1(path1);
+    return (p1 / path2).string();
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & path)
+ /***************************************************************************/  
+  {
+    std::string package_name;
+
+    boost::filesystem::path p(path);
+    boost::filesystem::path parent = p.parent_path();
+    // figure out the package this class is part of
+    while (true)
+    {
+      if ((boost::filesystem::exists(parent / "manifest.xml")) || (boost::filesystem::exists(parent / "package.xml")))
+      {
+  #if BOOST_FILESYSTEM_VERSION && BOOST_FILESYSTEM_VERSION == 3
+        std::string package = parent.filename().string();
+  #else
+        std::string package = parent.filename();
+  #endif
+        std::string package_path = ros::package::getPath(package);
+        if (path.find(package_path) == 0)
+        {
+          package_name = package;
+          break;
+        }
+      }
+
+  #if BOOST_FILESYSTEM_VERSION && BOOST_FILESYSTEM_VERSION == 3
+      parent = parent.parent_path().string();
+  #else
+      parent = parent.parent_path();
+  #endif
+
+      if (parent.string().empty())
+      {
+        return "";
+      }
+    }
+
+    return package_name;
+  }  
 };
 
 #endif

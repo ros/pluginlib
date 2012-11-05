@@ -257,6 +257,14 @@ namespace pluginlib
          * Strips all but the filename from an explicit file path.
          */
         std::string stripAllButFileFromPath(const std::string& path);
+        
+        /**
+        * Joins two filesystem paths together utilzing appropriate path separator
+        */
+        std::string joinPaths(const std::string& path1, const std::string& path2);
+
+        //Gets the package name from a path to a plugin XML file
+        std::string getPackageFromPluginXMLFilePath(const std::string & path);        
 
      private:
         std::map<std::string, ClassDesc> classes_available_; //Map from library to class's descriptions described in XML
