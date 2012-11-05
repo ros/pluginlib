@@ -30,8 +30,6 @@
 #define PLUGINLIB_CLASS_LOADER_H
 
 #include "ros/console.h"
-
-#include "pluginlib/boost_fs_wrapper.h"
 #include "pluginlib/class_desc.h"
 #include "pluginlib/class_loader_base.h"
 #include "pluginlib/pluginlib_exceptions.h"
