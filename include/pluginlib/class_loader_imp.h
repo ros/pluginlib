@@ -394,14 +394,14 @@ namespace pluginlib {
   T* ClassLoader<T>::createUnmanagedInstance(const std::string& lookup_name)
   /***************************************************************************/
   {
-    ROS_ERROR("Attempting to create unmanged instance...\n");
-    ROS_ERROR("Loading library for class %s...\n", lookup_name.c_str());
+    ROS_DEBUG("Attempting to create unmanged instance...\n");
+    ROS_DEBUG("Loading library for class %s...\n", lookup_name.c_str());
     loadLibraryForClass(lookup_name);
 
     T* instance = 0;
     try
     {
-      ROS_ERROR("Attempting to create instance through low level multi-library class loader.\n");
+      ROS_DEBUG("Attempting to create instance through low level multi-library class loader.\n");
       instance = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
       ROS_DEBUG("Instance created.\n");
     }
