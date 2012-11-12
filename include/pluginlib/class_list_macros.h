@@ -40,25 +40,25 @@
 //include "Poco/ClassLibrary.h"
 #include <class_loader/class_loader.h> 
 
-inline __attribute__((deprecated)) void PLUGINLIB_REGISTER_CLASS (){
-// "You are using a deprecated version of the PLUGINLIB_REGISTER_CLASS macro. Please switch to the new version PLUGINLIB_DECLARE_CLASS. For further information, see http://ros.org/wiki/pluginlib"
-  return;
-};
-
+//This version was deprecated in favor of PLUGINLIB_DECLARE_CLASS
+//class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
+//class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
+//base_class_type - The real base class type from which class_type inherits
 #define PLUGINLIB_REGISTER_CLASS(class_name, class_type, base_class_type) \
-  POCO_BEGIN_NAMED_MANIFEST(class_name, base_class_type) \
-  POCO_EXPORT_CLASS(class_type) \
-  PLUGINLIB_REGISTER_CLASS();   \
-  POCO_END_MANIFEST             
+  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type)             
 
-/*
-#define PLUGINLIB_DECLARE_CLASS(pkg, class_name, class_type, base_class_type) \
-  POCO_BEGIN_NAMED_MANIFEST(pkg##__##class_name, base_class_type) \
-  POCO_EXPORT_CLASS(class_type) \
-  POCO_END_MANIFEST
-*/
-
+//This version is the most in use and requires package name in addition to fields in PLUGINLIB_REGISTER_CLASS 
+//pkg - The package that exports the plugin (IGNORED AS OF PLUGINLIB 1.9)
+//class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
+//class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
+//base_class_type - The real base class type from which class_type inherits
 #define PLUGINLIB_DECLARE_CLASS(pkg, class_name, class_type, base_class_type) \
   CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type)
+  
+//This version was only made possible with pluginlib 1.9 series and 
+//utilizing the class_loader package. It's the easiest to use and
+//takes the minimal information needed.
+#define PLUGINLIB_DECLARE_CLASS_SIMPLE(class_type, base_class_type) \
+  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type);
 
 #endif
