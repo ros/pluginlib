@@ -71,28 +71,25 @@ namespace pluginlib {
   void ClassLoader<T>::loadLibraryForClass(const std::string& lookup_name)
   /***************************************************************************/
   {
-    std::string library_name;
-    ClassMapIterator it = classes_available_.find(lookup_name);
-
-    if (it != classes_available_.end())
-    {
-      library_name = it->second.library_name_;
-      ROS_DEBUG("pluginlib::ClassLoader: Class %s maps to library %s in classes_available_.", library_name.c_str(), lookup_name.c_str());
-    }
-    else
+    if (classes_available_.find(lookup_name) == classes_available_.end())
     {
       ROS_DEBUG("pluginlib::ClassLoader: Class %s has no mapping in classes_available_.", lookup_name.c_str());
-      throw LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
+      throw pluginlib::LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
+    }
+
+    std::string library_path = getClassLibraryPath(lookup_name);
+    if (library_path == "")
+    {
+      throw pluginlib::LibraryLoadException("Could not find library.");
     }
 
     try
     {
-      ROS_DEBUG("Attempting to load library %s for class %s",  library_name.c_str(), lookup_name.c_str());
-      it->second.resolved_library_path_ = loadClassLibraryInternal(library_name, it->second.package_);
+      lowlevel_class_loader_.loadLibrary(library_path);
     }
-    catch (class_loader::LibraryLoadException& ex)
+    catch(const class_loader::LibraryLoadException& ex)
     {
-      std::string error_string = "Failed to load library " + library_name + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
+      std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
       throw pluginlib::LibraryLoadException(error_string);
     }
   }
@@ -213,26 +210,6 @@ namespace pluginlib {
   }
 
   template <class T>
-  std::string ClassLoader<T>::loadClassLibraryInternal(const std::string& library_name, const std::string& exporting_package_name)
-  /***************************************************************************/
-  {
-    std::vector<std::string> paths_to_try = getAllLibraryPathsToTry(library_name, exporting_package_name);
-    for(unsigned int c = 0; c < paths_to_try.size(); c++)
-    {
-      try
-      {
-        std::string library_path = paths_to_try.at(c);
-        lowlevel_class_loader_.loadLibrary(library_path);
-        return(library_path);
-      }
-      catch(const class_loader::LibraryLoadException& e)
-      {
-      }
-    }
-    throw(pluginlib::LibraryLoadException("Could not find library."));
-  }
-
-  template <class T>
   int ClassLoader<T>::unloadClassLibraryInternal(const std::string& library_path)
   /***************************************************************************/
   {
@@ -337,10 +314,22 @@ namespace pluginlib {
   std::string ClassLoader<T>::getClassLibraryPath(const std::string& lookup_name)
   /***************************************************************************/
   {
-    ClassMapIterator it = classes_available_.find(lookup_name);
-    if (it != classes_available_.end() && it->second.resolved_library_path_ != "UNRESOLVED")
+    if (classes_available_.find(lookup_name) == classes_available_.end())
     {
-      return it->second.resolved_library_path_;
+      ROS_DEBUG("pluginlib::ClassLoader: Class %s has no mapping in classes_available_.", lookup_name.c_str());
+      return "";
+    }
+    ClassMapIterator it = classes_available_.find(lookup_name);
+    std::string library_name = it->second.library_name_;
+    ROS_DEBUG("pluginlib::ClassLoader: Class %s maps to library %s in classes_available_.", lookup_name.c_str(), library_name.c_str());
+
+    std::vector<std::string> paths_to_try = getAllLibraryPathsToTry(library_name, it->second.package_);
+    for(std::vector<std::string>::const_iterator it = paths_to_try.begin(); it != paths_to_try.end(); it++)
+    {
+      if (boost::filesystem::exists(*it))
+      {
+        return *it;
+      }
     }
     return "";
   }

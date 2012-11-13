@@ -192,12 +192,6 @@ namespace pluginlib
         virtual std::string getClassLibraryPath(const std::string& lookup_name);
 
       private:
-        /**
-         * @brief  Helper function for loading a shared library
-         * @param  library_name The name of the library to load both WITHOUT full path and extension (.so/.dll).
-         * @return The fully-resolved path to the library.  As the library can be located in multiple places due to our transition from rosbuild to Catkin build system, the call tries multiple places and then returns the path which yields successful.
-         */
-        std::string loadClassLibraryInternal(const std::string& library_name, const std::string& exporting_package_name);
 
         /**
          * @brief  Helper function for unloading a shared library
