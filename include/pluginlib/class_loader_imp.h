@@ -432,7 +432,7 @@ namespace pluginlib {
       ROS_ERROR("pluginlib::ClassLoader: Uh oh, we got a problem. class_loader::CreateClassException, forwarding exception up the chain.");
       std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.what();
       // call unload library to keep load/unload counting consistent
-      unloadLibraryForClass(lookup_name);
+      //unloadLibraryForClass(lookup_name);
       throw CreateClassException(error_string);
     }
     return instance;
