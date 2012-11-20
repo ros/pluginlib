@@ -1,0 +1,43 @@
+#include <ros/console.h>
+#include <pluginlib/class_loader.h>
+#include <vector>
+#include <string>
+#include <iostream>
+
+template <class $>
+
+extern "C"
+{
+  std::vector<std::string> availablePlugins(const string& package_name)
+  {
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
+    return(class_loader_.getAvailableClasses());    
+  }
+
+  bool loadPlugin(const string& package_name, const string& class_name)
+  {
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
+    try
+    {
+      class_loader.createInstance(class_name);      
+      return true;
+    }
+    catch(...)
+    {
+      return false;
+    }
+  }
+
+  string whereIsPluginLocated(const string& package_name, const string& class_name)
+  {
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
+    try
+    {
+      return class_loader.getClassLibraryPath(class_name);
+    }
+    catch(...)
+    {
+      return ("Could not find location of plugin " + class_name);
+    }
+  }
+}

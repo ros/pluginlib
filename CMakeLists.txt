@@ -14,6 +14,9 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
+add_executable(plugin_tool src/plugin_tool.cpp)
+target_link_libraries(plugin_tool ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
 target_link_libraries(${PROJECT_NAME}_utest tinyxml ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_utest test_plugins)
