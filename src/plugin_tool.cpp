@@ -40,6 +40,14 @@ string          getTypedClassLoaderTemplate();
 string          getTypedClassLoaderTemplateWithBaseSet();
 void            generateFile(string filename, string contents);
 
+std::string              callCommandLine(const char* cmd);
+std::vector<std::string> parseToStringVector(std::string newline_delimited_str);
+std::string              getPluginlibSharedFolder();
+std::string              generatedCppFile(){return "typedPluginInterface.cpp";}
+std::string              templateCppFileWithoutExtension(){return "typedPluginInterface";}
+std::string              templateCppFile(){return templateCppFileWithoutExtension() + ".cpp";}
+std::string              templateCppFileAbsolutePath(){return getPluginlibSharedFolder() + "/" + templateCppFile();}
+
 int main(int argc, char* argv[])
 /*****************************************************************************/
 {
@@ -72,11 +80,11 @@ void generateAndLoadTypedPluginInterface()
 	cout << code << endl;
 	cout << "***************************************************" << endl;
 
-	cout << "Outputting to file typedPluginInterface.cpp." << endl;
-	generateFile("typedPluginInterface.cpp", code);
+	cout << "Outputting to file " << templateCppFile() << "..." << endl;
+	generateFile(generatedCppFile(), code);
 
 	cout << "Building interface shared object..." << endl;
-	string cmd1 = "g++ -fPIC -DBASE_CLASS=" + baseClass() + " -c pluginlib/typed_class_loader_template.cpp";
+	string cmd1 = "g++ -fPIC -DBASE_CLASS=" + baseClass() + " -o ./typed_class_loader_template.o -c " + templateCppFileAbsolutePath();
 	string cmd2 = "g++ -shared -o libTypedPluginInterface.so typed_class_loader_template.o";
 
 	cout << "Command 1 = " << cmd1 << endl;
@@ -195,10 +203,11 @@ string getTypedClassLoaderTemplate()
 /*****************************************************************************/
 {
 	std::ifstream file;
-	file.open("include/typed_class_loader_template.template");
+   string path = getPluginlibSharedFolder() + "/typed_class_loader_template.cpp";
+	file.open(path.c_str());
 	if(!file)
 	{
-		cout << "Error: Cannot find file 'typed_class_loader_template.template' to generate class loader";
+		cout << "Error: Cannot find file " + path + " to generate class loader";
 		exit(-1);
 	}
 
@@ -294,8 +303,10 @@ std::vector<std::string> parseToStringVector(std::string newline_delimited_str)
  return(parse_result);
 }
 
-std::vector<std::string> getPluginlibSharedFolder()
+std::string getPluginlibSharedFolder()
 /***************************************************************************/
 {
-   return(parseToStringVector(callCommandLine("catkin_find pluginlib --share")));
+   vector<std::string> allVals = parseToStringVector(callCommandLine("catkin_find pluginlib --share"));
+   assert(allVals.size() > 0);
+   return(allVals.at(0));
 }

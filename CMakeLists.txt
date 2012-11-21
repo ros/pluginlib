@@ -21,7 +21,8 @@ catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
 target_link_libraries(${PROJECT_NAME}_utest tinyxml ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_utest test_plugins)
 
-install(TARGETS
+install(TARGETS plugin_tool
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
