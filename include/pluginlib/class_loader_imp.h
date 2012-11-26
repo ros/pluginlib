@@ -58,7 +58,6 @@ namespace pluginlib {
   lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded until class loader is destroyed or force unload.
   /***************************************************************************/
   {
-    printf("!!!!!!!!!MAS!!!! THIS CONFIRMS WET OVERLAY INCLUDE WORKS");
     classes_available_ = determineAvailableClasses();
   }
 

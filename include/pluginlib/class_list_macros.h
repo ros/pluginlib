@@ -37,7 +37,6 @@
 #ifndef PLUGINLIB_CLASS_LIST_MACROS_H_
 #define PLUGINLIB_CLASS_LIST_MACROS_H_
 
-//include "Poco/ClassLibrary.h"
 #include <class_loader/class_loader.h> 
 
 //This version was deprecated in favor of PLUGINLIB_DECLARE_CLASS
