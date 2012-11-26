@@ -55,9 +55,10 @@ namespace pluginlib {
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
-  lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded after last plugin destroyed
+  lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded until class loader is destroyed or force unload.
   /***************************************************************************/
   {
+    printf("!!!!!!!!!MAS!!!! THIS CONFIRMS WET OVERLAY INCLUDE WORKS");
     classes_available_ = determineAvailableClasses();
   }
 
@@ -359,7 +360,7 @@ namespace pluginlib {
   /***************************************************************************/
   {
     //Note: This method is deprecated
-    ROS_DEBUG("pluginlib::ClassLoader: In deprecated call createClassInstance(), lookup_name = %s, auto_load = %b.", lookup_name.c_str(), auto_load);
+    ROS_DEBUG("pluginlib::ClassLoader: In deprecated call createClassInstance(), lookup_name = %s, auto_load = %i.", (lookup_name.c_str()), auto_load);
         
     if(auto_load && !isClassLoaded(lookup_name))
     {

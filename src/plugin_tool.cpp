@@ -43,6 +43,9 @@ void            generateFile(string filename, string contents);
 std::string              callCommandLine(const char* cmd);
 std::vector<std::string> parseToStringVector(std::string newline_delimited_str);
 std::string              getPluginlibSharedFolder();
+
+std::string              generatedSharedLibrary(){return "libTypedPluginInterface.so";}
+std::string              generatedObjFile(){return "typedPluginInterface.o";}
 std::string              generatedCppFile(){return "typedPluginInterface.cpp";}
 std::string              templateCppFileWithoutExtension(){return "typedPluginInterface";}
 std::string              templateCppFile(){return templateCppFileWithoutExtension() + ".cpp";}
@@ -84,8 +87,8 @@ void generateAndLoadTypedPluginInterface()
 	generateFile(generatedCppFile(), code);
 
 	cout << "Building interface shared object..." << endl;
-	string cmd1 = "g++ -fPIC -DBASE_CLASS=" + baseClass() + " -o ./typed_class_loader_template.o -c " + templateCppFileAbsolutePath();
-	string cmd2 = "g++ -shared -o libTypedPluginInterface.so typed_class_loader_template.o";
+	string cmd1 = "g++ -fPIC -DBASE_CLASS=" + baseClass() + " -c " + generatedCppFile();
+	string cmd2 = "g++ -shared -o " + generatedSharedLibrary() + " " + generatedObjFile();
 
 	cout << "Command 1 = " << cmd1 << endl;
 	cout << "Command 2 = " << cmd2 << endl;
