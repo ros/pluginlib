@@ -520,13 +520,13 @@ namespace pluginlib {
               description_str = "No 'description' tag for this plugin in plugin description file.";
 
             classes_available.insert(std::pair<std::string, ClassDesc>(lookup_name, ClassDesc(lookup_name, derived_class, base_class_type, package_name, description_str, library_path, *it)));
-            ROS_DEBUG("MATCHED Base type for class with name: %s type: %s base_class_type: %s Expecting base_class_type %s",
-                      lookup_name.c_str(), derived_class.c_str(), base_class_type.c_str(), base_class_.c_str());
+            //ROS_DEBUG("MATCHED Base type for class with name: %s type: %s base_class_type: %s Expecting base_class_type %s",
+            //          lookup_name.c_str(), derived_class.c_str(), base_class_type.c_str(), base_class_.c_str());
           }
           else
           {
-            ROS_DEBUG("UNMATCHED Base type for class with name: %s type: %s base_class_type: %s Expecting base_class_type %s",
-                      lookup_name.c_str(), derived_class.c_str(), base_class_type.c_str(), base_class_.c_str());
+            //ROS_DEBUG("UNMATCHED Base type for class with name: %s type: %s base_class_type: %s Expecting base_class_type %s",
+            //          lookup_name.c_str(), derived_class.c_str(), base_class_type.c_str(), base_class_.c_str());
 
           }
           //step to next class_element

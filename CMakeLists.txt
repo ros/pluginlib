@@ -29,5 +29,5 @@ install(TARGETS plugin_tool
 install(DIRECTORY include/pluginlib/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(DIRECTORY share/pluginlib/
+install(FILES share/pluginlib/typed_class_loader_template.cpp
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

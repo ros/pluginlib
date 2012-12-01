@@ -1,7 +1,3 @@
-#ifndef BASE_CLASS
-#error You forgot to -DBASE_CLASS when compiling
-#endif 
-
 #include <ros/console.h>
 #include <pluginlib/class_loader.h>
 #include <vector>
@@ -14,13 +10,13 @@ extern "C"
 {
   std::vector<std::string> availablePlugins(const std::string& package_name)
   {
-    pluginlib::ClassLoader<BASE_CLASS> class_loader(package_name, "BASE_CLASS");
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
     return(class_loader.getDeclaredClasses());    
   }
 
   bool loadPlugin(const std::string& package_name, const std::string& class_name)
   {
-    pluginlib::ClassLoader<BASE_CLASS> class_loader(package_name, "BASE_CLASS");
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
     try
     {
       class_loader.createInstance(class_name);      
@@ -34,7 +30,7 @@ extern "C"
 
   std::string whereIsPluginLocated(const std::string& package_name, const std::string& class_name)
   {
-    pluginlib::ClassLoader<BASE_CLASS> class_loader(package_name, "BASE_CLASS");
+    pluginlib::ClassLoader<$> class_loader(package_name, "$");
     try
     {
       return class_loader.getClassLibraryPath(class_name);
