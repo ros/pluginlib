@@ -499,7 +499,7 @@ namespace pluginlib {
 
         std::string package_name = getPackageFromPluginXMLFilePath(*it);
         if (package_name == "")
-          ROS_ERROR("Could not find package manifest (neither package.xml or deprectated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)", it->c_str());
+          ROS_ERROR("Could not find package manifest (neither package.xml or deprecated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)", it->c_str());
 
         TiXmlElement* class_element = library->FirstChildElement("class");
         while (class_element)
@@ -562,41 +562,81 @@ namespace pluginlib {
   }
 
   template <class T>
-  std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & path)
+  std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string& package_xml_path)
  /***************************************************************************/  
   {
+      TiXmlDocument document;
+      document.LoadFile(package_xml_path);
+      TiXmlElement* doc_root_node = document.FirstChildElement("package");
+      if (doc_root_node == NULL)
+      {
+        ROS_ERROR("pluginlib::ClassLoader: Could not find a root element for package manifest at %s.", package_xml_path.c_str());
+        return "";
+      }
+
+      assert(doc_root_node == document.RootElement());
+
+      TiXmlElement* package_name_node = doc_root_node->FirstChildElement("name");
+      if(package_name_node == NULL)
+      {
+        ROS_ERROR("pluginlib::ClassLoader: package.xml at %s does not have a <name> tag! Cannot determine package which exports plugin.", package_xml_path.c_str());
+        return "";
+      }
+
+      return(package_name_node->GetText());
+  }
+
+  template <class T>
+  std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_file_path)
+ /***************************************************************************/  
+  {
+    //Note: This method takes an input a path to a plugin xml file and must determine which 
+    //package the XML file came from. This is not necessariliy the same thing as the member
+    //variable "package_". As rospack pulls in transitive dependencies, plugins from various 
+    //packages can be pulled in and the only way to know where they came from is to walk
+    //the file system from the folder containing the pluginxml.
+
+    //rosbuild:
+    //1. Find nearest encasing manifest.xml
+    //2. Once found, the name of the folder containg the manifest should be the package name we are looking for
+    //3. Confirm package is findable with rospack
+
+    //catkin:
+    //1. Find nearest encasing package.xml
+    //2. Extract name of package from package.xml
+
     std::string package_name;
 
-    boost::filesystem::path p(path);
+    boost::filesystem::path p(plugin_xml_file_path);
     boost::filesystem::path parent = p.parent_path();
-    // figure out the package this class is part of
+
+
+    //Figure out exactly which package the passed XML file is exported by.
     while (true)
     {
-      if ((boost::filesystem::exists(parent / "manifest.xml")) || (boost::filesystem::exists(parent / "package.xml")))
+      if(boost::filesystem::exists(parent / "package.xml"))
       {
-  #if BOOST_FILESYSTEM_VERSION && BOOST_FILESYSTEM_VERSION == 3
+        std::string package_file_path = (boost::filesystem::path(parent / "package.xml")).string();
+        return(extractPackageNameFromPackageXML(package_file_path));
+      }
+      else if (boost::filesystem::exists(parent / "manifest.xml"))
+      {
         std::string package = parent.filename().string();
-  #else
-        std::string package = parent.filename();
-  #endif
         std::string package_path = ros::package::getPath(package);
-        if (path.find(package_path) == 0)
+ 
+        if (plugin_xml_file_path.find(package_path) == 0) //package_path is a substr of passed plugin xml path
         {
           package_name = package;
           break;
-        }
+        }       
       }
 
-  #if BOOST_FILESYSTEM_VERSION && BOOST_FILESYSTEM_VERSION == 3
+      //Recursive case - hop one folder up
       parent = parent.parent_path().string();
-  #else
-      parent = parent.parent_path();
-  #endif
 
+      //Base case - reached root and cannot find what we're looking for
       if (parent.string().empty())
-      {
         return "";
-      }
     }
 
     return package_name;
