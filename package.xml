@@ -1,6 +1,6 @@
 <package>
   <name>pluginlib</name>
-  <version>1.9.13</version>
+  <version>1.9.14</version>
   <description>
     The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure.
     To work, these tools require plugin providers to register their plugins in the package.xml of their package.
