@@ -29,15 +29,19 @@
 #ifndef PLUGINLIB_CLASS_LOADER_H
 #define PLUGINLIB_CLASS_LOADER_H
 
-#include "ros/console.h"
+#include "boost/algorithm/string.hpp"
+#include "class_loader/multi_library_class_loader.h"
+#include <map>
 #include "pluginlib/class_desc.h"
 #include "pluginlib/class_loader_base.h"
 #include "pluginlib/pluginlib_exceptions.h"
-#include "boost/algorithm/string.hpp"
+#include "ros/console.h"
 #include "ros/package.h"
 #include "tinyxml.h"
-#include <map>
-#include <class_loader/multi_library_class_loader.h>
+
+//Note: pluginlib has traditionally utilized a "lookup name" for classes that does not match its real C++ name. This was
+//done due to limitations of how pluginlib was implemented. As of version 1.9, a lookup name is no longer necessary and
+//an attempt to the merge two concepts is underway
 
 namespace pluginlib
 {
@@ -110,6 +114,12 @@ namespace pluginlib
         virtual std::string getName(const std::string& lookup_name);
 
         /**
+         * @brief  Given the lookup name of a class, returns the type of the associated base class
+         * @return The type of the associated base class
+         */
+        virtual std::string getBaseClassType() const;
+
+        /**
          * @brief  Given the lookup name of a class, returns the type of the derived class associated with it
          * @param lookup_name The name of the class
          * @return The name of the associated derived class
@@ -124,10 +134,11 @@ namespace pluginlib
         virtual std::string getClassDescription(const std::string& lookup_name);
 
         /**
-         * @brief  Given the lookup name of a class, returns the type of the associated base class
-         * @return The type of the associated base class
+         * @brief  Given the name of a class, returns the path to its associated library
+         * @param lookup_name The name of the class
+         * @return The path to the associated library
          */
-        virtual std::string getBaseClassType() const;
+        virtual std::string getClassLibraryPath(const std::string& lookup_name);
 
         /**
          * @brief  Given the name of a class, returns name of the containing package
@@ -148,13 +159,6 @@ namespace pluginlib
          * @return A vector of strings corresponding to the names of registered libraries
          */
         virtual std::vector<std::string> getRegisteredLibraries();
-
-        /**
-         * @brief  Given the name of a class, returns the path to its associated library
-         * @param lookup_name The name of the class
-         * @return The path to the associated library
-         */
-        virtual std::string getClassLibraryPath(const std::string& lookup_name);
 
         /**
          * @brief Checks if the library for a given class is currently loaded
@@ -192,13 +196,10 @@ namespace pluginlib
         virtual int unloadLibraryForClass(const std::string& lookup_name);
 
       private:
-
         /**
-         * @brief  Helper function for unloading a shared library
-         * @param  library_path The exact path to the library to unload
-         * @return The number of pending unloads until the library is removed from memory
+         * Calls a program from command line and returns output to stdout as a string
          */
-        int unloadClassLibraryInternal(const std::string& library_path);
+        std::string callCommandLine(const char* cmd);
 
         /**
          * @brief  Returns the available classes
@@ -206,19 +207,6 @@ namespace pluginlib
          * @return A map of class names and the corresponding descriptions
          */
         std::map<std::string, ClassDesc> determineAvailableClasses();
-
-        /**
-         * @brief  Returns an error message for an unknown class
-         * @param lookup_name The name of the class
-         * @return The error message
-         */
-        std::string getErrorStringForUnknownClass(const std::string& lookup_name);
-
-      private:
-        /**
-         * Calls a program from command line and returns output to stdout as a string
-         */
-        std::string callCommandLine(const char* cmd);
 
         /**
         * Opens a package.xml file and extracts the package name (i.e. contents of <name> tag)
@@ -236,9 +224,11 @@ namespace pluginlib
         std::vector<std::string> getCatkinLibraryPaths();
 
         /**
-         * Gets the path where rosbuild build system thinks plugins are installed
+         * @brief  Returns an error message for an unknown class
+         * @param lookup_name The name of the class
+         * @return The error message
          */
-        std::string getROSBuildLibraryPath(const std::string& exporting_package_name);
+        std::string getErrorStringForUnknownClass(const std::string& lookup_name);
 
         /**
          * Gets the standard path separator for the native OS (e.g. "/" on *nix, "\" on windows)
@@ -246,9 +236,9 @@ namespace pluginlib
         std::string getPathSeparator();
         
         /**
-        * Joins two filesystem paths together utilzing appropriate path separator
-        */
-        std::string joinPaths(const std::string& path1, const std::string& path2);        
+         * Gets the path where rosbuild build system thinks plugins are installed
+         */
+        std::string getROSBuildLibraryPath(const std::string& exporting_package_name);
 
         /**
         * Gets the package name from a path to a plugin XML file
@@ -256,14 +246,32 @@ namespace pluginlib
         std::string getPackageFromPluginXMLFilePath(const std::string & path);  
 
         /**
+        * Joins two filesystem paths together utilzing appropriate path separator
+        */
+        std::string joinPaths(const std::string& path1, const std::string& path2);       
+
+        /**
          *Parses a string delimited by newlines into a vector of strings
          */
         std::vector<std::string> parseToStringVector(std::string newline_delimited_str);
 
         /**
+         * Parses a plugin XML file and inserts the appropriate ClassDesc entries into the passes classes_available map
+         */
+        void processSingleXMLPluginFile(const std::string& xml_file, std::map<std::string, ClassDesc>& class_available);
+
+        /**
          * Strips all but the filename from an explicit file path.
          */
         std::string stripAllButFileFromPath(const std::string& path);
+
+
+        /**
+         * @brief  Helper function for unloading a shared library
+         * @param  library_path The exact path to the library to unload
+         * @return The number of pending unloads until the library is removed from memory
+         */
+        int unloadClassLibraryInternal(const std::string& library_path);        
 
      private:
         std::map<std::string, ClassDesc> classes_available_; //Map from library to class's descriptions described in XML

@@ -46,6 +46,7 @@ class CreateClassException: public PluginlibException
     CreateClassException(const std::string error_desc) : PluginlibException(error_desc) {}
 };
 
+
 }
 
 #endif
