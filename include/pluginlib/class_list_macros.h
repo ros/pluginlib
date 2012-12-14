@@ -39,25 +39,31 @@
 
 #include <class_loader/class_loader.h> 
 
-//This version was deprecated in favor of PLUGINLIB_DECLARE_CLASS
-//class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
-//class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
-//base_class_type - The real base class type from which class_type inherits
+/** 
+ * @macro This version was deprecated in favor of PLUGINLIB_DECLARE_CLASS
+ * @param - class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
+ * @param - class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
+ * @param - base_class_type - The real base class type from which class_type inherits
+ */
 #define PLUGINLIB_REGISTER_CLASS(class_name, class_type, base_class_type) \
-  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type)             
+  CLASS_LOADER_REGISTER_CLASS_WITH_MESSAGE(class_type, base_class_type, "pluginlib WARNING: PLUGINLIB_REGISTER_CLASS is deprecated, please ue PLUGINLIB_EXPORT_CLASS instead.")             
 
-//This version is the most in use and requires package name in addition to fields in PLUGINLIB_REGISTER_CLASS 
-//pkg - The package that exports the plugin (IGNORED AS OF PLUGINLIB 1.9)
-//class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
-//class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
-//base_class_type - The real base class type from which class_type inherits
+/** 
+ * @macro This version is the most in use and requires package name in addition to fields in PLUGINLIB_REGISTER_CLASS 
+ * @param - pkg - The package that exports the plugin (IGNORED AS OF PLUGINLIB 1.9)
+ * @param - class_name - An alias for the class (no special characters allowed)  (IGNORED AS OF PLUGINLIB 1.9)
+ * @param - class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
+ * @param - base_class_type - The real base class type from which class_type inherits
+ */
 #define PLUGINLIB_DECLARE_CLASS(pkg, class_name, class_type, base_class_type) \
-  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type)
+  CLASS_LOADER_REGISTER_CLASS_WITH_MESSAGE(class_type, base_class_type, "pluginlib WARNING: PLUGINLIB_DECLARE_CLASS is deprecated, please ue PLUGINLIB_EXPORT_CLASS instead.")             
   
-//This version was only made possible with pluginlib 1.9 series and 
-//utilizing the class_loader package. It's the easiest to use and
-//takes the minimal information needed.
-#define PLUGINLIB_DECLARE_CLASS_SIMPLE(class_type, base_class_type) \
+/** 
+ * @macro This version was only made possible with pluginlib 1.9 series. It's the easiest to use and now the official way of exporting classes.
+ * @param - class_type - The real class name with namespace qualifier (e.g. Animals::Lion)
+ * @param - base_class_type - The real base class type from which class_type inherits
+ */
+#define PLUGINLIB_EXPORT_CLASS(class_type, base_class_type) \
   CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type);
 
 #endif

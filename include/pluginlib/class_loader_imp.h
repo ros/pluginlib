@@ -83,7 +83,7 @@ namespace pluginlib
     return result;
   }
 
- template <class T>
+  template <class T>
   T* ClassLoader<T>::createClassInstance(const std::string& lookup_name, bool auto_load)
   /***************************************************************************/
   {
@@ -133,7 +133,7 @@ namespace pluginlib
     }
     catch(const class_loader::CreateClassException& ex)
     {
-    ROS_DEBUG("pluginlib::ClassLoader: Exception raised by low-level multi-library class loader when attempting to class %s.", lookup_name.c_str());
+      ROS_DEBUG("pluginlib::ClassLoader: Exception raised by low-level multi-library class loader when attempting to create instance of class %s.", lookup_name.c_str());
       throw(pluginlib::CreateClassException(ex.what()));
     }
   }
@@ -158,9 +158,8 @@ namespace pluginlib
     }
     catch(const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
     {
-      ROS_ERROR("pluginlib::ClassLoader: Uh oh, we got a problem. class_loader::CreateClassException, forwarding exception up the chain.");
-      std::string error_string = "The class " + lookup_name + " could not be loaded. Error: " + ex.what();
-      throw CreateClassException(error_string);
+      ROS_DEBUG("pluginlib::ClassLoader: Exception raised by low-level multi-library class loader when attempting to create UNMANAGED instance of class %s.", lookup_name.c_str());
+      throw(pluginlib::CreateClassException(ex.what()));   
     }
     return instance;
   }
