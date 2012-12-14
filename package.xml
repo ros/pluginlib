@@ -15,8 +15,9 @@
   <author>Dirk Thomas</author>
   <author>Mirza Shah</author>
 
+  <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>boost</build_depend>
-  <build_depend>catkin</build_depend>
   <build_depend>class_loader</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>roslib</build_depend>
