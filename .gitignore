@@ -1,4 +1,3 @@
 build
-lib
-bin
+devel
 CMakeLists.txt.user

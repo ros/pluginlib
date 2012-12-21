@@ -4,6 +4,8 @@ project(pluginlib)
 find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 
+catkin_python_setup()
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES tinyxml
