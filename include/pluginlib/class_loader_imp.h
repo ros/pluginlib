@@ -40,11 +40,12 @@
 #define PLUGINLIB_CLASS_LOADER_IMP_H_
 
 #include "boost/bind.hpp"
-#include <list>
-#include <stdexcept>
-#include <class_loader/class_loader.h>
 #include "boost/filesystem.hpp"
+#include <class_loader/class_loader.h>
+#include <list>
 #include "ros/package.h"
+#include <sstream>
+#include <stdexcept>
 
 namespace pluginlib 
 {
@@ -470,7 +471,9 @@ namespace pluginlib
     if (library_path == "")
     {
       ROS_DEBUG("pluginlib::ClassLoader: No path could be found to the library containing %s.", lookup_name.c_str());
-      throw pluginlib::LibraryLoadException("Could not find library.");
+      std::ostringstream error_msg;
+      error_msg << "Could not find library corresponding to plugin " << lookup_name << ". Make sure the plugin description XML file has the correct name of the library and that the library actually exists.";
+      throw pluginlib::LibraryLoadException(error_msg.str());
     }
 
     try
@@ -479,7 +482,7 @@ namespace pluginlib
     }
     catch(const class_loader::LibraryLoadException& ex)
     {
-      std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_REGISTER_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
+      std::string error_string = "Failed to load library " + library_path + ". Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: " + ex.what();
       throw pluginlib::LibraryLoadException(error_string);
     }
   }
