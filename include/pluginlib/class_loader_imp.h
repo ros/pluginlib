@@ -504,6 +504,7 @@ namespace pluginlib
   void ClassLoader<T>::processSingleXMLPluginFile(const std::string& xml_file, std::map<std::string, ClassDesc>& classes_available)
   /***************************************************************************/
   {
+    ROS_DEBUG("pluginlib::ClassLoader: Processing xml file %s...", xml_file.c_str());
     TiXmlDocument document;
     document.LoadFile(xml_file);
     TiXmlElement * config = document.RootElement();
@@ -548,11 +549,14 @@ namespace pluginlib
         std::string lookup_name;
         if(class_element->Attribute("name") != NULL)
         {
-          ROS_DEBUG("XML file has no lookup name (i.e. magic name) for class %s, assuming lookup_name == real class name.", derived_class.c_str());
           lookup_name = class_element->Attribute("name");
+          ROS_DEBUG("XML file specifies lookup name (i.e. magic name) = %s.", lookup_name.c_str());          
         }
         else
+        {
+          ROS_DEBUG("XML file has no lookup name (i.e. magic name) for class %s, assuming lookup_name == real class name.", derived_class.c_str());
           lookup_name = derived_class;
+        }
 
         //make sure that this class is of the right type before registering it
         if(base_class_type == base_class_){
