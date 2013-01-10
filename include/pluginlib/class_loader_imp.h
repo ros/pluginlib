@@ -57,13 +57,16 @@ namespace pluginlib
   lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded until class loader is destroyed or force unload.
   /***************************************************************************/
   {
+    ROS_DEBUG("pluginlib::ClassLoader: Creating ClassLoader, base = %s, address = %p", base_class.c_str(), this);
     classes_available_ = determineAvailableClasses();
+    ROS_DEBUG("pluginlib::ClassLoader: Finished constructring ClassLoader, base = %s, address = %p", base_class.c_str(), this);
   }
 
   template <class T>
   ClassLoader<T>::~ClassLoader()
   /***************************************************************************/
   {
+    ROS_DEBUG("pluginlib::ClassLoader: Destroying ClassLoader, base = %s, address = %p", getBaseClassType().c_str(), this);
   }
 
   template <class T>
