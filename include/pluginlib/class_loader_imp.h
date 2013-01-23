@@ -391,7 +391,11 @@ namespace pluginlib
       }
       else if (boost::filesystem::exists(parent / "manifest.xml"))
       {
+#if BOOST_FILESYSTEM_VERSION >= 3
         std::string package = parent.filename().string();
+#else
+        std::string package = parent.filename();
+#endif
         std::string package_path = ros::package::getPath(package);
 
         if (plugin_xml_file_path.find(package_path) == 0) //package_path is a substr of passed plugin xml path
@@ -416,7 +420,11 @@ namespace pluginlib
   std::string ClassLoader<T>::getPathSeparator()
   /***************************************************************************/
   {
+#if BOOST_FILESYSTEM_VERSION >= 3
     return(boost::filesystem::path("/").native());
+#else
+    return(boost::filesystem::path("/").external_file_string());
+#endif
   }
 
 
