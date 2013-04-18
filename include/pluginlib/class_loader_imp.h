@@ -472,7 +472,8 @@ namespace pluginlib
   void ClassLoader<T>::loadLibraryForClass(const std::string& lookup_name)
   /***************************************************************************/
   {
-    if (classes_available_.find(lookup_name) == classes_available_.end())
+    ClassMapIterator it = classes_available_.find(lookup_name);
+    if (it == classes_available_.end())
     {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Class %s has no mapping in classes_available_.", lookup_name.c_str());
       throw pluginlib::LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
@@ -490,6 +491,7 @@ namespace pluginlib
     try
     {
       lowlevel_class_loader_.loadLibrary(library_path);
+      it->second.resolved_library_path_ = library_path;
     }
     catch(const class_loader::LibraryLoadException& ex)
     {

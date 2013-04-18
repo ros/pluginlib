@@ -118,6 +118,36 @@ TEST(PluginlibTest, workingPlugin)
   }
 }
 
+TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary)
+{
+  ROS_INFO( "Making the ClassLoader..." );
+  pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
+
+  ROS_INFO( "Instantiating plugin..." );
+  test_base::Fubar *inst = pl.createUnmanagedInstance("pluginlib/foo");
+
+  ROS_INFO( "Deleting plugin..." );
+  delete inst;
+
+  ROS_INFO( "Checking if plugin is loaded with isClassLoaded..." );
+  if( pl.isClassLoaded( "pluginlib/foo" ) )
+    ROS_INFO( "Class is loaded" );
+  else
+  {
+    FAIL() <<  "Library containing class should be loaded but isn't.";
+  }
+  ROS_INFO( "Trying to unload class with unloadLibraryForClass..." );
+  try
+  {
+    pl.unloadLibraryForClass("pluginlib/foo");
+  }
+  catch(pluginlib::PluginlibException& e)
+  {
+    FAIL() << "Could not unload library when I should be able to.";
+  }
+  ROS_INFO( "Done." );
+}
+
 // Run all the tests that were declared with TEST()
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
