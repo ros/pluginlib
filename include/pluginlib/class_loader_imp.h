@@ -50,7 +50,8 @@
 namespace pluginlib 
 {
   template <class T>
-  ClassLoader<T>::ClassLoader(std::string package, std::string base_class, std::string attrib_name) :
+  ClassLoader<T>::ClassLoader(std::string package, std::string base_class, std::string attrib_name, std::vector<std::string> plugin_xml_paths) :
+  plugin_xml_paths_(plugin_xml_paths),
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
@@ -58,7 +59,11 @@ namespace pluginlib
   /***************************************************************************/
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Creating ClassLoader, base = %s, address = %p", base_class.c_str(), this);
-    classes_available_ = determineAvailableClasses();
+    if (plugin_xml_paths_.size() == 0)
+    {
+      plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
+    }
+    classes_available_ = determineAvailableClasses(plugin_xml_paths_);
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Finished constructring ClassLoader, base = %s, address = %p", base_class.c_str(), this);
   }
 
@@ -169,26 +174,34 @@ namespace pluginlib
   }
 
   template <class T>
-  std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses()
+  std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(const std::string& package, const std::string& attrib_name)
   /***************************************************************************/
   {
-    //mas - This method requires major refactoring...not only is it really long and confusing but a lot of the comments do not seem to be correct. With time I keep correcting small things, but a good rewrite is needed.
-  
-    ROS_DEBUG_NAMED("pluginlib.ClassLoader","Entering determineAvailableClasses()...");
-    std::map<std::string, ClassDesc> classes_available;
-    
     //Pull possible files from manifests of packages which depend on this package and export class
     std::vector<std::string> paths;
-    ros::package::getPlugins(package_, attrib_name_, paths);
+    ros::package::getPlugins(package, attrib_name, paths);
     if (paths.size() == 0)
     {
       std::string error_string = "rospack could not find the " + package_ + " package containing " +  base_class_;
       throw LibraryLoadException(error_string);
     }
+    return paths;
+  }
+
+  template <class T>
+  std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses(const std::vector<std::string>& plugin_xml_paths)
+  /***************************************************************************/
+  {
+    //mas - This method requires major refactoring...not only is it really long and confusing but a lot of the comments do not seem to be correct. With time I keep correcting small things, but a good rewrite is needed.
+
+    ROS_DEBUG_NAMED("pluginlib.ClassLoader","Entering determineAvailableClasses()...");
+    std::map<std::string, ClassDesc> classes_available;
 
     //Walk the list of all plugin XML files (variable "paths") that are exported by the build system
-    for (std::vector<std::string>::iterator it = paths.begin(); it != paths.end(); ++it)
+    for (std::vector<std::string>::const_iterator it = plugin_xml_paths.begin(); it != plugin_xml_paths.end(); ++it)
+    {
       processSingleXMLPluginFile(*it, classes_available);
+    }
 
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Exiting determineAvailableClasses()...");
     return classes_available;
@@ -322,6 +335,13 @@ namespace pluginlib
     if (it != classes_available_.end())
       return it->second.package_;
     return "";
+  }
+
+  template <class T>
+  std::vector<std::string> ClassLoader<T>::getPluginXmlPaths()
+  /***************************************************************************/
+  {
+    return plugin_xml_paths_;
   }
 
   template <class T>
@@ -623,7 +643,8 @@ namespace pluginlib
     }
 
     // add new classes
-    std::map<std::string, ClassDesc> updated_classes = determineAvailableClasses();
+    plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
+    std::map<std::string, ClassDesc> updated_classes = determineAvailableClasses(plugin_xml_paths_);
     for (std::map<std::string, ClassDesc>::const_iterator it = updated_classes.begin(); it != updated_classes.end(); it++)
     {
       if (classes_available_.find(it->first) == classes_available_.end())
