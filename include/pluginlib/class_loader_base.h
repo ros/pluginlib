@@ -51,6 +51,12 @@ namespace pluginlib
       virtual ~ClassLoaderBase() {}
 
       /**
+       * @brief  Returns a list of all available plugin manifest paths for this ClassLoader's base class type
+       * @return A vector of strings corresponding to the paths of all available plugin manifests
+       */
+      virtual std::vector<std::string> getPluginXmlPaths() = 0;
+
+      /**
        * @brief  Returns a list of all available classes for this ClassLoader's base class type
        * @return A vector of strings corresponding to the names of all available classes
        */

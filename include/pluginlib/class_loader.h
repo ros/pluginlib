@@ -61,9 +61,10 @@ namespace pluginlib
          * @param package The package containing the base class
          * @param base_class The type of the base class for classes to be loaded
          * @param attrib_name The attribute to search for in manifext.xml files, defaults to "plugin"
+         * @param plugin_xml_paths The list of paths of plugin.xml files, defaults to be crawled via ros::package::getPlugins()
          * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
          */
-        ClassLoader(std::string package, std::string base_class, std::string attrib_name = std::string("plugin"));
+        ClassLoader(std::string package, std::string base_class, std::string attrib_name = std::string("plugin"), std::vector<std::string> plugin_xml_paths = std::vector<std::string>());
 
         /**
          * @brief  Destructor for ClassLoader
@@ -99,6 +100,12 @@ namespace pluginlib
          * @return An instance of the class
          */
         T* createUnmanagedInstance(const std::string& lookup_name);
+
+        /**
+         * @brief  Returns a list of all available plugin manifest paths for this ClassLoader's base class type
+         * @return A vector of strings corresponding to the paths of all available plugin manifests
+         */
+        std::vector<std::string> getPluginXmlPaths();
 
         /**
          * @brief  Returns a list of all available classes for this ClassLoader's base class type
@@ -202,11 +209,19 @@ namespace pluginlib
         std::string callCommandLine(const char* cmd);
 
         /**
+         * Returns the paths to plugin.xml files.
+         * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
+         * @return A vector of paths
+         */
+        std::vector<std::string> getPluginXmlPaths(const std::string& package, const std::string& attrib_name);
+
+        /**
          * @brief  Returns the available classes
+         * @param plugin_xml_paths The vector of paths of plugin.xml files
          * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
          * @return A map of class names and the corresponding descriptions
          */
-        std::map<std::string, ClassDesc> determineAvailableClasses();
+        std::map<std::string, ClassDesc> determineAvailableClasses(const std::vector<std::string>& plugin_xml_paths);
 
         /**
         * Opens a package.xml file and extracts the package name (i.e. contents of <name> tag)
@@ -274,6 +289,7 @@ namespace pluginlib
         int unloadClassLibraryInternal(const std::string& library_path);        
 
      private:
+        std::vector<std::string> plugin_xml_paths_;
         std::map<std::string, ClassDesc> classes_available_; //Map from library to class's descriptions described in XML
         std::string package_;
         std::string base_class_;
