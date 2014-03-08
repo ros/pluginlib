@@ -180,11 +180,6 @@ namespace pluginlib
     //Pull possible files from manifests of packages which depend on this package and export class
     std::vector<std::string> paths;
     ros::package::getPlugins(package, attrib_name, paths);
-    if (paths.size() == 0)
-    {
-      std::string error_string = "rospack could not find the " + package_ + " package containing " +  base_class_;
-      throw LibraryLoadException(error_string);
-    }
     return paths;
   }
 
