@@ -174,12 +174,12 @@ namespace pluginlib
   }
 
   template <class T>
-  std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(const std::string& package, const std::string& attrib_name)
+  std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(const std::string& package, const std::string& attrib_name, bool force_recrawl)
   /***************************************************************************/
   {
     //Pull possible files from manifests of packages which depend on this package and export class
     std::vector<std::string> paths;
-    ros::package::getPlugins(package, attrib_name, paths);
+    ros::package::getPlugins(package, attrib_name, paths, force_recrawl);
     return paths;
   }
 
@@ -638,7 +638,7 @@ namespace pluginlib
     }
 
     // add new classes
-    plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
+    plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_, true);
     std::map<std::string, ClassDesc> updated_classes = determineAvailableClasses(plugin_xml_paths_);
     for (std::map<std::string, ClassDesc>::const_iterator it = updated_classes.begin(); it != updated_classes.end(); it++)
     {
