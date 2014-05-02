@@ -213,7 +213,7 @@ namespace pluginlib
          * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
          * @return A vector of paths
          */
-        std::vector<std::string> getPluginXmlPaths(const std::string& package, const std::string& attrib_name);
+        std::vector<std::string> getPluginXmlPaths(const std::string& package, const std::string& attrib_name, bool force_recrawl=false);
 
         /**
          * @brief  Returns the available classes

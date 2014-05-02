@@ -20,13 +20,13 @@
   <build_depend>boost</build_depend>
   <build_depend>class_loader</build_depend>
   <build_depend>rosconsole</build_depend>
-  <build_depend>roslib</build_depend>
+  <build_depend version_gte="1.11.1">roslib</build_depend>
   <build_depend>tinyxml</build_depend>
 
   <run_depend>boost</run_depend>
   <run_depend>class_loader</run_depend>
   <run_depend>rosconsole</run_depend>
-  <run_depend>roslib</run_depend>
+  <run_depend version_gte="1.11.1">roslib</run_depend>
   <run_depend>tinyxml</run_depend>
 
   <export>
