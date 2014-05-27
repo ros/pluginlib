@@ -29,6 +29,9 @@ install(DIRECTORY include/pluginlib/
 install(FILES share/pluginlib/typed_class_loader_template.cpp
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
+install(PROGRAMS scripts/plugin_macro_update
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 if(CATKIN_ENABLE_TESTING)
   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
 
