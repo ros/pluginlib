@@ -32,7 +32,7 @@ install(FILES share/pluginlib/typed_class_loader_template.cpp
 install(PROGRAMS scripts/plugin_macro_update
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-if(CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING AND GTEST_FOUND)
   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
 
   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
