@@ -32,10 +32,12 @@ install(FILES share/pluginlib/typed_class_loader_template.cpp
 install(PROGRAMS scripts/plugin_macro_update
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-if(CATKIN_ENABLE_TESTING AND GTEST_FOUND)
+if(CATKIN_ENABLE_TESTING)
   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
 
   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
-  target_link_libraries(${PROJECT_NAME}_utest ${TinyXML_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-  add_dependencies(${PROJECT_NAME}_utest test_plugins)
+  if(TARGET ${PROJECT_NAME}_utest)
+    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+    add_dependencies(${PROJECT_NAME}_utest test_plugins)
+  endif()
 endif()
