@@ -385,7 +385,7 @@ namespace pluginlib
   {
     //remove the package name to get the raw plugin name
     std::vector<std::string> split;
-    boost::split(split, lookup_name, boost::is_any_of("/"));
+    boost::split(split, lookup_name, boost::is_any_of("/:"));
     return split.back();
   }
 
