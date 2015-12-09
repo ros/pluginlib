@@ -56,6 +56,16 @@ class LibraryLoadException: public PluginlibException
 };
 
 /**
+ * @class ClassLoaderException
+ * @brief An exception class thrown when pluginlib is unable to instantiate a class loader
+ */
+class ClassLoaderException: public PluginlibException
+{
+  public:
+    ClassLoaderException(const std::string error_desc) : PluginlibException(error_desc) {}
+};
+
+/**
  * @class LibraryUnloadException
  * @brief An exception class thrown when pluginlib is unable to unload the library associated with a given plugin
  */
