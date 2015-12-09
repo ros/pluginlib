@@ -55,7 +55,7 @@ TEST(PluginlibTest, invalidPackage)
   {
     pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib_bad", "test_base::Fubar");
   }
-  catch(pluginlib::LibraryLoadException& ex)
+  catch(pluginlib::ClassLoaderException& ex)
   {
     SUCCEED();
     return;
