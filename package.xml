@@ -7,7 +7,6 @@
   </description>
   <maintainer email="esteve@osrfoundation.org">Esteve Fernandez</maintainer>
   <license>BSD</license>
-  <license>Boost Software License</license>
 
   <url>http://www.ros.org/wiki/pluginlib</url>
   <author>Eitan Marder-Eppstein</author>
