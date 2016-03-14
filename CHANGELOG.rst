@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.2 (2016-03-14)
+-------------------
 * update maintainer
 * Merge pull request `#35 <https://github.com/ros/pluginlib/issues/35>`_ from jspricke/license_fix
   Remove Boost Software License from license tag
