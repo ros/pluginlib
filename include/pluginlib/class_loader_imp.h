@@ -55,7 +55,7 @@ namespace pluginlib
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
-  lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded until class loader is destroyed or force unload.
+  lowlevel_class_loader_(true) // Enable on-demand class loading/unloading
   /***************************************************************************/
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Creating ClassLoader, base = %s, address = %p", base_class.c_str(), this);
