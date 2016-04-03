@@ -40,4 +40,12 @@ if(CATKIN_ENABLE_TESTING)
     target_link_libraries(${PROJECT_NAME}_utest ${TinyXML_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
     add_dependencies(${PROJECT_NAME}_utest test_plugins)
   endif()
+
+  add_executable(issue1 test/issue1.cpp)
+  target_link_libraries(issue1 ${catkin_LIBRARIES} ${TinyXML_LIBRARIES} ${Boost_LIBRARIES})
+  add_dependencies(issue1 test_plugins)
+
+  add_executable(issue2 test/issue2.cpp)
+  target_link_libraries(issue2 ${catkin_LIBRARIES} ${TinyXML_LIBRARIES} ${Boost_LIBRARIES})
+  add_dependencies(issue2 test_plugins)
 endif()
