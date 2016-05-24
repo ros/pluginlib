@@ -5,11 +5,10 @@
 TEST(PluginlibTest, unknownPlugin)
 {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  test_base::Fubar* foo = NULL;
-  
+
   try
   {
-    foo = test_loader.createClassInstance("pluginlib/foobar");
+    boost::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foobar");
     foo->initialize(10.0);
   }
   catch(pluginlib::LibraryLoadException& ex)
@@ -29,11 +28,10 @@ TEST(PluginlibTest, unknownPlugin)
 TEST(PluginlibTest, misspelledPlugin)
 {
   pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib", "test_base::Fuba");
-  test_base::Fubar* foo = NULL;
-  
+
   try
   {
-    foo = bad_test_loader.createClassInstance("pluginlib/foo");
+    boost::shared_ptr<test_base::Fubar> foo = bad_test_loader.createInstance("pluginlib/foo");
     foo->initialize(10.0);
   }
   catch(pluginlib::LibraryLoadException& ex)
@@ -71,11 +69,10 @@ TEST(PluginlibTest, invalidPackage)
 TEST(PluginlibTest, brokenPlugin)
 {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  test_base::Fubar* none = NULL;
 
   try
   {
-    none = test_loader.createClassInstance("pluginlib/none");
+    boost::shared_ptr<test_base::Fubar> none = test_loader.createInstance("pluginlib/none");
     none->initialize(10.0);
   }
   catch(pluginlib::PluginlibException& ex)
@@ -98,11 +95,10 @@ TEST(PluginlibTest, brokenPlugin)
 TEST(PluginlibTest, workingPlugin)
 {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  test_base::Fubar* foo = NULL;
   
   try
   {
-    foo = test_loader.createClassInstance("pluginlib/foo");
+    boost::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foo");
     foo->initialize(10.0);
     EXPECT_EQ(foo->result(),100.0);
 
