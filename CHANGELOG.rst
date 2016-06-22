@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.3 (2016-06-22)
+-------------------
 * Merge pull request `#40 <https://github.com/ros/pluginlib/issues/40>`_ from ros/fix_warnings
   fix deprecated warnings in unit tests
 * fix deprecated warnings in unit tests
