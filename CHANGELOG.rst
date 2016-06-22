@@ -2,6 +2,14 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#40 <https://github.com/ros/pluginlib/issues/40>`_ from ros/fix_warnings
+  fix deprecated warnings in unit tests
+* fix deprecated warnings in unit tests
+* removed merge messages and redundant commits
+* Contributors: Mikael Arguedas
+
 1.10.2 (2016-03-14)
 -------------------
 * Remove Boost Software License from license tag `#35 <https://github.com/ros/pluginlib/issues/35>`_
