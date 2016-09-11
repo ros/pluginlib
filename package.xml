@@ -33,5 +33,6 @@
 
   <export>
     <pluginlib plugin="${prefix}/test/test_plugins.xml"/>
+    <pluginlib plugin_test="${prefix}/test/test_plugins_broken.xml"/>
   </export>
 </package>

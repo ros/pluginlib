@@ -24,7 +24,6 @@ TEST(PluginlibTest, unknownPlugin)
  
 }
 
-
 TEST(PluginlibTest, misspelledPlugin)
 {
   pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib", "test_base::Fuba");
@@ -172,6 +171,25 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary)
     FAIL() << "Could not unload library when I should be able to.";
   }
   ROS_INFO( "Done." );
+}
+
+TEST(PluginlibTest, brokenXML)
+{
+  try
+  {
+    pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar", "plugin_test");
+  }
+  catch(pluginlib::ClassLoaderException& ex)
+  {
+    SUCCEED();
+    return;
+  }
+  //catch(...)
+  //{
+  //  FAIL() << "Uncaught exception";
+  //}
+  ADD_FAILURE() << "Didn't throw exception as expected";
+
 }
 
 // Run all the tests that were declared with TEST()
