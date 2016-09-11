@@ -599,8 +599,19 @@ namespace pluginlib
       TiXmlElement* class_element = library->FirstChildElement("class");
       while (class_element)
       {
-        std::string base_class_type = class_element->Attribute("base_class_type");
-        std::string derived_class = class_element->Attribute("type");
+        std::string derived_class;
+        if (class_element->Attribute("type") != NULL) {
+          derived_class = std::string(class_element->Attribute("type"));
+        } else {
+          throw pluginlib::ClassLoaderException("Class could not be loaded. Attribute 'type' in class tag is missing.");
+        }
+
+        std::string base_class_type;
+        if (class_element->Attribute("base_class_type") != NULL) {
+          base_class_type = std::string(class_element->Attribute("base_class_type"));
+        } else {
+          throw pluginlib::ClassLoaderException("Class could not be loaded. Attribute 'base_class_type' in class tag is missing.");
+        }
 
         std::string lookup_name;
         if(class_element->Attribute("name") != NULL)
