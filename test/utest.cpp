@@ -184,12 +184,8 @@ TEST(PluginlibTest, brokenXML)
     SUCCEED();
     return;
   }
-  //catch(...)
-  //{
-  //  FAIL() << "Uncaught exception";
-  //}
-  ADD_FAILURE() << "Didn't throw exception as expected";
 
+  ADD_FAILURE() << "Didn't throw exception as expected";
 }
 
 // Run all the tests that were declared with TEST()
