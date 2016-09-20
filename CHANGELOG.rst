@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.4 (2016-09-20)
+-------------------
 * Merge pull request `#42 <https://github.com/ros/pluginlib/issues/42>`_ from delftrobotics-forks/unique-ptr
   Add std::unique_ptr API
 * Add unit test for unique_ptr API.
