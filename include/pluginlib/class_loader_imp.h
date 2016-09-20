@@ -47,7 +47,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace pluginlib 
+namespace pluginlib
 {
   template <class T>
   ClassLoader<T>::ClassLoader(std::string package, std::string base_class, std::string attrib_name, std::vector<std::string> plugin_xml_paths) :
@@ -103,8 +103,8 @@ namespace pluginlib
   {
     //Note: This method is deprecated
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","In deprecated call createClassInstance(), lookup_name = %s, auto_load = %i.", (lookup_name.c_str()), auto_load);
-        
-    if(auto_load && !isClassLoaded(lookup_name))
+
+    if (auto_load && !isClassLoaded(lookup_name))
     {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Autoloading class library before attempting to create instance.");
       loadLibraryForClass(lookup_name);
@@ -115,42 +115,71 @@ namespace pluginlib
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Attempting to create instance through low-level MultiLibraryClassLoader...");
       T* obj = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Instance created with object pointer = %p", obj);
-      
+
       return obj;
     }
-    catch(const class_loader::CreateClassException& ex)
+    catch (const class_loader::CreateClassException& ex)
     {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","CreateClassException about to be raised for class %s", lookup_name.c_str());
-      throw(pluginlib::CreateClassException(ex.what()));
+      throw pluginlib::CreateClassException(ex.what());
     }
   }
-  
+
   template <class T>
   boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string& lookup_name)
   /***************************************************************************/
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Attempting to create managed instance for class %s.", lookup_name.c_str());
-    
-    if(!isClassLoaded(lookup_name))
+
+    if (!isClassLoaded(lookup_name))
       loadLibraryForClass(lookup_name);
-    
+
     try
     {
       std::string class_type = getClassType(lookup_name);
-      ROS_DEBUG_NAMED("pluginlib.ClassLoader","%s maps to real class type %s", lookup_name.c_str(), class_type.c_str());    
-    
+      ROS_DEBUG_NAMED("pluginlib.ClassLoader","%s maps to real class type %s", lookup_name.c_str(), class_type.c_str());
+
       boost::shared_ptr<T> obj = lowlevel_class_loader_.createInstance<T>(class_type);
-      
-      ROS_DEBUG_NAMED("pluginlib.ClassLoader","boost::shared_ptr to object of real type %s created.", class_type.c_str());    
-      
+
+      ROS_DEBUG_NAMED("pluginlib.ClassLoader","boost::shared_ptr to object of real type %s created.", class_type.c_str());
+
       return obj;
     }
-    catch(const class_loader::CreateClassException& ex)
+    catch (const class_loader::CreateClassException& ex)
     {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Exception raised by low-level multi-library class loader when attempting to create instance of class %s.", lookup_name.c_str());
-      throw(pluginlib::CreateClassException(ex.what()));
+      throw pluginlib::CreateClassException(ex.what());
     }
   }
+
+#if __cplusplus >= 201103L
+  template <class T>
+  UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string& lookup_name)
+  {
+    ROS_DEBUG_NAMED("pluginlib.ClassLoader","Attempting to create managed (unique) instance for class %s.", lookup_name.c_str());
+
+    if (!isClassLoaded(lookup_name))
+      loadLibraryForClass(lookup_name);
+
+    try
+    {
+      std::string class_type = getClassType(lookup_name);
+      ROS_DEBUG_NAMED("pluginlib.ClassLoader","%s maps to real class type %s", lookup_name.c_str(), class_type.c_str());
+
+      UniquePtr<T> obj = lowlevel_class_loader_.createUniqueInstance<T>(class_type);
+
+      ROS_DEBUG_NAMED("pluginlib.ClassLoader","std::unique_ptr to object of real type %s created.", class_type.c_str());
+
+      return obj;
+    }
+    catch (const class_loader::CreateClassException& ex)
+    {
+      ROS_DEBUG_NAMED("pluginlib.ClassLoader","Exception raised by low-level multi-library class loader when attempting to create instance of class %s.", lookup_name.c_str());
+      throw pluginlib::CreateClassException(ex.what());
+    }
+
+  }
+#endif
 
   template <class T>
   T* ClassLoader<T>::createUnmanagedInstance(const std::string& lookup_name)
@@ -158,7 +187,7 @@ namespace pluginlib
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Attempting to create UNMANAGED instance for class %s.", lookup_name.c_str());
 
-    if(!isClassLoaded(lookup_name))
+    if (!isClassLoaded(lookup_name))
       loadLibraryForClass(lookup_name);
 
     T* instance = 0;
@@ -170,10 +199,10 @@ namespace pluginlib
       instance = lowlevel_class_loader_.createUnmanagedInstance<T>(class_type);
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Instance of type %s created.", class_type.c_str());
     }
-    catch(const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
+    catch (const class_loader::CreateClassException& ex) //mas - change exception type here (DONE)
     {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader","Exception raised by low-level multi-library class loader when attempting to create UNMANAGED instance of class %s.", lookup_name.c_str());
-      throw(pluginlib::CreateClassException(ex.what()));   
+      throw pluginlib::CreateClassException(ex.what());
     }
     return instance;
   }
@@ -209,7 +238,7 @@ namespace pluginlib
 
   template <class T>
   std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string& package_xml_path)
- /***************************************************************************/  
+ /***************************************************************************/
   {
       TiXmlDocument document;
       document.LoadFile(package_xml_path);
@@ -380,7 +409,7 @@ namespace pluginlib
     {
       declared_types = declared_types + std::string(" ") + types[i];
     }
-    return "According to the loaded plugin descriptions the class " + lookup_name 
+    return "According to the loaded plugin descriptions the class " + lookup_name
       + " with base class type " + base_class_ + " does not exist. Declared types are " + declared_types;
   }
 
@@ -396,9 +425,9 @@ namespace pluginlib
 
   template <class T>
   std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_file_path)
- /***************************************************************************/  
+ /***************************************************************************/
   {
-    //Note: This method takes an input a path to a plugin xml file and must determine which 
+    //Note: This method takes an input a path to a plugin xml file and must determine which
     //package the XML file came from. This is not necessariliy the same thing as the member
     //variable "package_". The plugin xml file can be located anywhere in the source tree for a
     //package
@@ -437,7 +466,7 @@ namespace pluginlib
         {
           package_name = package;
           break;
-        }       
+        }
       }
 
       //Recursive case - hop one folder up
@@ -448,7 +477,7 @@ namespace pluginlib
         return "";
     }
 
-    return package_name;    
+    return package_name;
   }
 
   template <class T>
@@ -617,7 +646,7 @@ namespace pluginlib
         if(class_element->Attribute("name") != NULL)
         {
           lookup_name = class_element->Attribute("name");
-          ROS_DEBUG_NAMED("pluginlib.ClassLoader","XML file specifies lookup name (i.e. magic name) = %s.", lookup_name.c_str());          
+          ROS_DEBUG_NAMED("pluginlib.ClassLoader","XML file specifies lookup name (i.e. magic name) = %s.", lookup_name.c_str());
         }
         else
         {
@@ -716,7 +745,7 @@ namespace pluginlib
 
 }
 
-  
+
 
 
 #endif
