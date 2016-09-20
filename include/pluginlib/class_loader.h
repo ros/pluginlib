@@ -45,6 +45,11 @@
 
 namespace pluginlib
 {
+
+#if __cplusplus >= 201103L
+  template<typename T>
+  using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
+#endif
   /**
    * @class ClassLoader
    * @brief A class to help manage and load classes
@@ -83,7 +88,8 @@ namespace pluginlib
         __attribute__((deprecated)) T* createClassInstance(const std::string& lookup_name, bool auto_load = true);
 
         /**
-         * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter). Deleting the instance and calling unloadLibraryForClass() is automatically handled by the shared pointer.
+         * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
+         * Deleting the instance and calling unloadLibraryForClass() is automatically handled by the shared pointer.
          * @param  lookup_name The name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
@@ -91,9 +97,25 @@ namespace pluginlib
          */
         boost::shared_ptr<T> createInstance(const std::string& lookup_name);
 
+#if __cplusplus >= 201103L
         /**
          * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
-         * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass() (in order to decrement the associated library counter and unloading it if it is no more used).
+         * Deleting the instance and calling unloadLibraryForClass() is automatically handled by the unique pointer.
+         *
+         * If you release the wrapped pointer you must manually call the original deleter when you want to destroy the released pointer.
+         *
+         * @param  lookup_name The name of the class to load
+         * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
+         * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+         * @return An instance of the class
+         */
+        UniquePtr<T> createUniqueInstance(const std::string& lookup_name);
+#endif
+
+        /**
+         * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
+         * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass()
+         * (in order to decrement the associated library counter and unloading it if it is no more used).
          * @param  lookup_name The name of the class to load
          * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
          * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
@@ -173,7 +195,7 @@ namespace pluginlib
          * @return True if the class is loaded, false otherwise
          */
         bool isClassLoaded(const std::string& lookup_name);
-        
+
         /**
          * @brief  Checks if the class associated with a plugin name is available to be loaded
          * @param lookup_name The name of the plugin
@@ -249,7 +271,7 @@ namespace pluginlib
          * Gets the standard path separator for the native OS (e.g. "/" on *nix, "\" on windows)
          */
         std::string getPathSeparator();
-        
+
         /**
          * Gets the path where rosbuild build system thinks plugins are installed
          */
