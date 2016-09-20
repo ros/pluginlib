@@ -2,6 +2,20 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#42 <https://github.com/ros/pluginlib/issues/42>`_ from delftrobotics-forks/unique-ptr
+  Add std::unique_ptr API
+* Add unit test for unique_ptr API.
+* Simplify unit tests with ASSERT_THROW.
+* Add ClassLoader::createUniqueInstance.
+* Wrap long comment on createInstance and friend.
+* Throw exception if plugin.xml is broken (`#41 <https://github.com/ros/pluginlib/issues/41>`_)
+  * added test case for broken xml files with missing attributes of class tag
+  * added checks if all needed attributes of the class tag are existing
+  * removed comment and empty line
+* Contributors: Maarten de Vries, Mikael Arguedas, cwecht
+
 1.10.3 (2016-06-22)
 -------------------
 * Merge pull request `#40 <https://github.com/ros/pluginlib/issues/40>`_ from ros/fix_warnings
@@ -104,7 +118,7 @@ Changelog for package pluginlib
 
 1.9.13 (2012-12-11)
 -------------------
-* Made robust to plugin package having different name from the folder it came from. `#6 <https://github.com/ros/pluginlib/issues/6`_
+* Made robust to plugin package having different name from the folder it came from. ```#6 <https://github.com/ros/pluginlib/issues/6`_``
 * Contributors: Mirza Shah
 
 1.9.12 (2012-12-06)
