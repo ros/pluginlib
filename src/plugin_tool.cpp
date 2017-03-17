@@ -374,7 +374,7 @@ bool verifyCLIArguments()
 		return false;
 	}
 
-   for(int c = 0; c < args.size(); c++)
+   for(size_t c = 0; c < args.size(); c++)
       cout << "Arg " << c << ": " << args.at(c) << endl;
 
 	return(true);
