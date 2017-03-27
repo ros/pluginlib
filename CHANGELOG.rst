@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.5 (2017-03-27)
+-------------------
 * Merge pull request `#47 <https://github.com/ros/pluginlib/issues/47>`_ from ros/fix_conversion
   fix size_t to int conversion
 * fix int conversion
