@@ -225,10 +225,6 @@ namespace pluginlib
         virtual int unloadLibraryForClass(const std::string& lookup_name);
 
       private:
-        /**
-         * Calls a program from command line and returns output to stdout as a string
-         */
-        std::string callCommandLine(const char* cmd);
 
         /**
          * Returns the paths to plugin.xml files.
@@ -288,11 +284,6 @@ namespace pluginlib
         std::string joinPaths(const std::string& path1, const std::string& path2);
 
         /**
-         *Parses a string delimited by newlines into a vector of strings
-         */
-        std::vector<std::string> parseToStringVector(std::string newline_delimited_str);
-
-        /**
          * Parses a plugin XML file and inserts the appropriate ClassDesc entries into the passes classes_available map
          */
         void processSingleXMLPluginFile(const std::string& xml_file, std::map<std::string, ClassDesc>& class_available);
@@ -323,4 +314,3 @@ namespace pluginlib
 #include "class_loader_imp.h" //Note: The implementation of the methods is in a separate file for clarity
 
 #endif //PLUGINLIB_CLASS_LOADER_H
-
