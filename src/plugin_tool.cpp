@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 #include <pluginlib/class_loader.h>
 #include <ros/console.h>
 #include <iostream>
@@ -149,13 +149,13 @@ void generateAndLoadTypedPluginInterface()
 		cout << "Error: Failed to compile interface." << endl;
 		exit(-1);
 	}
-	else 
+	else
 	{
       cout << "Interface compiled to an object file, attempting to build..." << endl;
       if(-1 == system(cmd2.c_str()))
       {
          cout << "Error: Failed to build shared object." << endl;
-         exit(-1);         
+         exit(-1);
       }
       else
          cout << "Build of shared object succeeded." << endl;
@@ -165,7 +165,7 @@ void generateAndLoadTypedPluginInterface()
 	cout << "Loading shared object into memory." << endl;
 	g_class_loader_library_handle = dlopen("libTypedPluginInterface.so", RTLD_LAZY);
 	if(g_class_loader_library_handle)
-		cout << "Shared object successfully loaded into memory." << endl;		
+		cout << "Shared object successfully loaded into memory." << endl;
 	else
 	{
 		cout << "Error: Failed to load shared object into memory." << endl;
@@ -222,7 +222,7 @@ string getTypedClassLoaderTemplate()
 		file.get(c);
 		contents.push_back(c);
 		cout << c;
-	}		
+	}
 
 	return contents;
 }
@@ -250,7 +250,7 @@ void handleFindPluginRequest()
 	//string whereIsPluginLocated(const string& package_name, const string& class_name)
 	typedef std::string (*WhereIsFunc)(const string&, const string&);
 	WhereIsFunc f = getPluginFunction<WhereIsFunc>("whereIsPluginLocated");
-	
+
 	cout << "Attempting to find plugin " << pluginName() << " exported from package " << packageName() << "..." << endl;
 
 	if(f)
@@ -287,7 +287,7 @@ void handleListPluginsRequest()
 void handleLoadPluginRequest()
 /*****************************************************************************/
 {
-	//  bool loadPlugin(const string& package_name, const string& class_name)  
+	//  bool loadPlugin(const string& package_name, const string& class_name)
 	typedef bool (*LoadPluginFunc)(const string&, const string&);
 	LoadPluginFunc f = getPluginFunction<LoadPluginFunc>("loadPlugin");
 	string plugin_name = getCLIArguments().at(4);
@@ -306,7 +306,7 @@ void handleLoadPluginRequest()
 	{
 		cout << "Error: Could not find function 'loadPlugin' in shared object." << endl;
 		exit(-1);
-	}	
+	}
 }
 
 vector<string> parseToStringVector(std::string newline_delimited_str)

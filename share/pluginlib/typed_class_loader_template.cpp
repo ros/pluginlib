@@ -39,7 +39,7 @@ extern "C"
   std::vector<std::string> availablePlugins(const std::string& package_name)
   {
     pluginlib::ClassLoader<$> class_loader(package_name, "$");
-    return(class_loader.getDeclaredClasses());    
+    return(class_loader.getDeclaredClasses());
   }
 
   bool loadPlugin(const std::string& package_name, const std::string& class_name)
@@ -47,7 +47,7 @@ extern "C"
     pluginlib::ClassLoader<$> class_loader(package_name, "$");
     try
     {
-      class_loader.createInstance(class_name);      
+      class_loader.createInstance(class_name);
       return true;
     }
     catch(...)

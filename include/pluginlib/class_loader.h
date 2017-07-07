@@ -280,12 +280,12 @@ namespace pluginlib
         /**
         * Gets the package name from a path to a plugin XML file
         */
-        std::string getPackageFromPluginXMLFilePath(const std::string & path);  
+        std::string getPackageFromPluginXMLFilePath(const std::string & path);
 
         /**
         * Joins two filesystem paths together utilzing appropriate path separator
         */
-        std::string joinPaths(const std::string& path1, const std::string& path2);       
+        std::string joinPaths(const std::string& path1, const std::string& path2);
 
         /**
          *Parses a string delimited by newlines into a vector of strings
@@ -308,7 +308,7 @@ namespace pluginlib
          * @param  library_path The exact path to the library to unload
          * @return The number of pending unloads until the library is removed from memory
          */
-        int unloadClassLibraryInternal(const std::string& library_path);        
+        int unloadClassLibraryInternal(const std::string& library_path);
 
      private:
         std::vector<std::string> plugin_xml_paths_;

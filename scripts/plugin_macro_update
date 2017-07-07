@@ -39,7 +39,7 @@ import subprocess
 cmd = "find . -type f ! -name '*.svn-base' -a ! -name '*.hg' -a ! -name '*.git' -a \( -name '*.c*' -o -name '*.h*' \) -exec sed -i '%(rule)s' {} \;"
 
 rules = ['s/PLUGINLIB_DECLARE_CLASS(.*,.*,\(.*\),\(.*\))/PLUGINLIB_EXPORT_CLASS(\\1,\\2)/g',
-         's/PLUGINLIB_REGISTER_CLASS(.*,\(.*\),\(.*\))/PLUGINLIB_EXPORT_CLASS(\\1,\\2)/g',   
+         's/PLUGINLIB_REGISTER_CLASS(.*,\(.*\),\(.*\))/PLUGINLIB_EXPORT_CLASS(\\1,\\2)/g',
         ]
 
 for rule in rules:

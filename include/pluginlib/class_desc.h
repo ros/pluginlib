@@ -45,7 +45,7 @@ namespace pluginlib {
     public:
       /**
        * @brief  Constructor for a ClassDesc
-       * @param lookup_name The lookup name of the class 
+       * @param lookup_name The lookup name of the class
        * @param derived_class The type of the derived class of the class
        * @param base_class The type of the class, corresponds to the type of the base class
        * @param package The package the class lives in
@@ -53,13 +53,13 @@ namespace pluginlib {
        * @param library_name The name of the containing library for the class (not a full path!)
        * @param plugin_manifest_path The path to the plugin manifest file
        */
-      ClassDesc(const std::string& lookup_name, const std::string& derived_class, const std::string& base_class, const std::string& package, 
+      ClassDesc(const std::string& lookup_name, const std::string& derived_class, const std::string& base_class, const std::string& package,
           const std::string& description, const std::string& library_name, const std::string& plugin_manifest_path):
-        lookup_name_(lookup_name), 
+        lookup_name_(lookup_name),
         derived_class_(derived_class),
         base_class_(base_class),
         package_(package),
-        description_(description), 
+        description_(description),
         library_name_(library_name),
         resolved_library_path_("UNRESOLVED"),
         plugin_manifest_path_(plugin_manifest_path){}
