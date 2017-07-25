@@ -26,7 +26,7 @@
   <depend>class_loader</depend>
   <depend>rosconsole</depend>
   <depend version_gte="1.11.1">roslib</depend>
-  <depend>tinyxml</depend>
+  <depend>tinyxml2</depend>
 
   <export>
     <pluginlib plugin="${prefix}/test/test_plugins.xml"/>
