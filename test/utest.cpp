@@ -112,7 +112,7 @@ TEST(PluginlibTest, brokenXML)
   {
     pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar", "plugin_test");
   }
-  catch(pluginlib::ClassLoaderException& ex)
+  catch(pluginlib::InvalidXMLException& ex)
   {
     SUCCEED();
     return;
