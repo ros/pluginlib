@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.0 (2017-07-27)
+-------------------
 * Switch to Tinyxml2 (`#59 <https://github.com/ros/pluginlib/issues/59>`_)
 * do not use popen to solve catkin_path. (`#49 <https://github.com/ros/pluginlib/issues/49>`_)
 * switch to package format 2 (`#55 <https://github.com/ros/pluginlib/issues/55>`_)

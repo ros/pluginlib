@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>pluginlib</name>
-  <version>1.10.5</version>
+  <version>1.11.0</version>
   <description>
     The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure.
     To work, these tools require plugin providers to register their plugins in the package.xml of their package.
