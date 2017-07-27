@@ -39,13 +39,42 @@
 #ifndef PLUGINLIB_CLASS_LOADER_IMP_H_
 #define PLUGINLIB_CLASS_LOADER_IMP_H_
 
-#include "boost/bind.hpp"
-#include "boost/filesystem.hpp"
+#include <cstdlib>
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 #include <class_loader/class_loader.h>
 #include <list>
 #include "ros/package.h"
 #include <sstream>
 #include <stdexcept>
+
+#ifdef _WIN32
+const std::string os_pathsep(";");
+#else
+const std::string os_pathsep(":");
+#endif
+
+namespace
+{
+std::vector<std::string> catkinFindLib() {
+  std::vector<std::string> lib_paths;
+  const char* env = std::getenv("CMAKE_PREFIX_PATH");
+  if (env) {
+    std::string env_catkin_prefix_paths(env);
+    std::vector<std::string> catkin_prefix_paths;
+    boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
+    BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
+      boost::filesystem::path path(catkin_prefix_path);
+      boost::filesystem::path lib("lib");
+      lib_paths.push_back((path / lib).string());
+    }
+  }
+  return lib_paths;
+}
+
+}
 
 namespace pluginlib
 {
@@ -79,23 +108,6 @@ namespace pluginlib
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Destroying ClassLoader, base = %s, address = %p", getBaseClassType().c_str(), this);
   }
 
-  template <class T>
-  std::string ClassLoader<T>::callCommandLine(const char* cmd)
-  /***************************************************************************/
-  {
-    FILE* pipe = popen(cmd, "r");
-    if (!pipe)
-      return "ERROR";
-    char buffer[128];
-    std::string result = "";
-    while(!feof(pipe))
-    {
-      if(fgets(buffer, 128, pipe) != NULL)
-              result += buffer;
-    }
-    pclose(pipe);
-    return result;
-  }
 
   template <class T>
   T* ClassLoader<T>::createClassInstance(const std::string& lookup_name, bool auto_load)
@@ -265,8 +277,7 @@ namespace pluginlib
   std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
   /***************************************************************************/
   {
-    //TODO: This needs to be replaced with an api call
-    return(parseToStringVector(callCommandLine("catkin_find --lib")));
+    return(catkinFindLib());
   }
 
   template <class T>
@@ -563,27 +574,6 @@ namespace pluginlib
       throw pluginlib::LibraryLoadException(error_string);
     }
   }
-
-  template <class T>
-  std::vector<std::string> ClassLoader<T>::parseToStringVector(std::string newline_delimited_str)
-  /***************************************************************************/
-  {
-    std::string next;
-    std::vector<std::string> parse_result;
-    for(unsigned int c = 0; c < newline_delimited_str.size(); c++)
-    {
-      char ch = newline_delimited_str.at(c);
-      if(ch == '\n')
-      {
-        parse_result.push_back(next);
-        next = "";
-      }
-      else
-        next.push_back(ch);
-    }
-    return(parse_result);
-  }
-
 
   template <class T>
   void ClassLoader<T>::processSingleXMLPluginFile(const std::string& xml_file, std::map<std::string, ClassDesc>& classes_available)
