@@ -252,9 +252,9 @@ namespace pluginlib
   std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string& package_xml_path)
  /***************************************************************************/
   {
-      TiXmlDocument document;
-      document.LoadFile(package_xml_path);
-      TiXmlElement* doc_root_node = document.FirstChildElement("package");
+      tinyxml2::XMLDocument document;
+      document.LoadFile(package_xml_path.c_str());
+      tinyxml2::XMLElement* doc_root_node = document.FirstChildElement("package");
       if (doc_root_node == NULL)
       {
         ROS_ERROR_NAMED("pluginlib.ClassLoader","Could not find a root element for package manifest at %s.", package_xml_path.c_str());
@@ -263,7 +263,7 @@ namespace pluginlib
 
       assert(doc_root_node == document.RootElement());
 
-      TiXmlElement* package_name_node = doc_root_node->FirstChildElement("name");
+      tinyxml2::XMLElement* package_name_node = doc_root_node->FirstChildElement("name");
       if(package_name_node == NULL)
       {
         ROS_ERROR_NAMED("pluginlib.ClassLoader","package.xml at %s does not have a <name> tag! Cannot determine package which exports plugin.", package_xml_path.c_str());
@@ -580,28 +580,28 @@ namespace pluginlib
   /***************************************************************************/
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader","Processing xml file %s...", xml_file.c_str());
-    TiXmlDocument document;
-    document.LoadFile(xml_file);
-    TiXmlElement * config = document.RootElement();
+    tinyxml2::XMLDocument document;
+    document.LoadFile(xml_file.c_str());
+    tinyxml2::XMLElement * config = document.RootElement();
     if (config == NULL)
     {
-      ROS_ERROR_NAMED("pluginlib.ClassLoader","Skipping XML Document \"%s\" which had no Root Element.  This likely means the XML is malformed or missing.", xml_file.c_str());
+      throw pluginlib::InvalidXMLException("XML Document has no Root Element.  This likely means the XML is malformed or missing.");
       return;
     }
-    if (config->ValueStr() != "library" &&
-        config->ValueStr() != "class_libraries")
+    if (!(strcmp(config->Value(), "library") == 0 ||
+          strcmp(config->Value(), "class_libraries") == 0))
     {
-      ROS_ERROR_NAMED("pluginlib.ClassLoader","The XML document \"%s\" given to add must have either \"library\" or \
-          \"class_libraries\" as the root tag", xml_file.c_str());
+      throw pluginlib::InvalidXMLException("The XML document given to add must have either \"library\" or \
+          \"class_libraries\" as the root tag");
       return;
     }
     //Step into the filter list if necessary
-    if (config->ValueStr() == "class_libraries")
+    if (strcmp(config->Value(), "class_libraries") == 0)
     {
       config = config->FirstChildElement("library");
     }
 
-    TiXmlElement* library = config;
+    tinyxml2::XMLElement* library = config;
     while ( library != NULL)
     {
       std::string library_path = library->Attribute("path");
@@ -615,7 +615,7 @@ namespace pluginlib
       if (package_name == "")
         ROS_ERROR_NAMED("pluginlib.ClassLoader","Could not find package manifest (neither package.xml or deprecated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)", xml_file.c_str());
 
-      TiXmlElement* class_element = library->FirstChildElement("class");
+      tinyxml2::XMLElement* class_element = library->FirstChildElement("class");
       while (class_element)
       {
         std::string derived_class;
@@ -648,7 +648,7 @@ namespace pluginlib
         if(base_class_type == base_class_){
 
           // register class here
-          TiXmlElement* description = class_element->FirstChildElement("description");
+          tinyxml2::XMLElement* description = class_element->FirstChildElement("description");
           std::string description_str;
           if (description)
             description_str = description->GetText() ? description->GetText() : "";

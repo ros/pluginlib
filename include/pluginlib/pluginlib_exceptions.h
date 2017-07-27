@@ -46,6 +46,16 @@ class PluginlibException: public std::runtime_error
 };
 
 /**
+ * @class InvalidXMLException
+ * @brief An exception class thrown when pluginlib is unable to load a plugin XML file
+ */
+class InvalidXMLException: public PluginlibException
+{
+  public:
+    InvalidXMLException(const std::string error_desc) : PluginlibException(error_desc) {}
+};
+
+/**
  * @class LibraryLoadException
  * @brief An exception class thrown when pluginlib is unable to load the library associated with a given plugin
  */
