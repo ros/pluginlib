@@ -585,14 +585,14 @@ namespace pluginlib
     TiXmlElement * config = document.RootElement();
     if (config == NULL)
     {
-      ROS_ERROR_NAMED("pluginlib.ClassLoader","Skipping XML Document \"%s\" which had no Root Element.  This likely means the XML is malformed or missing.", xml_file.c_str());
+      throw pluginlib::InvalidXMLException("XML Document has no Root Element.  This likely means the XML is malformed or missing.");
       return;
     }
     if (config->ValueStr() != "library" &&
         config->ValueStr() != "class_libraries")
     {
-      ROS_ERROR_NAMED("pluginlib.ClassLoader","The XML document \"%s\" given to add must have either \"library\" or \
-          \"class_libraries\" as the root tag", xml_file.c_str());
+      throw pluginlib::InvalidXMLException("The XML document given to add must have either \"library\" or \
+          \"class_libraries\" as the root tag");
       return;
     }
     //Step into the filter list if necessary
