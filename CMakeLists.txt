@@ -3,20 +3,20 @@ project(pluginlib)
 
 find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib cmake_modules)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
-find_package(TinyXML2 REQUIRED)
+find_package(TinyXML REQUIRED)
 
 catkin_python_setup()
 
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS class_loader rosconsole roslib
-  DEPENDS Boost TinyXML2
+  DEPENDS Boost TinyXML
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${TinyXML2_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
 add_executable(plugin_tool src/plugin_tool.cpp)
-target_link_libraries(plugin_tool ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML2_LIBRARIES})
+target_link_libraries(plugin_tool ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
 
 install(TARGETS plugin_tool
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -37,7 +37,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
   if(TARGET ${PROJECT_NAME}_utest)
-    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
     add_dependencies(${PROJECT_NAME}_utest test_plugins)
   endif()
 
@@ -46,7 +46,7 @@ if(CATKIN_ENABLE_TESTING)
   if(COMPILER_SUPPORTS_CXX11)
     catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
     if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-      target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+      target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
       set_target_properties(${PROJECT_NAME}_unique_ptr_test PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
       add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
     endif()
