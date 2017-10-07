@@ -8,7 +8,7 @@ namespace test_plugins
 class Bar : public test_base::Fubar
 {
 public:
-  Bar(){}
+  Bar() {}
 
   void initialize(double foo)
   {
@@ -32,7 +32,7 @@ private:
 class Foo : public test_base::Fubar
 {
 public:
-  Foo(){}
+  Foo() {}
 
   void initialize(double foo)
   {
@@ -48,5 +48,5 @@ private:
   double foo_;
 
 };
-};
+}
 #endif
