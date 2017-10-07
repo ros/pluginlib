@@ -35,6 +35,9 @@
 *********************************************************************/
 #ifndef PLUGINLIB_CLASS_DESC_H_
 #define PLUGINLIB_CLASS_DESC_H_
+
+#include <string>
+
 namespace pluginlib {
   /**
    * @class ClassDesc
