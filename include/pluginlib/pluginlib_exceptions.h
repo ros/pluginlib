@@ -42,7 +42,7 @@ namespace pluginlib
 class PluginlibException: public std::runtime_error
 {
   public:
-    PluginlibException(const std::string error_desc) : std::runtime_error(error_desc) {}
+    PluginlibException(const std::string & error_desc) : std::runtime_error(error_desc) {}
 };
 
 /**
@@ -52,7 +52,7 @@ class PluginlibException: public std::runtime_error
 class InvalidXMLException: public PluginlibException
 {
   public:
-    InvalidXMLException(const std::string error_desc) : PluginlibException(error_desc) {}
+    InvalidXMLException(const std::string & error_desc) : PluginlibException(error_desc) {}
 };
 
 /**
@@ -62,7 +62,7 @@ class InvalidXMLException: public PluginlibException
 class LibraryLoadException: public PluginlibException
 {
   public:
-    LibraryLoadException(const std::string error_desc) : PluginlibException(error_desc) {}
+    LibraryLoadException(const std::string & error_desc) : PluginlibException(error_desc) {}
 };
 
 /**
@@ -72,7 +72,7 @@ class LibraryLoadException: public PluginlibException
 class ClassLoaderException: public PluginlibException
 {
   public:
-    ClassLoaderException(const std::string error_desc) : PluginlibException(error_desc) {}
+    ClassLoaderException(const std::string & error_desc) : PluginlibException(error_desc) {}
 };
 
 /**
@@ -82,7 +82,7 @@ class ClassLoaderException: public PluginlibException
 class LibraryUnloadException: public PluginlibException
 {
   public:
-    LibraryUnloadException(const std::string error_desc) : PluginlibException(error_desc) {}
+    LibraryUnloadException(const std::string & error_desc) : PluginlibException(error_desc) {}
 };
 
 /**
@@ -92,7 +92,7 @@ class LibraryUnloadException: public PluginlibException
 class CreateClassException: public PluginlibException
 {
   public:
-    CreateClassException(const std::string error_desc) : PluginlibException(error_desc) {}
+    CreateClassException(const std::string & error_desc) : PluginlibException(error_desc) {}
 };
 
 
