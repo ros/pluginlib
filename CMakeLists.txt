@@ -5,8 +5,6 @@ find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib cmake_mod
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 find_package(TinyXML2 REQUIRED)
 
-catkin_python_setup()
-
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS class_loader rosconsole roslib
@@ -15,9 +13,6 @@ catkin_package(
 
 install(DIRECTORY include/pluginlib/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-
-install(PROGRAMS scripts/plugin_macro_update
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 if(CATKIN_ENABLE_TESTING)
   include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${TinyXML2_INCLUDE_DIRS})
