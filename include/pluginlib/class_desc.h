@@ -33,22 +33,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 *********************************************************************/
-#ifndef PLUGINLIB_CLASS_DESC_H_
-#define PLUGINLIB_CLASS_DESC_H_
+
+#ifndef PLUGINLIB__CLASS_DESC_H_
+#define PLUGINLIB__CLASS_DESC_H_
 
 #include <string>
 
 namespace pluginlib
 {
-/**
- * @class ClassDesc
- * @brief Storage for information about a given class
- */
+
+/// Storage for information about a given class.
 class ClassDesc
 {
 public:
   /**
-   * @brief  Constructor for a ClassDesc
    * @param lookup_name The lookup name of the class
    * @param derived_class The type of the derived class of the class
    * @param base_class The type of the class, corresponds to the type of the base class
@@ -77,8 +75,10 @@ public:
   std::string package_;
   std::string description_;
   std::string library_name_;
-  std::string resolved_library_path_;     //This is set by pluginlib::ClassLoader at load time
+  std::string resolved_library_path_;  // This is set by pluginlib::ClassLoader at load time.
   std::string plugin_manifest_path_;
 };
-}
-#endif
+
+}  // namespace pluginlib
+
+#endif  // PLUGINLIB__CLASS_DESC_H_

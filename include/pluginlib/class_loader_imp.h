@@ -34,26 +34,31 @@
 *
 *********************************************************************/
 
-//NOTE: this should really never be included on its own, but just in case someone is bad we'll guard
-
-#ifndef PLUGINLIB_CLASS_LOADER_IMP_H_
-#define PLUGINLIB_CLASS_LOADER_IMP_H_
+#ifndef PLUGINLIB__CLASS_LOADER_IMP_H_
+#define PLUGINLIB__CLASS_LOADER_IMP_H_
 
 #include <cstdlib>
-#include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
-#include <class_loader/class_loader.h>
 #include <list>
-#include "ros/package.h"
+#include <map>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "boost/algorithm/string.hpp"
+#include "boost/bind.hpp"
+#include "boost/filesystem.hpp"
+#include "boost/foreach.hpp"
+#include "class_loader/class_loader.h"
+
+#include "ros/package.h"
 
 #ifdef _WIN32
-const std::string os_pathsep(";");
+const std::string os_pathsep(";");  // NOLINT
 #else
-const std::string os_pathsep(":");
+const std::string os_pathsep(":");  // NOLINT
 #endif
 
 namespace
@@ -75,7 +80,7 @@ std::vector<std::string> catkinFindLib()
   return lib_paths;
 }
 
-}
+}  // namespace
 
 namespace pluginlib
 {
@@ -87,7 +92,11 @@ ClassLoader<T>::ClassLoader(
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
-  lowlevel_class_loader_(false) //NOTE: The parameter to the class loader enables/disables on-demand class loading/unloading. Leaving it off for now...libraries will be loaded immediately and won't be unloaded until class loader is destroyed or force unload.
+  // NOTE: The parameter to the class loader enables/disables on-demand class
+  // loading/unloading.
+  // Leaving it off for now... libraries will be loaded immediately and won't
+  // be unloaded until class loader is destroyed or force unload.
+  lowlevel_class_loader_(false)
   /***************************************************************************/
 {
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Creating ClassLoader, base = %s, address = %p",
@@ -118,7 +127,7 @@ template<class T>
 T * ClassLoader<T>::createClassInstance(const std::string & lookup_name, bool auto_load)
 /***************************************************************************/
 {
-  //Note: This method is deprecated
+  // Note: This method is deprecated
   ROS_DEBUG_NAMED("pluginlib.ClassLoader",
     "In deprecated call createClassInstance(), lookup_name = %s, auto_load = %i.",
     (lookup_name.c_str()), auto_load);
@@ -167,7 +176,8 @@ boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_n
     return obj;
   } catch (const class_loader::CreateClassException & ex) {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Exception raised by low-level multi-library class loader when attempting to create instance of class %s.",
+      "Exception raised by low-level multi-library class loader when attempting "
+      "to create instance of class %s.",
       lookup_name.c_str());
     throw pluginlib::CreateClassException(ex.what());
   }
@@ -198,11 +208,11 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
     return obj;
   } catch (const class_loader::CreateClassException & ex) {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Exception raised by low-level multi-library class loader when attempting to create instance of class %s.",
+      "Exception raised by low-level multi-library class loader when attempting "
+      "to create instance of class %s.",
       lookup_name.c_str());
     throw pluginlib::CreateClassException(ex.what());
   }
-
 }
 #endif
 
@@ -226,9 +236,10 @@ T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name)
       lookup_name.c_str(), class_type.c_str());
     instance = lowlevel_class_loader_.createUnmanagedInstance<T>(class_type);
     ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Instance of type %s created.", class_type.c_str());
-  } catch (const class_loader::CreateClassException & ex) { //mas - change exception type here (DONE)
+  } catch (const class_loader::CreateClassException & ex) {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Exception raised by low-level multi-library class loader when attempting to create UNMANAGED instance of class %s.",
+      "Exception raised by low-level multi-library class loader when attempting "
+      "to create UNMANAGED instance of class %s.",
       lookup_name.c_str());
     throw pluginlib::CreateClassException(ex.what());
   }
@@ -242,7 +253,7 @@ std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(
   bool force_recrawl)
 /***************************************************************************/
 {
-  //Pull possible files from manifests of packages which depend on this package and export class
+  // Pull possible files from manifests of packages which depend on this package and export class
   std::vector<std::string> paths;
   ros::package::getPlugins(package, attrib_name, paths, force_recrawl);
   return paths;
@@ -253,12 +264,15 @@ std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses(
   const std::vector<std::string> & plugin_xml_paths)
 /***************************************************************************/
 {
-  //mas - This method requires major refactoring...not only is it really long and confusing but a lot of the comments do not seem to be correct. With time I keep correcting small things, but a good rewrite is needed.
+  // mas - This method requires major refactoring...
+  // not only is it really long and confusing but a lot of the comments do not
+  // seem to be correct.
+  // With time I keep correcting small things, but a good rewrite is needed.
 
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Entering determineAvailableClasses()...");
   std::map<std::string, ClassDesc> classes_available;
 
-  //Walk the list of all plugin XML files (variable "paths") that are exported by the build system
+  // Walk the list of all plugin XML files (variable "paths") that are exported by the build system
   for (std::vector<std::string>::const_iterator it = plugin_xml_paths.begin();
     it != plugin_xml_paths.end(); ++it)
   {
@@ -288,7 +302,8 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
   tinyxml2::XMLElement * package_name_node = doc_root_node->FirstChildElement("name");
   if (package_name_node == NULL) {
     ROS_ERROR_NAMED("pluginlib.ClassLoader",
-      "package.xml at %s does not have a <name> tag! Cannot determine package which exports plugin.",
+      "package.xml at %s does not have a <name> tag! Cannot determine package "
+      "which exports plugin.",
       package_xml_path.c_str());
     return "";
   }
@@ -309,10 +324,12 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   const std::string & exporting_package_name)
 /***************************************************************************/
 {
-  //Catkin-rosbuild Backwards Compatability Rules - Note library_name may be prefixed with relative path (e.g. "/lib/libFoo")
-  //1. Try catkin library paths (catkin_find --libs) + library_name + extension
-  //2. Try catkin library paths (catkin_find -- libs) + stripAllButFileFromPath(library_name) + extension
-  //3. Try export_pkg/library_name + extension
+  // Catkin-rosbuild Backwards Compatability Rules - Note library_name may be prefixed with
+  // relative path (e.g. "/lib/libFoo")
+  // 1. Try catkin library paths (catkin_find --libs) + library_name + extension
+  // 2. Try catkin library paths
+  //   (catkin_find -- libs) + stripAllButFileFromPath(library_name) + extension
+  // 3. Try export_pkg/library_name + extension
 
   std::vector<std::string> all_paths;
   std::vector<std::string> all_paths_without_extension = getCatkinLibraryPaths();
@@ -351,7 +368,7 @@ template<class T>
 bool ClassLoader<T>::isClassLoaded(const std::string & lookup_name)
 /***************************************************************************/
 {
-  return lowlevel_class_loader_.isClassAvailable<T>(getClassType(lookup_name));   //mas - (DONE)
+  return lowlevel_class_loader_.isClassAvailable<T>(getClassType(lookup_name));
 }
 
 template<class T>
@@ -464,35 +481,37 @@ template<class T>
 std::string ClassLoader<T>::getName(const std::string & lookup_name)
 /***************************************************************************/
 {
-  //remove the package name to get the raw plugin name
+  // remove the package name to get the raw plugin name
   std::vector<std::string> split;
   boost::split(split, lookup_name, boost::is_any_of("/:"));
   return split.back();
 }
 
 template<class T>
-std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_file_path)
+std::string
+ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_file_path)
 /***************************************************************************/
 {
-  //Note: This method takes an input a path to a plugin xml file and must determine which
-  //package the XML file came from. This is not necessariliy the same thing as the member
-  //variable "package_". The plugin xml file can be located anywhere in the source tree for a
-  //package
+  // Note: This method takes an input a path to a plugin xml file and must determine which
+  // package the XML file came from. This is not necessariliy the same thing as the member
+  // variable "package_". The plugin xml file can be located anywhere in the source tree for a
+  // package
 
-  //rosbuild:
-  //1. Find nearest encasing manifest.xml
-  //2. Once found, the name of the folder containg the manifest should be the package name we are looking for
-  //3. Confirm package is findable with rospack
+  // rosbuild:
+  // 1. Find nearest encasing manifest.xml
+  // 2. Once found, the name of the folder containg the manifest should be the
+  //   package name we are looking for
+  // 3. Confirm package is findable with rospack
 
-  //catkin:
-  //1. Find nearest encasing package.xml
-  //2. Extract name of package from package.xml
+  // catkin:
+  // 1. Find nearest encasing package.xml
+  // 2. Extract name of package from package.xml
 
   std::string package_name;
   boost::filesystem::path p(plugin_xml_file_path);
   boost::filesystem::path parent = p.parent_path();
 
-  //Figure out exactly which package the passed XML file is exported by.
+  // Figure out exactly which package the passed XML file is exported by.
   while (true) {
     if (boost::filesystem::exists(parent / "package.xml")) {
       std::string package_file_path = (boost::filesystem::path(parent / "package.xml")).string();
@@ -505,16 +524,17 @@ std::string ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & 
 #endif
       std::string package_path = ros::package::getPath(package);
 
-      if (plugin_xml_file_path.find(package_path) == 0) { //package_path is a substr of passed plugin xml path
+      // package_path is a substr of passed plugin xml path
+      if (plugin_xml_file_path.find(package_path) == 0) {
         package_name = package;
         break;
       }
     }
 
-    //Recursive case - hop one folder up
+    // Recursive case - hop one folder up
     parent = parent.parent_path().string();
 
-    //Base case - reached root and cannot find what we're looking for
+    // Base case - reached root and cannot find what we're looking for
     if (parent.string().empty()) {
       return "";
     }
@@ -593,7 +613,8 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
       lookup_name.c_str());
     std::ostringstream error_msg;
     error_msg << "Could not find library corresponding to plugin " << lookup_name <<
-      ". Make sure the plugin description XML file has the correct name of the library and that the library actually exists.";
+      ". Make sure the plugin description XML file has the correct name of the "
+      "library and that the library actually exists.";
     throw pluginlib::LibraryLoadException(error_msg.str());
   }
 
@@ -602,7 +623,9 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
     it->second.resolved_library_path_ = library_path;
   } catch (const class_loader::LibraryLoadException & ex) {
     std::string error_string = "Failed to load library " + library_path +
-      ". Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the library code, and that names are consistent between this macro and your XML. Error string: "
+      ". Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the "
+      "library code, and that names are consistent between this macro and your XML. "
+      "Error string: "
       +
       ex.what();
     throw pluginlib::LibraryLoadException(error_string);
@@ -621,18 +644,18 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLElement * config = document.RootElement();
   if (config == NULL) {
     throw pluginlib::InvalidXMLException(
-            "XML Document has no Root Element.  This likely means the XML is malformed or missing.");
+            "XML Document has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
   if (!(strcmp(config->Value(), "library") == 0 ||
     strcmp(config->Value(), "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
-            "The XML document given to add must have either \"library\" or \
-          \"class_libraries\" as the root tag");
+            "The XML document given to add must have either \"library\" or "
+            "\"class_libraries\" as the root tag");
     return;
   }
-  //Step into the filter list if necessary
+  // Step into the filter list if necessary
   if (strcmp(config->Value(), "class_libraries") == 0) {
     config = config->FirstChildElement("library");
   }
@@ -649,7 +672,9 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     std::string package_name = getPackageFromPluginXMLFilePath(xml_file);
     if (package_name == "") {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
-        "Could not find package manifest (neither package.xml or deprecated manifest.xml) at same directory level as the plugin XML file %s. Plugins will likely not be exported properly.\n)",
+        "Could not find package manifest (neither package.xml or deprecated "
+        "manifest.xml) at same directory level as the plugin XML file %s. "
+        "Plugins will likely not be exported properly.\n)",
         xml_file.c_str());
     }
 
@@ -679,14 +704,14 @@ void ClassLoader<T>::processSingleXMLPluginFile(
           lookup_name.c_str());
       } else {
         ROS_DEBUG_NAMED("pluginlib.ClassLoader",
-          "XML file has no lookup name (i.e. magic name) for class %s, assuming lookup_name == real class name.",
+          "XML file has no lookup name (i.e. magic name) for class %s, "
+          "assuming lookup_name == real class name.",
           derived_class.c_str());
         lookup_name = derived_class;
       }
 
-      //make sure that this class is of the right type before registering it
+      // make sure that this class is of the right type before registering it
       if (base_class_type == base_class_) {
-
         // register class here
         tinyxml2::XMLElement * description = class_element->FirstChildElement("description");
         std::string description_str;
@@ -701,7 +726,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
           library_path, xml_file)));
       }
 
-      //step to next class_element
+      // step to next class_element
       class_element = class_element->NextSiblingElement("class");
     }
     library = library->NextSiblingElement("library");
@@ -718,7 +743,6 @@ void ClassLoader<T>::refreshDeclaredClasses()
   for (std::map<std::string, ClassDesc>::const_iterator it = classes_available_.begin();
     it != classes_available_.end(); it++)
   {
-
     std::string resolved_library_path = it->second.resolved_library_path_;
     std::vector<std::string> open_libs = lowlevel_class_loader_.getRegisteredLibraries();
     if (std::find(open_libs.begin(), open_libs.end(), resolved_library_path) != open_libs.end()) {
@@ -778,7 +802,6 @@ int ClassLoader<T>::unloadClassLibraryInternal(const std::string & library_path)
   return lowlevel_class_loader_.unloadLibrary(library_path);
 }
 
-}
+}  // namespace pluginlib
 
-
-#endif
+#endif  // PLUGINLIB__CLASS_LOADER_IMP_H_
