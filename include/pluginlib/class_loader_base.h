@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLUGINLIB_CLASS_LOADER_BASE_H
-#define PLUGINLIB_CLASS_LOADER_BASE_H
+#ifndef PLUGINLIB__CLASS_LOADER_BASE_H_
+#define PLUGINLIB__CLASS_LOADER_BASE_H_
 
 #include <vector>
 #include <string>
@@ -36,12 +36,12 @@
 namespace pluginlib
 {
 /**
-  * Pure virtual base class of pluginlib::ClassLoader which is not
-  * templated.  This allows the writing of non-templated manager code
-  * which can call all the administrative functions of ClassLoaders -
-  * everything except createClassInstance(), createInstance()
-  * and createUnmanagedInstance().
-  */
+ * Pure virtual base class of pluginlib::ClassLoader which is not
+ * templated.  This allows the writing of non-templated manager code
+ * which can call all the administrative functions of ClassLoaders -
+ * everything except createClassInstance(), createInstance()
+ * and createUnmanagedInstance().
+ */
 class ClassLoaderBase
 {
 public:
@@ -50,8 +50,8 @@ public:
    */
   virtual ~ClassLoaderBase() {}
 
+  /// Return a list of all available plugin manifest paths.
   /**
-   * @brief  Returns a list of all available plugin manifest paths for this ClassLoader's base class type
    * @return A vector of strings corresponding to the paths of all available plugin manifests
    */
   virtual std::vector<std::string> getPluginXmlPaths() = 0;
@@ -82,8 +82,8 @@ public:
    */
   virtual bool isClassAvailable(const std::string & lookup_name) = 0;
 
+  /// Given the lookup name of a class, return the type of the derived class associated with it.
   /**
-   * @brief  Given the lookup name of a class, returns the type of the derived class associated with it
    * @param lookup_name The name of the class
    * @return The name of the associated derived class
    */
@@ -126,14 +126,16 @@ public:
   /**
    * @brief  Attempts to load a class with a given name
    * @param lookup_name The lookup name of the class to load
-   * @exception pluginlib::LibraryLoadException Thrown if the library for the class cannot be loaded
+   * @exception pluginlib::LibraryLoadException Thrown if the library for the
+   *   class cannot be loaded
    */
   virtual void loadLibraryForClass(const std::string & lookup_name) = 0;
 
   /**
    * @brief  Attempts to unload a class with a given name
    * @param lookup_name The lookup name of the class to unload
-   * @exception pluginlib::LibraryUnloadException Thrown if the library for the class cannot be unloaded
+   * @exception pluginlib::LibraryUnloadException Thrown if the library for the
+   *   class cannot be unloaded
    * @return The number of pending unloads until the library is removed from memory
    */
   virtual int unloadLibraryForClass(const std::string & lookup_name) = 0;
@@ -151,6 +153,6 @@ public:
    */
   virtual std::string getClassLibraryPath(const std::string & lookup_name) = 0;
 };
-}
+}  // namespace pluginlib
 
-#endif
+#endif  // PLUGINLIB__CLASS_LOADER_BASE_H_

@@ -26,22 +26,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PLUGINLIB_CLASS_LOADER_H
-#define PLUGINLIB_CLASS_LOADER_H
+
+#ifndef PLUGINLIB__CLASS_LOADER_H_
+#define PLUGINLIB__CLASS_LOADER_H_
+
+#include <map>
+#include <string>
+#include <vector>
 
 #include "boost/algorithm/string.hpp"
 #include "class_loader/multi_library_class_loader.h"
-#include <map>
 #include "pluginlib/class_desc.h"
 #include "pluginlib/class_loader_base.h"
 #include "pluginlib/pluginlib_exceptions.h"
 #include "ros/console.h"
 #include "ros/package.h"
-#include "tinyxml2.h"
+#include "tinyxml2.h"  // NOLINT
 
-//Note: pluginlib has traditionally utilized a "lookup name" for classes that does not match its real C++ name. This was
-//done due to limitations of how pluginlib was implemented. As of version 1.9, a lookup name is no longer necessary and
-//an attempt to the merge two concepts is underway
+// Note: pluginlib has traditionally utilized a "lookup name" for classes that does not match its
+// real C++ name.
+// This was done due to limitations of how pluginlib was implemented.
+// As of version 1.9, a lookup name is no longer necessary and an attempt to the merge two concepts
+// is underway.
 
 namespace pluginlib
 {
@@ -50,10 +56,7 @@ namespace pluginlib
 template<typename T>
 using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
 #endif
-/**
- * @class ClassLoader
- * @brief A class to help manage and load classes
- */
+/// A class to help manage and load classes.
 template<class T>
 class ClassLoader : public ClassLoaderBase
 {
@@ -62,11 +65,11 @@ public:
 
 public:
   /**
-   * @brief  Constructor for a ClassLoader
    * @param package The package containing the base class
    * @param base_class The type of the base class for classes to be loaded
    * @param attrib_name The attribute to search for in manifext.xml files, defaults to "plugin"
-   * @param plugin_xml_paths The list of paths of plugin.xml files, defaults to be crawled via ros::package::getPlugins()
+   * @param plugin_xml_paths The list of paths of plugin.xml files, defaults to be crawled via
+   *   ros::package::getPlugins()
    * @exception pluginlib::ClassLoaderException Thrown if package manifest cannot be found
    */
   ClassLoader(
@@ -74,17 +77,17 @@ public:
     std::string attrib_name = std::string("plugin"),
     std::vector<std::string> plugin_xml_paths = std::vector<std::string>());
 
-  /**
-   * @brief  Destructor for ClassLoader
-   */
   ~ClassLoader();
 
+  /// Creates an instance of a desired class, optionally loading the associated library too.
   /**
-   * @brief  Creates an instance of a desired class, optionally loading the associated library automatically if necessary
-   * @param  lookup_name The name of the class to load
-   * @param  auto_load Specifies whether or not to automatically load the library containing the class, set to true by default
-   * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
-   * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+   * @param lookup_name The name of the class to load
+   * @param auto_load Specifies whether or not to automatically load the
+   *   library containing the class, set to true by default.
+   * @exception pluginlib::LibraryLoadException Thrown when the library
+   *   associated with the class cannot be loaded
+   * @exception pluginlib::CreateClassException Thrown when the class cannot be
+   *   instantiated
    * @return An instance of the class
    * @deprecated use either createInstance() or createUnmanagedInstance().
    */
@@ -92,44 +95,61 @@ public:
     const std::string & lookup_name,
     bool auto_load = true);
 
+  /// Creates an instance of a desired class.
   /**
-   * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
-   * Deleting the instance and calling unloadLibraryForClass() is automatically handled by the shared pointer.
-   * @param  lookup_name The name of the class to load
-   * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
-   * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+   * Implicitly calls loadLibraryForClass() to increment the library counter.
+   *
+   * Deleting the instance and calling unloadLibraryForClass() is automatically
+   * handled by the shared pointer.
+   * @param lookup_name The name of the class to load
+   * @exception pluginlib::LibraryLoadException Thrown when the library
+   *   associated with the class cannot be loaded.
+   * @exception pluginlib::CreateClassException Thrown when the class cannot be
+   *   instantiated.
    * @return An instance of the class
    */
   boost::shared_ptr<T> createInstance(const std::string & lookup_name);
 
 #if __cplusplus >= 201103L
+  /// Creates an instance of a desired class.
   /**
-   * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
-   * Deleting the instance and calling unloadLibraryForClass() is automatically handled by the unique pointer.
+   * Implicitly calls loadLibraryForClass() to increment the library counter.
    *
-   * If you release the wrapped pointer you must manually call the original deleter when you want to destroy the released pointer.
+   * Deleting the instance and calling unloadLibraryForClass() is automatically
+   * handled by the unique pointer.
    *
-   * @param  lookup_name The name of the class to load
-   * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
-   * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+   * If you release the wrapped pointer you must manually call the original
+   * deleter when you want to destroy the released pointer.
+   *
+   * @param lookup_name The name of the class to load.
+   * @exception pluginlib::LibraryLoadException Thrown when the library
+   *   associated with the class cannot be loaded.
+   * @exception pluginlib::CreateClassException Thrown when the class cannot
+   *   be instantiated.
    * @return An instance of the class
    */
   UniquePtr<T> createUniqueInstance(const std::string & lookup_name);
 #endif
 
+  /// Creates an instance of a desired class.
   /**
-   * @brief  Creates an instance of a desired class (which implicitly calls loadLibraryForClass() to increment the library counter).
-   * @attention The ownership is transfered to the caller, which is responsible for deleting the instance and calling unloadLibraryForClass()
-   * (in order to decrement the associated library counter and unloading it if it is no more used).
-   * @param  lookup_name The name of the class to load
-   * @exception pluginlib::LibraryLoadException Thrown when the library associated with the class cannot be loaded
-   * @exception pluginlib::CreateClassException Thrown when the class cannot be instantiated
+   * Implicitly calls loadLibraryForClass() to increment the library counter.
+   *
+   * @attention The ownership is transfered to the caller, which is responsible
+   *   for deleting the instance and calling unloadLibraryForClass()
+   *   (in order to decrement the associated library counter and unloading it
+   *   if it is no more used).
+   * @param lookup_name The name of the class to load
+   * @exception pluginlib::LibraryLoadException Thrown when the library
+   *   associated with the class cannot be loaded
+   * @exception pluginlib::CreateClassException Thrown when the class cannot
+   *   be instantiated
    * @return An instance of the class
    */
   T * createUnmanagedInstance(const std::string & lookup_name);
 
+  /// Returns a list of all available plugin manifest paths for this ClassLoader's base class type.
   /**
-   * @brief  Returns a list of all available plugin manifest paths for this ClassLoader's base class type
    * @return A vector of strings corresponding to the paths of all available plugin manifests
    */
   std::vector<std::string> getPluginXmlPaths();
@@ -153,15 +173,15 @@ public:
    */
   virtual std::string getBaseClassType() const;
 
+  /// Given the lookup name of a class, returns the type of the derived class associated with it.
   /**
-   * @brief  Given the lookup name of a class, returns the type of the derived class associated with it
    * @param lookup_name The name of the class
    * @return The name of the associated derived class
    */
   virtual std::string getClassType(const std::string & lookup_name);
 
+  /// Given the lookup name of a class, returns its description.
   /**
-   * @brief  Given the lookup name of a class, returns its description
    * @param lookup_name The lookup name of the class
    * @return The description of the class
    */
@@ -208,10 +228,13 @@ public:
    */
   virtual bool isClassAvailable(const std::string & lookup_name);
 
+  /// Attempt to load the library containing a class with a given name.
   /**
-   * @brief  Attempts to load the library containing a class with a given name and increments a counter for the library
+   * The counter for the library uses (refcount) is also incremented.
+   *
    * @param lookup_name The lookup name of the class to load
-   * @exception pluginlib::LibraryLoadException Thrown if the library for the class cannot be loaded
+   * @exception pluginlib::LibraryLoadException Thrown if the library for the
+   *   class cannot be loaded
    */
   virtual void loadLibraryForClass(const std::string & lookup_name);
 
@@ -221,17 +244,20 @@ public:
    */
   virtual void refreshDeclaredClasses();
 
+  /// Decrement the counter for the library containing a class with a given name.
   /**
-   * @brief  Decrements the counter for the library containing a class with a given name and attempts to unload it if the counter reaches zero
+   * Also try to unload the library, If the counter reaches zero.
+   *
    * @param lookup_name The lookup name of the class to unload
-   * @exception pluginlib::LibraryUnloadException Thrown if the library for the class cannot be unloaded
+   * @exception pluginlib::LibraryUnloadException Thrown if the library for the
+   *   class cannot be unloaded
    * @return The number of pending unloads until the library is removed from memory
    */
   virtual int unloadLibraryForClass(const std::string & lookup_name);
 
 private:
+  /// Return the paths to plugin.xml files.
   /**
-   * Returns the paths to plugin.xml files.
    * @exception pluginlib::LibraryLoadException Thrown if package manifest cannot be found
    * @return A vector of paths
    */
@@ -254,8 +280,11 @@ private:
   */
   std::string extractPackageNameFromPackageXML(const std::string & package_xml_path);
 
+  /// Gets a list of paths to try to find a library.
   /**
-   * Gets a list of paths to try to find a library. As we transition from rosbuild to Catkin build systems, plugins can be found in the old rosbuild place (pkg_name/lib usually) or somewhere in the Catkin build space
+   * As we transition from rosbuild to Catkin build systems, plugins can be
+   * found in the old rosbuild place (pkg_name/lib usually) or somewhere in the
+   * Catkin build space.
    */
   std::vector<std::string> getAllLibraryPathsToTry(
     const std::string & library_name,
@@ -293,8 +322,10 @@ private:
   */
   std::string joinPaths(const std::string & path1, const std::string & path2);
 
+  /// Parse a plugin XML file.
   /**
-   * Parses a plugin XML file and inserts the appropriate ClassDesc entries into the passes classes_available map
+   * Also insert the appropriate ClassDesc entries into the passes
+   * classes_available map.
    */
   void processSingleXMLPluginFile(
     const std::string & xml_file, std::map<std::string,
@@ -315,14 +346,17 @@ private:
 
 private:
   std::vector<std::string> plugin_xml_paths_;
-  std::map<std::string, ClassDesc> classes_available_;       //Map from library to class's descriptions described in XML
+  // Map from library to class's descriptions described in XML.
+  std::map<std::string, ClassDesc> classes_available_;
   std::string package_;
   std::string base_class_;
   std::string attrib_name_;
-  class_loader::MultiLibraryClassLoader lowlevel_class_loader_;       //The underlying classloader
+  class_loader::MultiLibraryClassLoader lowlevel_class_loader_;  // The underlying classloader
 };
-}
 
-#include "class_loader_imp.h" //Note: The implementation of the methods is in a separate file for clarity
+}  // namespace pluginlib
 
-#endif //PLUGINLIB_CLASS_LOADER_H
+// Note: The implementation of the methods is in a separate file for clarity.
+#include "class_loader_imp.h"  // NOLINT
+
+#endif  // PLUGINLIB__CLASS_LOADER_H_
