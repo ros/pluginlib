@@ -1,6 +1,6 @@
 # while this doesn't require sudo we don't want to run within a Docker container
 sudo: true
-dist: trusty
+dist: xenial
 language: python
 python:
   - "3.5"
