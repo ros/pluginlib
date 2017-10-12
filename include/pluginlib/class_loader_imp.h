@@ -622,12 +622,11 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
     lowlevel_class_loader_.loadLibrary(library_path);
     it->second.resolved_library_path_ = library_path;
   } catch (const class_loader::LibraryLoadException & ex) {
-    std::string error_string = "Failed to load library " + library_path +
-      ". Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the "
+    std::string error_string =
+      "Failed to load library " + library_path + ". "
+      "Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the "
       "library code, and that names are consistent between this macro and your XML. "
-      "Error string: "
-      +
-      ex.what();
+      "Error string: " + ex.what();
     throw pluginlib::LibraryLoadException(error_string);
   }
 }

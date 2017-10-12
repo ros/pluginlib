@@ -76,7 +76,7 @@ TEST(PluginlibUniquePtrTest, createUniqueInstanceAndUnloadLibrary) {
   }
 
   ROS_INFO("Checking if plugin is loaded with isClassLoaded...");
-  if (pl.isClassLoaded("pluginlib/foo") ) {
+  if (pl.isClassLoaded("pluginlib/foo")) {
     ROS_INFO("Class is loaded");
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
