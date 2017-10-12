@@ -105,7 +105,7 @@ ClassLoader<T>::ClassLoader(
     throw pluginlib::ClassLoaderException("Unable to find package: " + package_);
   }
 
-  if (plugin_xml_paths_.size() == 0) {
+  if (0 == plugin_xml_paths_.size()) {
     plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
   }
   classes_available_ = determineAvailableClasses(plugin_xml_paths_);
@@ -290,17 +290,17 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
   tinyxml2::XMLDocument document;
   document.LoadFile(package_xml_path.c_str());
   tinyxml2::XMLElement * doc_root_node = document.FirstChildElement("package");
-  if (doc_root_node == NULL) {
+  if (NULL == doc_root_node) {
     ROS_ERROR_NAMED("pluginlib.ClassLoader",
       "Could not find a root element for package manifest at %s.",
       package_xml_path.c_str());
     return "";
   }
 
-  assert(doc_root_node == document.RootElement());
+  assert(document.RootElement() == doc_root_node);
 
   tinyxml2::XMLElement * package_name_node = doc_root_node->FirstChildElement("name");
-  if (package_name_node == NULL) {
+  if (NULL == package_name_node) {
     ROS_ERROR_NAMED("pluginlib.ClassLoader",
       "package.xml at %s does not have a <name> tag! Cannot determine package "
       "which exports plugin.",
@@ -334,7 +334,7 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   std::vector<std::string> all_paths;
   std::vector<std::string> all_paths_without_extension = getCatkinLibraryPaths();
   all_paths_without_extension.push_back(getROSBuildLibraryPath(exporting_package_name));
-  bool debug_library_suffix = (class_loader::systemLibrarySuffix().compare(0, 1, "d") == 0);
+  bool debug_library_suffix = (0 == class_loader::systemLibrarySuffix().compare(0, 1, "d"));
   std::string non_debug_suffix;
   if (debug_library_suffix) {
     non_debug_suffix = class_loader::systemLibrarySuffix().substr(1);
@@ -525,7 +525,7 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
       std::string package_path = ros::package::getPath(package);
 
       // package_path is a substr of passed plugin xml path
-      if (plugin_xml_file_path.find(package_path) == 0) {
+      if (0 == plugin_xml_file_path.find(package_path)) {
         package_name = package;
         break;
       }
@@ -608,7 +608,7 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
   }
 
   std::string library_path = getClassLibraryPath(lookup_name);
-  if (library_path == "") {
+  if ("" == library_path) {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader", "No path could be found to the library containing %s.",
       lookup_name.c_str());
     std::ostringstream error_msg;
@@ -641,7 +641,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLDocument document;
   document.LoadFile(xml_file.c_str());
   tinyxml2::XMLElement * config = document.RootElement();
-  if (config == NULL) {
+  if (NULL == config) {
     throw pluginlib::InvalidXMLException(
             "XML Document has no Root Element. This likely means the XML is malformed or missing.");
     return;
@@ -662,14 +662,14 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLElement * library = config;
   while (library != NULL) {
     std::string library_path = library->Attribute("path");
-    if (library_path.size() == 0) {
+    if (0 == library_path.size()) {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
         "Failed to find Path Attirbute in library element in %s", xml_file.c_str());
       continue;
     }
 
     std::string package_name = getPackageFromPluginXMLFilePath(xml_file);
-    if (package_name == "") {
+    if ("" == package_name) {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
         "Could not find package manifest (neither package.xml or deprecated "
         "manifest.xml) at same directory level as the plugin XML file %s. "
@@ -772,7 +772,7 @@ std::string ClassLoader<T>::stripAllButFileFromPath(const std::string & path)
 {
   std::string only_file;
   size_t c = path.find_last_of(getPathSeparator());
-  if (c == std::string::npos) {
+  if (std::string::npos == c) {
     return path;
   } else {
     return path.substr(c, path.size());

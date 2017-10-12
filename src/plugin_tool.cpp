@@ -234,9 +234,9 @@ string getTypedClassLoaderTemplateWithBaseSet()
 	string class_with_type_set;
 	for(unsigned int c = 0; c < class_template.size(); c++)
 	{
-		if(class_template.at(c) == '$')
+		if('$' == class_template.at(c))
 			class_with_type_set += baseClass();
-		else if(class_template.at(c) == '@')
+		else if('@' == class_template.at(c))
 			class_with_type_set += "#include \"" + baseClassHeader() + "\"";
 		else
 			class_with_type_set.push_back(class_template.at(c));
@@ -317,7 +317,7 @@ vector<string> parseToStringVector(std::string newline_delimited_str)
    for(unsigned int c = 0; c < newline_delimited_str.size(); c++)
    {
       char ch = newline_delimited_str.at(c);
-      if(ch == '\n')
+      if('\n' == ch)
       {
        parse_result.push_back(next);
        next = "";
@@ -333,11 +333,11 @@ void processUserCommand()
 {
 	string verb = commandVerb();
 
-	if (verb == "find")
+	if ("find" == verb)
 		handleFindPluginRequest();
-	else if (verb == "list")
+	else if ("list" == verb)
 		handleListPluginsRequest();
-	else if(verb == "load")
+	else if("load" == verb)
 		handleLoadPluginRequest();
 	else
 		cout << "Error: Unknown verb for plugin_tool, available verbs are 'load', 'list', and 'find'." << endl;
