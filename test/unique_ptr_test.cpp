@@ -57,7 +57,7 @@ TEST(PluginlibUniquePtrTest, workingPlugin) {
   try {
     pluginlib::UniquePtr<test_base::Fubar> foo = test_loader.createUniqueInstance("pluginlib/foo");
     foo->initialize(10.0);
-    EXPECT_EQ(foo->result(), 100.0);
+    EXPECT_EQ(100.0, foo->result());
   } catch (pluginlib::PluginlibException & ex) {
     FAIL() << "Throwing exception: " << ex.what();
     return;
