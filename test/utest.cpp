@@ -33,7 +33,7 @@ TEST(PluginlibTest, workingPlugin)
   {
     boost::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foo");
     foo->initialize(10.0);
-    EXPECT_EQ(foo->result(),100.0);
+    EXPECT_EQ(100, foo->result());
   }
   catch(pluginlib::PluginlibException& ex)
   {
