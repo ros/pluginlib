@@ -34,8 +34,8 @@
 *
 *********************************************************************/
 
-#ifndef PLUGINLIB_CLASS_LIST_MACROS_H_
-#define PLUGINLIB_CLASS_LIST_MACROS_H_
+#ifndef PLUGINLIB__CLASS_LIST_MACROS_H_
+#define PLUGINLIB__CLASS_LIST_MACROS_H_
 
 #include <class_loader/class_loader.h>
 
@@ -47,4 +47,4 @@
 #define PLUGINLIB_EXPORT_CLASS(class_type, base_class_type) \
   CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type);
 
-#endif  // PLUGINLIB_CLASS_LIST_MACROS_H_
+#endif  // PLUGINLIB__CLASS_LIST_MACROS_H_
