@@ -29,7 +29,7 @@ TEST(PluginlibUniquePtrTest, workingPlugin)
   {
     pluginlib::UniquePtr<test_base::Fubar> foo = test_loader.createUniqueInstance("pluginlib/foo");
     foo->initialize(10.0);
-    EXPECT_EQ(100.0, foo->result());
+    EXPECT_EQ(foo->result(),100.0);
   }
   catch(pluginlib::PluginlibException& ex)
   {
