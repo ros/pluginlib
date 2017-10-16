@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLUGINLIB__CLASS_LOADER_H_
-#define PLUGINLIB__CLASS_LOADER_H_
+#ifndef PLUGINLIB__CLASS_LOADER_HPP_
+#define PLUGINLIB__CLASS_LOADER_HPP_
 
 #include <map>
 #include <string>
@@ -36,9 +36,9 @@
 
 #include "boost/algorithm/string.hpp"
 #include "class_loader/multi_library_class_loader.h"
-#include "pluginlib/class_desc.h"
-#include "pluginlib/class_loader_base.h"
-#include "pluginlib/pluginlib_exceptions.h"
+#include "pluginlib/class_desc.hpp"
+#include "pluginlib/class_loader_base.hpp"
+#include "pluginlib/exceptions.hpp"
 #include "ros/console.h"
 #include "ros/package.h"
 #include "tinyxml2.h"  // NOLINT
@@ -347,6 +347,6 @@ private:
 }  // namespace pluginlib
 
 // Note: The implementation of the methods is in a separate file for clarity.
-#include "./class_loader_imp.h"
+#include "./class_loader_imp.hpp"
 
-#endif  // PLUGINLIB__CLASS_LOADER_H_
+#endif  // PLUGINLIB__CLASS_LOADER_HPP_
