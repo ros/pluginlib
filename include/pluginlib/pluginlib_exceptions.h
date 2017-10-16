@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
+ * Software License Agreement (BSD License)
+ *
+ * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +12,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
+ *     * Neither the name of the copyright holders nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
@@ -30,78 +32,10 @@
 #ifndef PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 #define PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 
-#include <stdexcept>
-#include <string>
+// *INDENT-OFF* (prevent uncrustify from adding indention below)
+#warning Including header <pluginlib/pluginlib_exceptions.h> is deprecated, \
+include <pluginlib/exceptions.hpp> instead.
 
-namespace pluginlib
-{
-
-/**
- * @class PluginlibException
- * @brief A base class for all pluginlib exceptions that inherits from std::runtime_exception
- */
-class PluginlibException : public std::runtime_error
-{
-public:
-  explicit PluginlibException(const std::string & error_desc)
-  : std::runtime_error(error_desc) {}
-};
-
-/**
- * @class InvalidXMLException
- * @brief An exception class thrown when pluginlib is unable to load a plugin XML file
- */
-class InvalidXMLException : public PluginlibException
-{
-public:
-  explicit InvalidXMLException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
-};
-
-/**
- * @class LibraryLoadException
- * @brief An exception class thrown when pluginlib is unable to load the library associated with a given plugin
- */
-class LibraryLoadException : public PluginlibException
-{
-public:
-  explicit LibraryLoadException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
-};
-
-/**
- * @class ClassLoaderException
- * @brief An exception class thrown when pluginlib is unable to instantiate a class loader
- */
-class ClassLoaderException : public PluginlibException
-{
-public:
-  explicit ClassLoaderException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
-};
-
-/**
- * @class LibraryUnloadException
- * @brief An exception class thrown when pluginlib is unable to unload the library associated with a given plugin
- */
-class LibraryUnloadException : public PluginlibException
-{
-public:
-  explicit LibraryUnloadException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
-};
-
-/**
- * @class CreateClassException
- * @brief An exception class thrown when pluginlib is unable to create the class associated with a given plugin
- */
-class CreateClassException : public PluginlibException
-{
-public:
-  explicit CreateClassException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
-};
-
-}  // namespace pluginlib
+#include "./exceptions.hpp"
 
 #endif  // PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
