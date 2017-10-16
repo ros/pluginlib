@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
-#define PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
+#ifndef PLUGINLIB__EXCEPTIONS_HPP_
+#define PLUGINLIB__EXCEPTIONS_HPP_
 
 #include <stdexcept>
 #include <string>
@@ -104,4 +104,4 @@ public:
 
 }  // namespace pluginlib
 
-#endif  // PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
+#endif  // PLUGINLIB__EXCEPTIONS_HPP_

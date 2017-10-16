@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLUGINLIB__CLASS_LOADER_BASE_H_
-#define PLUGINLIB__CLASS_LOADER_BASE_H_
+#ifndef PLUGINLIB__CLASS_LOADER_BASE_HPP_
+#define PLUGINLIB__CLASS_LOADER_BASE_HPP_
 
 #include <vector>
 #include <string>
@@ -155,4 +155,4 @@ public:
 };
 }  // namespace pluginlib
 
-#endif  // PLUGINLIB__CLASS_LOADER_BASE_H_
+#endif  // PLUGINLIB__CLASS_LOADER_BASE_HPP_

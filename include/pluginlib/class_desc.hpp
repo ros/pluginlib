@@ -34,8 +34,8 @@
 *
 *********************************************************************/
 
-#ifndef PLUGINLIB__CLASS_DESC_H_
-#define PLUGINLIB__CLASS_DESC_H_
+#ifndef PLUGINLIB__CLASS_DESC_HPP_
+#define PLUGINLIB__CLASS_DESC_HPP_
 
 #include <string>
 
@@ -81,4 +81,4 @@ public:
 
 }  // namespace pluginlib
 
-#endif  // PLUGINLIB__CLASS_DESC_H_
+#endif  // PLUGINLIB__CLASS_DESC_HPP_

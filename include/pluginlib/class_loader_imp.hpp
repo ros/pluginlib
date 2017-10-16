@@ -34,8 +34,8 @@
 *
 *********************************************************************/
 
-#ifndef PLUGINLIB__CLASS_LOADER_IMP_H_
-#define PLUGINLIB__CLASS_LOADER_IMP_H_
+#ifndef PLUGINLIB__CLASS_LOADER_IMP_HPP_
+#define PLUGINLIB__CLASS_LOADER_IMP_HPP_
 
 #include <cstdlib>
 #include <list>
@@ -54,6 +54,8 @@
 #include "class_loader/class_loader.h"
 
 #include "ros/package.h"
+
+#include "./class_loader.hpp"
 
 #ifdef _WIN32
 const std::string os_pathsep(";");  // NOLINT
@@ -803,4 +805,4 @@ int ClassLoader<T>::unloadClassLibraryInternal(const std::string & library_path)
 
 }  // namespace pluginlib
 
-#endif  // PLUGINLIB__CLASS_LOADER_IMP_H_
+#endif  // PLUGINLIB__CLASS_LOADER_IMP_HPP_
