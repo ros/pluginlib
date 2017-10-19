@@ -154,6 +154,15 @@ T * ClassLoader<T>::createClassInstance(const std::string & lookup_name, bool au
   }
 }
 
+#if __cplusplus >= 201103L
+template<class T>
+std::shared_ptr<T> ClassLoader<T>::createSharedInstance(const std::string & lookup_name)
+/***************************************************************************/
+{
+  return createUniqueInstance(lookup_name);
+}
+#endif
+
 template<class T>
 boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_name)
 /***************************************************************************/
