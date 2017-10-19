@@ -47,36 +47,35 @@
 #include <utility>
 #include <vector>
 
-#include "boost/algorithm/string.hpp"
-#include "boost/bind.hpp"
-#include "boost/filesystem.hpp"
-#include "boost/foreach.hpp"
 #include "class_loader/class_loader.h"
 
 #include "ros/package.h"
 
 #include "./class_loader.hpp"
+#include "./impl/filesystem_helper.hpp"
+#include "./impl/split.hpp"
 
 #ifdef _WIN32
-const std::string os_pathsep(";");  // NOLINT
+#define CLASS_LOADER_IMPL_OS_PATHSEP ";"
 #else
-const std::string os_pathsep(":");  // NOLINT
+#define CLASS_LOADER_IMPL_OS_PATHSEP ":"
 #endif
 
 namespace
 {
+
 std::vector<std::string> catkinFindLib()
 {
   std::vector<std::string> lib_paths;
   const char * env = std::getenv("CMAKE_PREFIX_PATH");
   if (env) {
     std::string env_catkin_prefix_paths(env);
-    std::vector<std::string> catkin_prefix_paths;
-    boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
-    BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
-      boost::filesystem::path path(catkin_prefix_path);
-      boost::filesystem::path lib("lib");
-      lib_paths.push_back((path / lib).string());
+    std::vector<std::string> catkin_prefix_paths =
+      pluginlib::impl::split(env_catkin_prefix_paths, CLASS_LOADER_IMPL_OS_PATHSEP);
+    for(std::string catkin_prefix_path : catkin_prefix_paths) {
+      pluginlib::impl::fs::path prefix(catkin_prefix_path);
+      pluginlib::impl::fs::path lib("lib");
+      lib_paths.push_back((prefix / lib).string());
     }
   }
   return lib_paths;
@@ -86,6 +85,7 @@ std::vector<std::string> catkinFindLib()
 
 namespace pluginlib
 {
+
 template<class T>
 ClassLoader<T>::ClassLoader(
   std::string package, std::string base_class, std::string attrib_name,
@@ -426,7 +426,7 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
     it++)
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", it->c_str());
-    if (boost::filesystem::exists(*it)) {
+    if (pluginlib::impl::fs::exists(*it)) {
       ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
         library_name.c_str(), it->c_str());
       return *it;
@@ -484,9 +484,8 @@ std::string ClassLoader<T>::getName(const std::string & lookup_name)
 /***************************************************************************/
 {
   // remove the package name to get the raw plugin name
-  std::vector<std::string> split;
-  boost::split(split, lookup_name, boost::is_any_of("/:"));
-  return split.back();
+  std::vector<std::string> result = pluginlib::impl::split(lookup_name, "/|:");
+  return result.back();
 }
 
 template<class T>
@@ -510,20 +509,16 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 2. Extract name of package from package.xml
 
   std::string package_name;
-  boost::filesystem::path p(plugin_xml_file_path);
-  boost::filesystem::path parent = p.parent_path();
+  pluginlib::impl::fs::path p(plugin_xml_file_path);
+  pluginlib::impl::fs::path parent = p.parent_path();
 
   // Figure out exactly which package the passed XML file is exported by.
   while (true) {
-    if (boost::filesystem::exists(parent / "package.xml")) {
-      std::string package_file_path = (boost::filesystem::path(parent / "package.xml")).string();
+    if (pluginlib::impl::fs::exists(parent / "package.xml")) {
+      std::string package_file_path = (parent / "package.xml").string();
       return extractPackageNameFromPackageXML(package_file_path);
-    } else if (boost::filesystem::exists(parent / "manifest.xml")) {
-#if BOOST_FILESYSTEM_VERSION >= 3
+    } else if (pluginlib::impl::fs::exists(parent / "manifest.xml")) {
       std::string package = parent.filename().string();
-#else
-      std::string package = parent.filename();
-#endif
       std::string package_path = ros::package::getPath(package);
 
       // package_path is a substr of passed plugin xml path
@@ -549,11 +544,7 @@ template<class T>
 std::string ClassLoader<T>::getPathSeparator()
 /***************************************************************************/
 {
-#if BOOST_FILESYSTEM_VERSION >= 3
-  return boost::filesystem::path("/").native();
-#else
-  return boost::filesystem::path("/").external_file_string();
-#endif
+  return std::string(1, pluginlib::impl::fs::path::preferred_separator);
 }
 
 
@@ -594,7 +585,7 @@ template<class T>
 std::string ClassLoader<T>::joinPaths(const std::string & path1, const std::string & path2)
 /***************************************************************************/
 {
-  boost::filesystem::path p1(path1);
+  pluginlib::impl::fs::path p1(path1);
   return (p1 / path2).string();
 }
 
