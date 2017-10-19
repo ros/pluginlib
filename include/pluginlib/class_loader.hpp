@@ -43,12 +43,6 @@
 #include "ros/package.h"
 #include "tinyxml2.h"  // NOLINT
 
-// Note: pluginlib has traditionally utilized a "lookup name" for classes that does not match its
-// real C++ name.
-// This was done due to limitations of how pluginlib was implemented.
-// As of version 1.9, a lookup name is no longer necessary and an attempt to the merge two concepts
-// is underway.
-
 namespace pluginlib
 {
 
