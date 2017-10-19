@@ -34,7 +34,11 @@
 #include <string>
 #include <vector>
 
-#include "boost/algorithm/string.hpp"
+#if __cplusplus >= 201103L
+# include <memory>
+#endif
+
+#include <boost/shared_ptr.hpp>
 #include "class_loader/multi_library_class_loader.h"
 #include "pluginlib/class_desc.hpp"
 #include "pluginlib/class_loader_base.hpp"
@@ -89,6 +93,7 @@ public:
     const std::string & lookup_name,
     bool auto_load = true);
 
+#if __cplusplus >= 201103L
   /// Creates an instance of a desired class.
   /**
    * Implicitly calls loadLibraryForClass() to increment the library counter.
@@ -102,6 +107,15 @@ public:
    *   instantiated.
    * @return An instance of the class
    */
+  std::shared_ptr<T> createSharedInstance(const std::string & lookup_name);
+#endif
+
+  /// Creates an instance of a desired class.
+  /**
+   * Deprecated, use createSharedInstance() instead.
+   * Same as createSharedInstance() except it returns a boost::shared_ptr.
+   */
+  __attribute__((deprecated))
   boost::shared_ptr<T> createInstance(const std::string & lookup_name);
 
 #if __cplusplus >= 201103L

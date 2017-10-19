@@ -58,7 +58,7 @@ TEST(PluginlibTest, workingPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
 
   try {
-    boost::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foo");
+    std::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foo");
     foo->initialize(10.0);
     EXPECT_EQ(100.0, foo->result());
   } catch (pluginlib::PluginlibException & ex) {
@@ -100,7 +100,7 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
 
   ROS_INFO("Instantiating plugin...");
   {
-    boost::shared_ptr<test_base::Fubar> inst = pl.createInstance("pluginlib/foo");
+    std::shared_ptr<test_base::Fubar> inst = pl.createInstance("pluginlib/foo");
   }
 
   ROS_INFO("Checking if plugin is loaded with isClassLoaded...");
