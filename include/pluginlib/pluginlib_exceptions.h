@@ -38,9 +38,9 @@
 namespace pluginlib
 {
 
+/// A base class for all pluginlib exceptions that inherits from std::runtime_exception.
 /**
- * @class PluginlibException
- * @brief A base class for all pluginlib exceptions that inherits from std::runtime_exception
+ * \class PluginlibException
  */
 class PluginlibException : public std::runtime_error
 {
@@ -49,9 +49,9 @@ public:
   : std::runtime_error(error_desc) {}
 };
 
+/// An exception class thrown when pluginlib is unable to load a plugin XML file.
 /**
- * @class InvalidXMLException
- * @brief An exception class thrown when pluginlib is unable to load a plugin XML file
+ * \class InvalidXMLException
  */
 class InvalidXMLException : public PluginlibException
 {
@@ -60,9 +60,9 @@ public:
   : PluginlibException(error_desc) {}
 };
 
+/// An exception class thrown when pluginlib is unable to load the library associated with a given plugin.
 /**
  * @class LibraryLoadException
- * @brief An exception class thrown when pluginlib is unable to load the library associated with a given plugin
  */
 class LibraryLoadException : public PluginlibException
 {
@@ -71,9 +71,9 @@ public:
   : PluginlibException(error_desc) {}
 };
 
+/// An exception class thrown when pluginlib is unable to instantiate a class loader.
 /**
  * @class ClassLoaderException
- * @brief An exception class thrown when pluginlib is unable to instantiate a class loader
  */
 class ClassLoaderException : public PluginlibException
 {
@@ -82,9 +82,9 @@ public:
   : PluginlibException(error_desc) {}
 };
 
+/// An exception class thrown when pluginlib is unable to unload the library associated with a given plugin.
 /**
  * @class LibraryUnloadException
- * @brief An exception class thrown when pluginlib is unable to unload the library associated with a given plugin
  */
 class LibraryUnloadException : public PluginlibException
 {
@@ -93,9 +93,9 @@ public:
   : PluginlibException(error_desc) {}
 };
 
+/// An exception class thrown when pluginlib is unable to create the class associated with a given plugin.
 /**
  * @class CreateClassException
- * @brief An exception class thrown when pluginlib is unable to create the class associated with a given plugin
  */
 class CreateClassException : public PluginlibException
 {
