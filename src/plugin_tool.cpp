@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2012, Willow Garage, Inc.
  * All rights reserved.
  *
@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <dlfcn.h>
 #include <pluginlib/class_loader.h>
 #include <ros/console.h>
 #include <iostream>
@@ -34,348 +35,338 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <dlfcn.h>
 
 using std::cout;
 using std::endl;
 using std::vector;
 using std::string;
 
-vector<string>  g_cli_arguments;
-void*           g_class_loader_library_handle = NULL;
+vector<string> g_cli_arguments;
+void * g_class_loader_library_handle = NULL;
 
-//Handle CLI request
-void            processUserCommand();
-void            handleFindPluginRequest();
-void            handleListPluginsRequest();
-void            handleLoadPluginRequest();
+// Handle CLI request
+void processUserCommand();
+void handleFindPluginRequest();
+void handleListPluginsRequest();
+void handleLoadPluginRequest();
 
-//Command line arguments
-vector<string>  getCLIArguments();
-void            setCLIArguments(int argc, char* argv[]);
-bool            verifyCLIArguments();
+// Command line arguments
+vector<string> getCLIArguments();
+void setCLIArguments(int argc, char * argv[]);
+bool verifyCLIArguments();
 
-string          baseClass(){return(getCLIArguments().at(1));}
-string          baseClassHeader(){return(getCLIArguments().at(2));}
-string          packageName(){return(getCLIArguments().at(3));}
-string          commandVerb(){return(getCLIArguments().at(4));}
-string          pluginName(){return(getCLIArguments().at(5));}
+string baseClass() {return getCLIArguments().at(1);}
+string baseClassHeader() {return getCLIArguments().at(2);}
+string packageName() {return getCLIArguments().at(3);}
+string commandVerb() {return getCLIArguments().at(4);}
+string pluginName() {return getCLIArguments().at(5);}
 
-//Typed Class Loader Interface (shared object)
-string          callCommandLine(const char* cmd);
-string          determineIncludePathsForBaseClassHeaderDependencies();
-void            generateAndLoadTypedPluginInterface();
-void            generateFile(string filename, string contents);
-string          generatedSharedLibrary(){return "libTypedPluginInterface.so";}
-string          generatedObjFile(){return "typedPluginInterface.o";}
-string          generatedCppFile(){return "typedPluginInterface.cpp";}
-string          getPluginlibSharedFolder();
-string          getTypedClassLoaderTemplate();
-string          getTypedClassLoaderTemplateWithBaseSet();
-vector<string>  parseToStringVector(std::string newline_delimited_str);
-string          stripNewlineCharacters(const std::string& s);
-string          templateCppFileWithoutExtension(){return "typedPluginInterface";}
-string          templateCppFile(){return templateCppFileWithoutExtension() + ".cpp";}
-string          templateCppFileAbsolutePath(){return getPluginlibSharedFolder() + "/" + templateCppFile();}
+// Typed Class Loader Interface (shared object)
+string callCommandLine(const char * cmd);
+string determineIncludePathsForBaseClassHeaderDependencies();
+void generateAndLoadTypedPluginInterface();
+void generateFile(string filename, string contents);
+string generatedSharedLibrary() {return "libTypedPluginInterface.so";}
+string generatedObjFile() {return "typedPluginInterface.o";}
+string generatedCppFile() {return "typedPluginInterface.cpp";}
+string getPluginlibSharedFolder();
+string getTypedClassLoaderTemplate();
+string getTypedClassLoaderTemplateWithBaseSet();
+vector<string> parseToStringVector(std::string newline_delimited_str);
+string stripNewlineCharacters(const std::string & s);
+string templateCppFileWithoutExtension() {return "typedPluginInterface";}
+string templateCppFile() {return templateCppFileWithoutExtension() + ".cpp";}
+string templateCppFileAbsolutePath() {return getPluginlibSharedFolder() + "/" + templateCppFile();}
 
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 /*****************************************************************************/
 {
-	cout << "plugin_tool - A command line tool for pluginlib testing" << endl;
-	cout << "-------------------------------------------------------" << endl;
+  cout << "plugin_tool - A command line tool for pluginlib testing" << endl;
+  cout << "-------------------------------------------------------" << endl;
 
-	setCLIArguments(argc, argv);
-	if(!verifyCLIArguments())
-	{
-		cout << "Error: Invalid arguments passed to plugin_tool." << endl;
-		exit(-1);
-	}
+  setCLIArguments(argc, argv);
+  if (!verifyCLIArguments()) {
+    cout << "Error: Invalid arguments passed to plugin_tool." << endl;
+    exit(-1);
+  }
 
-	cout << "Base class = " << baseClass() << endl;
-	cout << "Package name = " << packageName() << endl << endl;
+  cout << "Base class = " << baseClass() << endl;
+  cout << "Package name = " << packageName() << endl << endl;
 
-	generateAndLoadTypedPluginInterface();
-	processUserCommand();
+  generateAndLoadTypedPluginInterface();
+  processUserCommand();
 
-   return 0;
+  return 0;
 }
 
-std::string callCommandLine(const char* cmd)
+std::string callCommandLine(const char * cmd)
 /***************************************************************************/
 {
-	FILE* pipe = popen(cmd, "r");
-	if (!pipe)
-	  return "ERROR";
-	char buffer[128];
-	std::string result = "";
-	while(!feof(pipe))
-	{
-	  if(fgets(buffer, 128, pipe) != NULL)
-		  result += buffer;
-	}
-	pclose(pipe);
-	return result;
+  FILE * pipe = popen(cmd, "r");
+  if (!pipe) {
+    return "ERROR";
+  }
+  char buffer[128];
+  std::string result = "";
+  while (!feof(pipe)) {
+    if (fgets(buffer, 128, pipe) != NULL) {
+      result += buffer;
+    }
+  }
+  pclose(pipe);
+  return result;
 }
 
 string determineIncludePathsForBaseClassHeaderDependencies()
 /*****************************************************************************/
 {
-   string cmd = "rospack cflags-only-I " + packageName();
-	return(stripNewlineCharacters(callCommandLine(cmd.c_str())));
+  string cmd = "rospack cflags-only-I " + packageName();
+  return stripNewlineCharacters(callCommandLine(cmd.c_str()));
 }
 
 void generateAndLoadTypedPluginInterface()
 /*****************************************************************************/
 {
-	cout << "Generating typed plugin interface cpp..." << endl;
-	string code = getTypedClassLoaderTemplateWithBaseSet();
-	cout << "***************************************************" << endl;
-	cout << code << endl;
-	cout << "***************************************************" << endl;
+  cout << "Generating typed plugin interface cpp..." << endl;
+  string code = getTypedClassLoaderTemplateWithBaseSet();
+  cout << "***************************************************" << endl;
+  cout << code << endl;
+  cout << "***************************************************" << endl;
 
-	cout << "Outputting to file " << templateCppFile() << "..." << endl;
-	generateFile(generatedCppFile(), code);
+  cout << "Outputting to file " << templateCppFile() << "..." << endl;
+  generateFile(generatedCppFile(), code);
 
-	cout << "Building interface shared object..." << endl;
-	string cmd1 = "g++ -fPIC -I" + determineIncludePathsForBaseClassHeaderDependencies() + " -c " + generatedCppFile();
-	string cmd2 = "g++ -shared -o " + generatedSharedLibrary() + " " + generatedObjFile();
+  cout << "Building interface shared object..." << endl;
+  string cmd1 = "g++ -fPIC -I" + determineIncludePathsForBaseClassHeaderDependencies() + \
+    " -c " + generatedCppFile();
+  string cmd2 = "g++ -shared -o " + generatedSharedLibrary() + " " + generatedObjFile();
 
-	cout << "Command 1 = " << cmd1 << endl;
-	cout << "Command 2 = " << cmd2 << endl;
+  cout << "Command 1 = " << cmd1 << endl;
+  cout << "Command 2 = " << cmd2 << endl;
 
-	if(-1 == system(cmd1.c_str()))
-	{
-		cout << "Error: Failed to compile interface." << endl;
-		exit(-1);
-	}
-	else
-	{
-      cout << "Interface compiled to an object file, attempting to build..." << endl;
-      if(-1 == system(cmd2.c_str()))
-      {
-         cout << "Error: Failed to build shared object." << endl;
-         exit(-1);
-      }
-      else
-         cout << "Build of shared object succeeded." << endl;
+  if (-1 == system(cmd1.c_str())) {
+    cout << "Error: Failed to compile interface." << endl;
+    exit(-1);
+  } else {
+    cout << "Interface compiled to an object file, attempting to build..." << endl;
+    if (-1 == system(cmd2.c_str())) {
+      cout << "Error: Failed to build shared object." << endl;
+      exit(-1);
+    } else {
+      cout << "Build of shared object succeeded." << endl;
+    }
+  }
 
-	}
-
-	cout << "Loading shared object into memory." << endl;
-	g_class_loader_library_handle = dlopen("libTypedPluginInterface.so", RTLD_LAZY);
-	if(g_class_loader_library_handle)
-		cout << "Shared object successfully loaded into memory." << endl;
-	else
-	{
-		cout << "Error: Failed to load shared object into memory." << endl;
-		exit(-1);
-	}
+  cout << "Loading shared object into memory." << endl;
+  g_class_loader_library_handle = dlopen("libTypedPluginInterface.so", RTLD_LAZY);
+  if (g_class_loader_library_handle) {
+    cout << "Shared object successfully loaded into memory." << endl;
+  } else {
+    cout << "Error: Failed to load shared object into memory." << endl;
+    exit(-1);
+  }
 }
 
-template <typename T> T getPluginFunction(const std::string& function_name)
+template<typename T>
+T getPluginFunction(const std::string & function_name)
 /*****************************************************************************/
 {
-	void* ptr = dlsym(g_class_loader_library_handle, function_name.c_str());
-	return((T)(ptr));
+  void * ptr = dlsym(g_class_loader_library_handle, function_name.c_str());
+  return (T)(ptr);
 }
 
-vector<string>  getCLIArguments()
+vector<string> getCLIArguments()
 /*****************************************************************************/
 {
-	return(g_cli_arguments);
+  return g_cli_arguments;
 }
 
 void generateFile(string filename, string contents)
 /*****************************************************************************/
 {
-	std::ofstream file;
-	file.open(filename.c_str());
-	file << contents;
-	file.close();
+  std::ofstream file;
+  file.open(filename.c_str());
+  file << contents;
+  file.close();
 }
 
 std::string getPluginlibSharedFolder()
 /***************************************************************************/
 {
-   vector<std::string> allVals = parseToStringVector(callCommandLine("catkin_find pluginlib --share"));
-   assert(allVals.size() > 0);
-   return(allVals.at(0));
+  vector<std::string> allVals = parseToStringVector(
+    callCommandLine("catkin_find pluginlib --share"));
+  assert(allVals.size() > 0);
+  return allVals.at(0);
 }
 
 string getTypedClassLoaderTemplate()
 /*****************************************************************************/
 {
-	std::ifstream file;
-   string path = getPluginlibSharedFolder() + "/typed_class_loader_template.cpp";
-	file.open(path.c_str());
-	if(!file)
-	{
-		cout << "Error: Cannot find file " + path + " to generate class loader";
-		exit(-1);
-	}
+  std::ifstream file;
+  string path = getPluginlibSharedFolder() + "/typed_class_loader_template.cpp";
+  file.open(path.c_str());
+  if (!file) {
+    cout << "Error: Cannot find file " + path + " to generate class loader";
+    exit(-1);
+  }
 
-	string contents;
-	while(!file.eof())
-	{
-		char c;
-		file.get(c);
-		contents.push_back(c);
-		cout << c;
-	}
+  string contents;
+  while (!file.eof()) {
+    char c;
+    file.get(c);
+    contents.push_back(c);
+    cout << c;
+  }
 
-	return contents;
+  return contents;
 }
 
 string getTypedClassLoaderTemplateWithBaseSet()
 /*****************************************************************************/
 {
-	string class_template = getTypedClassLoaderTemplate();
-	string class_with_type_set;
-	for(unsigned int c = 0; c < class_template.size(); c++)
-	{
-		if('$' == class_template.at(c))
-			class_with_type_set += baseClass();
-		else if('@' == class_template.at(c))
-			class_with_type_set += "#include \"" + baseClassHeader() + "\"";
-		else
-			class_with_type_set.push_back(class_template.at(c));
-	}
-	return(class_with_type_set);
+  string class_template = getTypedClassLoaderTemplate();
+  string class_with_type_set;
+  for (unsigned int c = 0; c < class_template.size(); c++) {
+    if ('$' == class_template.at(c)) {
+      class_with_type_set += baseClass();
+    } else if ('@' == class_template.at(c)) {
+      class_with_type_set += "#include \"" + baseClassHeader() + "\"";
+    } else {
+      class_with_type_set.push_back(class_template.at(c));
+    }
+  }
+  return class_with_type_set;
 }
 
 void handleFindPluginRequest()
 /*****************************************************************************/
 {
-	//string whereIsPluginLocated(const string& package_name, const string& class_name)
-	typedef std::string (*WhereIsFunc)(const string&, const string&);
-	WhereIsFunc f = getPluginFunction<WhereIsFunc>("whereIsPluginLocated");
+  // string whereIsPluginLocated(const string& package_name, const string& class_name)
+  typedef std::string (* WhereIsFunc)(const string &, const string &);
+  WhereIsFunc f = getPluginFunction<WhereIsFunc>("whereIsPluginLocated");
 
-	cout << "Attempting to find plugin " << pluginName() << " exported from package " << packageName() << "..." << endl;
+  cout << "Attempting to find plugin " << pluginName() << " exported from package " << \
+    packageName() << "..." << endl;
 
-	if(f)
-		cout << "Plugin " << pluginName() << " is located in library " << f(packageName(), pluginName()) << endl;
-	else
-	{
-		cout << "Error: Could not find function 'whereIsPluginLocated' in shared object." << endl;
-		exit(-1);
-	}
+  if (f) {
+    cout << "Plugin " << pluginName() << " is located in library " << \
+      f(packageName(), pluginName()) << endl;
+  } else {
+    cout << "Error: Could not find function 'whereIsPluginLocated' in shared object." << endl;
+    exit(-1);
+  }
 }
 
 void handleListPluginsRequest()
 /*****************************************************************************/
 {
-	//  std::vector<std::string> availablePlugins(const string& package_name)
-	typedef std::vector<std::string> (*ListFunc)(const string&);
-	ListFunc f = getPluginFunction<ListFunc>("availablePlugins");
+  // std::vector<std::string> availablePlugins(const string& package_name)
+  typedef std::vector<std::string>(*ListFunc)(const string &);
+  ListFunc f = getPluginFunction<ListFunc>("availablePlugins");
 
-	cout << "The following plugins are available in package " << packageName() << ":" << endl;
-	if(f)
-	{
-
-		std::vector<std::string> plugins = f(packageName());
-		for(unsigned int c = 0; c < plugins.size(); c++)
-			cout << plugins.at(c) << endl;
-	}
-	else
-	{
-		cout << "Error: Could not find function 'availablePlugins' in shared object." << endl;
-		exit(-1);
-	}
+  cout << "The following plugins are available in package " << packageName() << ":" << endl;
+  if (f) {
+    std::vector<std::string> plugins = f(packageName());
+    for (unsigned int c = 0; c < plugins.size(); c++) {
+      cout << plugins.at(c) << endl;
+    }
+  } else {
+    cout << "Error: Could not find function 'availablePlugins' in shared object." << endl;
+    exit(-1);
+  }
 }
 
 void handleLoadPluginRequest()
 /*****************************************************************************/
 {
-	//  bool loadPlugin(const string& package_name, const string& class_name)
-	typedef bool (*LoadPluginFunc)(const string&, const string&);
-	LoadPluginFunc f = getPluginFunction<LoadPluginFunc>("loadPlugin");
-	string plugin_name = getCLIArguments().at(4);
-	cout << "Attempting to find plugin " << plugin_name << "..." << endl;
-	if(f)
-	{
-		if(f(packageName(), plugin_name))
-			cout << "Opened plugin successfully :)" << endl;
-		else
-		{
-			cout << "Error: Plugin did not open :(" << endl;
-			exit(-1);
-		}
-	}
-	else
-	{
-		cout << "Error: Could not find function 'loadPlugin' in shared object." << endl;
-		exit(-1);
-	}
+  // bool loadPlugin(const string& package_name, const string& class_name)
+  typedef bool (* LoadPluginFunc)(const string &, const string &);
+  LoadPluginFunc f = getPluginFunction<LoadPluginFunc>("loadPlugin");
+  string plugin_name = getCLIArguments().at(4);
+  cout << "Attempting to find plugin " << plugin_name << "..." << endl;
+  if (f) {
+    if (f(packageName(), plugin_name)) {
+      cout << "Opened plugin successfully :)" << endl;
+    } else {
+      cout << "Error: Plugin did not open :(" << endl;
+      exit(-1);
+    }
+  } else {
+    cout << "Error: Could not find function 'loadPlugin' in shared object." << endl;
+    exit(-1);
+  }
 }
 
 vector<string> parseToStringVector(std::string newline_delimited_str)
 /***************************************************************************/
 {
-   string next;
-   vector<string> parse_result;
-   for(unsigned int c = 0; c < newline_delimited_str.size(); c++)
-   {
-      char ch = newline_delimited_str.at(c);
-      if('\n' == ch)
-      {
-       parse_result.push_back(next);
-       next = "";
-      }
-      else
-       next.push_back(ch);
-   }
-   return(parse_result);
+  string next;
+  vector<string> parse_result;
+  for (unsigned int c = 0; c < newline_delimited_str.size(); c++) {
+    char ch = newline_delimited_str.at(c);
+    if ('\n' == ch) {
+      parse_result.push_back(next);
+      next = "";
+    } else {
+      next.push_back(ch);
+    }
+  }
+  return parse_result;
 }
 
 void processUserCommand()
 /*****************************************************************************/
 {
-	string verb = commandVerb();
+  string verb = commandVerb();
 
-	if ("find" == verb)
-		handleFindPluginRequest();
-	else if ("list" == verb)
-		handleListPluginsRequest();
-	else if("load" == verb)
-		handleLoadPluginRequest();
-	else
-		cout << "Error: Unknown verb for plugin_tool, available verbs are 'load', 'list', and 'find'." << endl;
+  if ("find" == verb) {
+    handleFindPluginRequest();
+  } else if ("list" == verb) {
+    handleListPluginsRequest();
+  } else if ("load" == verb) {
+    handleLoadPluginRequest();
+  } else {
+    cout << "Error: Unknown verb for plugin_tool, available verbs are" <<
+      "'load', 'list', and 'find'." << endl;
+  }
 }
 
-void setCLIArguments(int argc, char* argv[])
+void setCLIArguments(int argc, char * argv[])
 /*****************************************************************************/
 {
-	g_cli_arguments = vector<string>(argc);
-	for(int c = 0; c < argc; c++)
-		g_cli_arguments.at(c) = string(argv[c]);
+  g_cli_arguments = vector<string>(argc);
+  for (int c = 0; c < argc; c++) {
+    g_cli_arguments.at(c) = string(argv[c]);
+  }
 }
 
-string stripNewlineCharacters(const std::string& s)
+string stripNewlineCharacters(const std::string & s)
 /*****************************************************************************/
 {
-   string stripped;
-   for(unsigned int c = 0; c < s.size(); c++)
-   {
-      if(s.at(c) != '\n')
-         stripped.push_back(s.at(c));
-   }
-   return stripped;
+  string stripped;
+  for (unsigned int c = 0; c < s.size(); c++) {
+    if (s.at(c) != '\n') {
+      stripped.push_back(s.at(c));
+    }
+  }
+  return stripped;
 }
 
 bool verifyCLIArguments()
 /*****************************************************************************/
 {
-	vector<string> args = getCLIArguments();
+  vector<string> args = getCLIArguments();
 
-	if(args.size() < 5)
-	{
-		cout << "Not enough arguments. Usage: plugin_tool <BASE CLASS> <BASE_CLASS_HEADER> <PACKAGE_NAME> <find [class_name] | list | load [class_name]>";
-		return false;
-	}
+  if (args.size() < 5) {
+    cout << "Not enough arguments. Usage: plugin_tool <BASE CLASS> <BASE_CLASS_HEADER> " << \
+      "<PACKAGE_NAME> <find [class_name] | list | load [class_name]>";
+    return false;
+  }
 
-   for(size_t c = 0; c < args.size(); c++)
-      cout << "Arg " << c << ": " << args.at(c) << endl;
+  for (size_t c = 0; c < args.size(); c++) {
+    cout << "Arg " << c << ": " << args.at(c) << endl;
+  }
 
-	return(true);
+  return true;
 }
