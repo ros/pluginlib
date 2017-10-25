@@ -62,7 +62,7 @@ public:
 
 /// An exception class thrown when pluginlib is unable to load the library associated with a given plugin.
 /**
- * @class LibraryLoadException
+ * \class LibraryLoadException
  */
 class LibraryLoadException : public PluginlibException
 {
@@ -73,7 +73,7 @@ public:
 
 /// An exception class thrown when pluginlib is unable to instantiate a class loader.
 /**
- * @class ClassLoaderException
+ * \class ClassLoaderException
  */
 class ClassLoaderException : public PluginlibException
 {
@@ -84,7 +84,7 @@ public:
 
 /// An exception class thrown when pluginlib is unable to unload the library associated with a given plugin.
 /**
- * @class LibraryUnloadException
+ * \class LibraryUnloadException
  */
 class LibraryUnloadException : public PluginlibException
 {
@@ -95,7 +95,7 @@ public:
 
 /// An exception class thrown when pluginlib is unable to create the class associated with a given plugin.
 /**
- * @class CreateClassException
+ * \class CreateClassException
  */
 class CreateClassException : public PluginlibException
 {
