@@ -31,7 +31,7 @@
 
 #include <pluginlib/class_loader.h>
 
-#include "test_base.h"  // NOLINT
+#include "./test_base.h"
 
 TEST(PluginlibUniquePtrTest, unknownPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");

@@ -357,6 +357,6 @@ private:
 }  // namespace pluginlib
 
 // Note: The implementation of the methods is in a separate file for clarity.
-#include "class_loader_imp.h"  // NOLINT
+#include "./class_loader_imp.h"
 
 #endif  // PLUGINLIB__CLASS_LOADER_H_
