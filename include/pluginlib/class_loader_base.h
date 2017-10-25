@@ -45,7 +45,7 @@ namespace pluginlib
 class ClassLoaderBase
 {
 public:
-  /// Empty virtual destructor
+  /// Empty virtual destructor.
   virtual ~ClassLoaderBase() {}
 
   /// Return a list of all available plugin manifest paths.
@@ -54,26 +54,26 @@ public:
    */
   virtual std::vector<std::string> getPluginXmlPaths() = 0;
 
-  /// Return a list of all available classes for this ClassLoader's base class type
+  /// Return a list of all available classes for this ClassLoader's base class type.
   /**
    * \return A vector of strings corresponding to the names of all available classes
    */
   virtual std::vector<std::string> getDeclaredClasses() = 0;
 
-  /// Refresh the list of all available classes for this ClassLoader's base class type
+  /// Refresh the list of all available classes for this ClassLoader's base class type.
   /**
    * \throws pluginlib::LibraryLoadException if package manifest cannot be found
    */
   virtual void refreshDeclaredClasses() = 0;
 
-  /// Strips the package name off of a lookup name
+  /// Strip the package name off of a lookup name.
   /**
    * \param lookup_name The name of the plugin
    * \return The name of the plugin stripped of the package name
    */
   virtual std::string getName(const std::string & lookup_name) = 0;
 
-  /// Checks if the class associated with a plugin name is available to be loaded
+  /// Check if the class associated with a plugin name is available to be loaded.
   /**
    * \param lookup_name The name of the plugin
    * \return True if the plugin is available, false otherwise
@@ -87,41 +87,41 @@ public:
    */
   virtual std::string getClassType(const std::string & lookup_name) = 0;
 
-  /// Given the lookup name of a class, return its description
+  /// Given the lookup name of a class, return its description.
   /**
    * \param lookup_name The lookup name of the class
    * \return The description of the class
    */
   virtual std::string getClassDescription(const std::string & lookup_name) = 0;
 
-  /// Given the lookup name of a class, return the type of the associated base class
+  /// Given the lookup name of a class, return the type of the associated base class.
   /**
    * \return The type of the associated base class
    */
   virtual std::string getBaseClassType() const = 0;
 
-  /// Given the name of a class, return name of the containing package
+  /// Given the name of a class, return name of the containing package.
   /**
    * \param lookup_name The name of the class
    * \return The name of the containing package
    */
   virtual std::string getClassPackage(const std::string & lookup_name) = 0;
 
-  /// Given the name of a class, return the path of the associated plugin manifest
+  /// Given the name of a class, return the path of the associated plugin manifest.
   /**
    * \param lookup_name The name of the class
    * \return The path of the associated plugin manifest
    */
   virtual std::string getPluginManifestPath(const std::string & lookup_name) = 0;
 
-  /// Check if a given class is currently loaded
+  /// Check if a given class is currently loaded.
   /**
    * \param lookup_name The lookup name of the class to query
    * \return True if the class is loaded, false otherwise
    */
   virtual bool isClassLoaded(const std::string & lookup_name) = 0;
 
-  /// Attempt to load a class with a given name
+  /// Attempt to load a class with a given name.
   /**
    * \param lookup_name The lookup name of the class to load
    * \throws pluginlib::LibraryLoadException if the library for the
@@ -129,7 +129,7 @@ public:
    */
   virtual void loadLibraryForClass(const std::string & lookup_name) = 0;
 
-  /// Attempt to unload a class with a given name
+  /// Attempt to unload a class with a given name.
   /**
    * \param lookup_name The lookup name of the class to unload
    * \throws pluginlib::LibraryUnloadException if the library for the class
@@ -138,13 +138,13 @@ public:
    */
   virtual int unloadLibraryForClass(const std::string & lookup_name) = 0;
 
-  /// Return the libraries that are registered and can be loaded
+  /// Return the libraries that are registered and can be loaded.
   /**
    * \return A vector of strings corresponding to the names of registered libraries
    */
   virtual std::vector<std::string> getRegisteredLibraries() = 0;
 
-  /// Given the name of a class, return the path to its associated library
+  /// Given the name of a class, return the path to its associated library.
   /**
    * \param lookup_name The name of the class
    * \return The path to the associated library
