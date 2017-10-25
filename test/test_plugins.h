@@ -32,7 +32,7 @@
 
 #include <cmath>
 
-#include "test_base.h"  // NOLINT
+#include "./test_base.h"
 
 namespace test_plugins
 {

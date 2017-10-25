@@ -31,7 +31,7 @@
 
 #include <pluginlib/class_loader.hpp>
 
-#include "test_base.h"  // NOLINT
+#include "./test_base.h"
 
 TEST(PluginlibTest, unknownPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
