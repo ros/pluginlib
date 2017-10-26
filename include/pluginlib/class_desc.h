@@ -47,13 +47,13 @@ class ClassDesc
 {
 public:
   /**
-   * @param lookup_name The lookup name of the class
-   * @param derived_class The type of the derived class of the class
-   * @param base_class The type of the class, corresponds to the type of the base class
-   * @param package The package the class lives in
-   * @param description A description for the class
-   * @param library_name The name of the containing library for the class (not a full path!)
-   * @param plugin_manifest_path The path to the plugin manifest file
+   * \param lookup_name The lookup name of the class
+   * \param derived_class The type of the derived class of the class
+   * \param base_class The type of the class, corresponds to the type of the base class
+   * \param package The package the class lives in
+   * \param description A description for the class
+   * \param library_name The name of the containing library for the class (not a full path!)
+   * \param plugin_manifest_path The path to the plugin manifest file
    */
   ClassDesc(
     const std::string & lookup_name, const std::string & derived_class,
