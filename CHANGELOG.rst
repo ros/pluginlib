@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.1 (2017-10-27)
+-------------------
 * update macros in tests to not use the deprecated ones (`#78 <https://github.com/ros/pluginlib/issues/78>`_)
 * update documentation to use doxygen c++ format (`#75 <https://github.com/ros/pluginlib/issues/75>`_)
 * style cleanup (`#64 <https://github.com/ros/pluginlib/issues/64>`_, `#68 <https://github.com/ros/pluginlib/issues/68>`_, `#73 <https://github.com/ros/pluginlib/issues/73>`_ and `#72 <https://github.com/ros/pluginlib/issues/72>`_)
