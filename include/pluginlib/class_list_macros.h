@@ -32,10 +32,6 @@
 #ifndef PLUGINLIB__CLASS_LIST_MACROS_H_
 #define PLUGINLIB__CLASS_LIST_MACROS_H_
 
-// *INDENT-OFF* (prevent uncrustify from adding indention below)
-#warning Including header <pluginlib/class_list_macros.h> is deprecated, \
-include <pluginlib/class_list_macros.hpp> instead.
-
 #include "./class_list_macros.hpp"
 
 #endif  // PLUGINLIB__CLASS_LIST_MACROS_H_
