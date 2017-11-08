@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
+ * Software License Agreement (BSD License)
+ *
+ * Copyright (c) 2017, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +12,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
+ *     * Neither the name of the copyright holders nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
  *
@@ -30,80 +32,6 @@
 #ifndef PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 #define PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 
-#include <stdexcept>
-#include <string>
-
-// TODO(wjwwood): replace no lints with the explicit keyword in an ABI break
-
-namespace pluginlib
-{
-
-/// A base class for all pluginlib exceptions that inherits from std::runtime_exception.
-/**
- * \class PluginlibException
- */
-class PluginlibException : public std::runtime_error
-{
-public:
-  PluginlibException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : std::runtime_error(error_desc) {}
-};
-
-/// An exception class thrown when pluginlib is unable to load a plugin XML file.
-/**
- * \class InvalidXMLException
- */
-class InvalidXMLException : public PluginlibException
-{
-public:
-  InvalidXMLException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : PluginlibException(error_desc) {}
-};
-
-/// An exception class thrown when pluginlib is unable to load the library associated with a given plugin.
-/**
- * \class LibraryLoadException
- */
-class LibraryLoadException : public PluginlibException
-{
-public:
-  LibraryLoadException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : PluginlibException(error_desc) {}
-};
-
-/// An exception class thrown when pluginlib is unable to instantiate a class loader.
-/**
- * \class ClassLoaderException
- */
-class ClassLoaderException : public PluginlibException
-{
-public:
-  ClassLoaderException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : PluginlibException(error_desc) {}
-};
-
-/// An exception class thrown when pluginlib is unable to unload the library associated with a given plugin.
-/**
- * \class LibraryUnloadException
- */
-class LibraryUnloadException : public PluginlibException
-{
-public:
-  LibraryUnloadException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : PluginlibException(error_desc) {}
-};
-
-/// An exception class thrown when pluginlib is unable to create the class associated with a given plugin.
-/**
- * \class CreateClassException
- */
-class CreateClassException : public PluginlibException
-{
-public:
-  CreateClassException(const std::string error_desc)  // NOLINT(runtime/explicit)
-  : PluginlibException(error_desc) {}
-};
-
-}  // namespace pluginlib
+#include "./exceptions.hpp"
 
 #endif  // PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
