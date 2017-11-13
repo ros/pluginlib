@@ -58,6 +58,8 @@ class InvalidXMLException : public PluginlibException
 public:
   InvalidXMLException(const std::string error_desc)  // NOLINT(runtime/explicit)
   : PluginlibException(error_desc) {}
+  InvalidXMLException(const std::string error_desc, const std::string xml_path)  // NOLINT(runtime/explicit)
+  : PluginlibException(error_desc + " at " + xml_path) {}
 };
 
 /// An exception class thrown when pluginlib is unable to load the library associated with a given plugin.

@@ -278,7 +278,15 @@ std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses(
   for (std::vector<std::string>::const_iterator it = plugin_xml_paths.begin();
     it != plugin_xml_paths.end(); ++it)
   {
-    processSingleXMLPluginFile(*it, classes_available);
+    try {
+      processSingleXMLPluginFile(*it, classes_available);
+    }
+    catch(const pluginlib::InvalidXMLException &e)
+    {
+      ROS_ERROR_NAMED("pluginlib.ClassLoader",
+        "Skipped loading plugin with error: %s.",
+        e.what());
+    }
   }
 
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Exiting determineAvailableClasses()...");
@@ -645,7 +653,8 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLElement * config = document.RootElement();
   if (NULL == config) {
     throw pluginlib::InvalidXMLException(
-            "XML Document has no Root Element. This likely means the XML is malformed or missing.");
+            "XML Document has no Root Element. This likely means the XML is malformed or missing.",
+            xml_file);
     return;
   }
   if (!(strcmp(config->Value(), "library") == 0 ||
@@ -653,7 +662,8 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   {
     throw pluginlib::InvalidXMLException(
             "The XML document given to add must have either \"library\" or "
-            "\"class_libraries\" as the root tag");
+            "\"class_libraries\" as the root tag",
+            xml_file);
     return;
   }
   // Step into the filter list if necessary
