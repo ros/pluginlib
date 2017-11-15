@@ -652,14 +652,14 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   if (NULL == config) {
     throw pluginlib::InvalidXMLException(
             "XML Document '" + xml_file +
-            "'has no Root Element. This likely means the XML is malformed or missing.");
+            "' has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
   if (!(strcmp(config->Value(), "library") == 0 ||
     strcmp(config->Value(), "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
-            "The XML document '" + xml_file + "'given to add must have either \"library\" or "
+            "The XML document '" + xml_file + "' given to add must have either \"library\" or "
             "\"class_libraries\" as the root tag");
     return;
   }
