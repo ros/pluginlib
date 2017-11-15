@@ -653,17 +653,16 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLElement * config = document.RootElement();
   if (NULL == config) {
     throw pluginlib::InvalidXMLException(
-            "XML Document has no Root Element. This likely means the XML is malformed or missing.",
-            xml_file);
+              "XML Document '" + xml_file +
+              "'has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
   if (!(strcmp(config->Value(), "library") == 0 ||
     strcmp(config->Value(), "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
-            "The XML document given to add must have either \"library\" or "
-            "\"class_libraries\" as the root tag",
-            xml_file);
+            "The XML document '" + xml_file + "'given to add must have either \"library\" or "
+            "\"class_libraries\" as the root tag");
     return;
   }
   // Step into the filter list if necessary
