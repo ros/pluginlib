@@ -280,9 +280,7 @@ std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses(
   {
     try {
       processSingleXMLPluginFile(*it, classes_available);
-    }
-    catch(const pluginlib::InvalidXMLException &e)
-    {
+    } catch (const pluginlib::InvalidXMLException & e) {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
         "Skipped loading plugin with error: %s.",
         e.what());
@@ -653,8 +651,8 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLElement * config = document.RootElement();
   if (NULL == config) {
     throw pluginlib::InvalidXMLException(
-              "XML Document '" + xml_file +
-              "'has no Root Element. This likely means the XML is malformed or missing.");
+            "XML Document '" + xml_file +
+            "'has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
   if (!(strcmp(config->Value(), "library") == 0 ||
