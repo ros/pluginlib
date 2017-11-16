@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.2 (2017-11-15)
+-------------------
 * Fix cpplint and lint_cmake errors (backport 84) (`#87 <https://github.com/ros/pluginlib/issues/87>`_)
   * fix line length
   add back NOLINT on test header to avoid 'should include its header file' cpplint error
