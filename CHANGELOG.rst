@@ -2,6 +2,25 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix cpplint and lint_cmake errors (backport 84) (`#87 <https://github.com/ros/pluginlib/issues/87>`_)
+  * fix line length
+  add back NOLINT on test header to avoid 'should include its header file' cpplint error
+  * lint cmake
+* Continue loading classes on error (`#85 <https://github.com/ros/pluginlib/issues/85>`_)
+  * continue loading classes on error
+  * construct string with file rather than adding new API
+  * match style of the rest of the file
+  * missing whitespace
+* Backport 70 to kinetic (`#82 <https://github.com/ros/pluginlib/issues/82>`_)
+  * rename header files to make clear they are c++
+  * fixup to support new header file names
+  * restore old header names with deprecation warnings for API stability
+  * remove deprecation warnings
+* alphabetize includes (`#80 <https://github.com/ros/pluginlib/issues/80>`_)
+* Contributors: Furushchev, Mikael Arguedas
+
 1.11.1 (2017-10-27)
 -------------------
 * update macros in tests to not use the deprecated ones (`#78 <https://github.com/ros/pluginlib/issues/78>`_)
