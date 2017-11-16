@@ -49,7 +49,7 @@ public:
   : std::runtime_error(error_desc) {}
 };
 
-/// An exception class thrown when pluginlib is unable to load a plugin XML file.
+/// Thrown when pluginlib is unable to load a plugin XML file.
 /**
  * \class InvalidXMLException
  */
@@ -60,7 +60,7 @@ public:
   : PluginlibException(error_desc) {}
 };
 
-/// An exception class thrown when pluginlib is unable to load the library associated with a given plugin.
+/// Thrown when pluginlib is unable to load the library associated with a given plugin.
 /**
  * \class LibraryLoadException
  */
@@ -71,7 +71,7 @@ public:
   : PluginlibException(error_desc) {}
 };
 
-/// An exception class thrown when pluginlib is unable to instantiate a class loader.
+/// Thrown when pluginlib is unable to instantiate a class loader.
 /**
  * \class ClassLoaderException
  */
@@ -82,7 +82,7 @@ public:
   : PluginlibException(error_desc) {}
 };
 
-/// An exception class thrown when pluginlib is unable to unload the library associated with a given plugin.
+/// Thrown when pluginlib is unable to unload the library associated with a given plugin.
 /**
  * \class LibraryUnloadException
  */
@@ -93,7 +93,7 @@ public:
   : PluginlibException(error_desc) {}
 };
 
-/// An exception class thrown when pluginlib is unable to create the class associated with a given plugin.
+/// Thrown when pluginlib is unable to create the class associated with a given plugin.
 /**
  * \class CreateClassException
  */

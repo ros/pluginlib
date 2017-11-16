@@ -301,7 +301,7 @@ private:
   /// Get the standard path separator for the native OS (e.g. "/" on *nix, "\" on Windows).
   std::string getPathSeparator();
 
-  /// Given a package name, return the path where rosbuild build system thinks plugins are installed.
+  /// Given a package name, return the path where rosbuild thinks plugins are installed.
   std::string getROSBuildLibraryPath(const std::string & exporting_package_name);
 
   /// Get the package name from a path to a plugin XML file.
