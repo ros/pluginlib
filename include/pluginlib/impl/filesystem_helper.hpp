@@ -32,8 +32,8 @@
  * If std::filesystem is not available the necessary functions are emulated.
  */
 
-#ifndef SOMETHING_FILESYSTEM_HELPER
-#define SOMETHING_FILESYSTEM_HELPER
+#ifndef PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
+#define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
 #if defined(__has_include)
 #if __has_include(<filesystem>)
@@ -137,29 +137,28 @@ public:
     return path_.empty() ? path() : *--this->cend();
   }
 
-  path & operator/(const std::string & other)
+  path operator/(const std::string & other)
   {
-    this->path_ += CLASS_LOADER_IMPL_OS_DIRSEP + other;
-    this->path_as_vector_.push_back(other);
-    return *this;
+    return this->operator/(path(other));
   }
 
   path & operator/=(const std::string & other)
   {
-    this->operator/(other);
+    this->operator/=(path(other));
     return *this;
   }
 
-  path & operator/(const path & other)
+  path operator/(const path & other)
   {
-    this->path_ += CLASS_LOADER_IMPL_OS_DIRSEP + other.string();
-    this->path_as_vector_.push_back(other.string()); 
-    return *this;
+    return path(*this).operator/=(other);
   }
 
   path & operator/=(const path & other)
   {
-    this->operator/(other);
+    this->path_ += CLASS_LOADER_IMPL_OS_DIRSEP + other.string();
+    this->path_as_vector_.insert(
+      std::end(this->path_as_vector_),
+      std::begin(other.path_as_vector_), std::end(other.path_as_vector_));
     return *this;
   }
 
@@ -168,7 +167,7 @@ private:
   std::vector<std::string> path_as_vector_;
 };
 
-bool exists(const path & path_to_check)
+inline bool exists(const path & path_to_check)
 {
   return path_to_check.exists();
 }
@@ -183,4 +182,4 @@ bool exists(const path & path_to_check)
 
 #undef PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
 
-#endif  // SOMETHING_FILESYSTEM_HELPER
+#endif  // PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_

@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SOMETHING_SPLIT
-#define SOMETHING_SPLIT
+#ifndef PLUGINLIB__IMPL__SPLIT_HPP_
+#define PLUGINLIB__IMPL__SPLIT_HPP_
 
 #include <regex>
 #include <string>
@@ -39,7 +39,7 @@ namespace pluginlib
 namespace impl
 {
 
-std::vector<std::string>
+inline std::vector<std::string>
 split(const std::string & input, const std::string & regex) {
   std::regex re(regex);
   // the -1 will cause this to return the stuff between the matches, see the submatch argument:
@@ -52,4 +52,4 @@ split(const std::string & input, const std::string & regex) {
 }  // namespace impl
 }  // namespace pluginlib
 
-#endif  // SOMETHING_SPLIT
+#endif  // PLUGINLIB__IMPL__SPLIT_HPP_
