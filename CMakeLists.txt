@@ -1,41 +1,85 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(pluginlib)
 
-find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib cmake_modules)
-find_package(Boost REQUIRED)  # should be removed when deprecated createInstance is removed
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+find_package(class_loader REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
-catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS class_loader rosconsole roslib
-  DEPENDS
-    Boost  # should be removed when deprecated createInstance is removed
-    TinyXML2
+ament_export_dependencies(ament_index_cpp class_loader TinyXML2)
+ament_export_include_directories(include)
+
+# target_include_directories(plugin_tool PUBLIC
+#   include
+#   ${ament_index_cpp_INCLUDE_DIRS}
+#   ${class_loader_INCLUDE_DIRS}
+#   ${TinyXML_INCLUDE_DIRS}
+# )
+# target_link_libraries(plugin_tool
+#   ${ament_index_cpp_LIBRARIES}
+#   ${class_loader_LIBRARIES}
+#   ${TinyXML_LIBRARIES}
+# )
+
+install(
+  DIRECTORY cmake
+  DESTINATION share/${PROJECT_NAME}
 )
 
-install(DIRECTORY include/pluginlib/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
 
-if(CATKIN_ENABLE_TESTING)
-  include_directories(include ${catkin_INCLUDE_DIRS} ${TinyXML2_INCLUDE_DIRS})
+# if(BUILD_TESTING)
+#   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
+#   target_include_directories(test_plugins PUBLIC
+#     include
+#     ${ament_index_cpp_INCLUDE_DIRS}
+#     ${class_loader_INCLUDE_DIRS}
+#     ${TinyXML_INCLUDE_DIRS}
+#   )
+#   # place the library in an FHS compliant layout in the build space
+#   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
+#   set_target_properties(
+#     test_plugins PROPERTIES
+#     ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib"
+#     LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib"
+#     RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin"
+#   )
+#   # place the plugin manifest in an FHS compliant layout in the build space
+#   file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/test")
+#   # create an entry in the ament index for the exported plugins
+#   file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__plugin/pluginlib"
+#     "\${prefix}/test/test_plugins.xml\n")
 
-  add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
+#   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
+#   if(TARGET ${PROJECT_NAME}_utest)
+#     target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
+#     add_dependencies(${PROJECT_NAME}_utest test_plugins)
+#   endif()
 
-  catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
-  if(TARGET ${PROJECT_NAME}_utest)
-    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
-    add_dependencies(${PROJECT_NAME}_utest test_plugins)
-  endif()
+#   include(CheckCXXCompilerFlag)
+#   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#   if(COMPILER_SUPPORTS_CXX11)
+#     catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
+#     if(TARGET ${PROJECT_NAME}_unique_ptr_test)
+#       target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
+#       set_target_properties(${PROJECT_NAME}_unique_ptr_test PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
+#       add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
+#     endif()
+#   endif()
+# endif()
 
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  if(COMPILER_SUPPORTS_CXX11)
-    catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
-    if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-      target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
-      set_target_properties(${PROJECT_NAME}_unique_ptr_test PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
-      add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
-    endif()
-  endif()
-
-endif()
+ament_package(
+  CONFIG_EXTRAS "pluginlib-extras.cmake"
+)

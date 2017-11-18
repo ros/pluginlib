@@ -38,13 +38,14 @@
 # include <memory>
 #endif
 
+#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
 #include <boost/shared_ptr.hpp>
+#endif
+
 #include "class_loader/multi_library_class_loader.h"
 #include "pluginlib/class_desc.hpp"
 #include "pluginlib/class_loader_base.hpp"
 #include "pluginlib/exceptions.hpp"
-#include "ros/console.h"
-#include "ros/package.h"
 #include "tinyxml2.h"  // NOLINT
 
 namespace pluginlib
@@ -54,6 +55,7 @@ namespace pluginlib
 template<typename T>
 using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
 #endif
+
 /// A class to help manage and load classes.
 template<class T>
 class ClassLoader : public ClassLoaderBase
@@ -71,7 +73,8 @@ public:
    * \throws pluginlib::ClassLoaderException if package manifest cannot be found
    */
   ClassLoader(
-    std::string package, std::string base_class,
+    std::string package,
+    std::string base_class,
     std::string attrib_name = std::string("plugin"),
     std::vector<std::string> plugin_xml_paths = std::vector<std::string>());
 
@@ -108,6 +111,7 @@ public:
   std::shared_ptr<T> createSharedInstance(const std::string & lookup_name);
 #endif
 
+#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
   /// Create an instance of a desired class.
   /**
    * Deprecated, use createSharedInstance() instead.
@@ -115,6 +119,7 @@ public:
    */
   __attribute__((deprecated))
   boost::shared_ptr<T> createInstance(const std::string & lookup_name);
+#endif
 
 #if __cplusplus >= 201103L
   /// Create an instance of a desired class.
@@ -267,8 +272,7 @@ private:
    */
   std::vector<std::string> getPluginXmlPaths(
     const std::string & package,
-    const std::string & attrib_name,
-    bool force_recrawl = false);
+    const std::string & attrib_name);
 
   /// Return the available classes.
   /**
@@ -296,9 +300,6 @@ private:
     const std::string & library_name,
     const std::string & exporting_package_name);
 
-  /// Return the paths where libraries are installed according to the Catkin build system.
-  std::vector<std::string> getCatkinLibraryPaths();
-
   /// Return an error message for an unknown class.
   /**
    * \param lookup_name The name of the class
@@ -308,9 +309,6 @@ private:
 
   /// Get the standard path separator for the native OS (e.g. "/" on *nix, "\" on Windows).
   std::string getPathSeparator();
-
-  /// Given a package name, return the path where rosbuild build system thinks plugins are installed.
-  std::string getROSBuildLibraryPath(const std::string & exporting_package_name);
 
   /// Get the package name from a path to a plugin XML file.
   std::string getPackageFromPluginXMLFilePath(const std::string & path);
