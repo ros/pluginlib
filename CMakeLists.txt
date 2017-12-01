@@ -13,21 +13,26 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
-find_package(TinyXML2 REQUIRED)
+find_package(tinyxml2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
 
-ament_export_dependencies(ament_index_cpp class_loader TinyXML2)
+ament_export_dependencies(ament_index_cpp class_loader tinyxml2)
 ament_export_include_directories(include)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  find_library(STD_CPP_FS_PATH stdc++fs)
+  message(STATUS "STD_CPP_FS_PATH: ${STD_CPP_FS_PATH}")
+  ament_export_libraries(${STD_CPP_FS_PATH})
+endif()
 
 # target_include_directories(plugin_tool PUBLIC
 #   include
 #   ${ament_index_cpp_INCLUDE_DIRS}
 #   ${class_loader_INCLUDE_DIRS}
-#   ${TinyXML_INCLUDE_DIRS}
+#   ${tinyxml2_INCLUDE_DIRS}
 # )
 # target_link_libraries(plugin_tool
 #   ${ament_index_cpp_LIBRARIES}
 #   ${class_loader_LIBRARIES}
-#   ${TinyXML_LIBRARIES}
+#   ${tinyxml2_LIBRARIES}
 # )
 
 install(
@@ -46,7 +51,7 @@ install(
 #     include
 #     ${ament_index_cpp_INCLUDE_DIRS}
 #     ${class_loader_INCLUDE_DIRS}
-#     ${TinyXML_INCLUDE_DIRS}
+#     ${tinyxml2_INCLUDE_DIRS}
 #   )
 #   # place the library in an FHS compliant layout in the build space
 #   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
@@ -64,7 +69,7 @@ install(
 
 #   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
 #   if(TARGET ${PROJECT_NAME}_utest)
-#     target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
+#     target_link_libraries(${PROJECT_NAME}_utest ${tinyxml2_LIBRARIES} ${catkin_LIBRARIES})
 #     add_dependencies(${PROJECT_NAME}_utest test_plugins)
 #   endif()
 
@@ -73,8 +78,10 @@ install(
 #   if(COMPILER_SUPPORTS_CXX11)
 #     catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
 #     if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-#       target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES} ${catkin_LIBRARIES})
-#       set_target_properties(${PROJECT_NAME}_unique_ptr_test PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
+#       target_link_libraries(${PROJECT_NAME}_unique_ptr_test
+#         ${tinyxml2_LIBRARIES} ${catkin_LIBRARIES})
+#       set_target_properties(${PROJECT_NAME}_unique_ptr_test
+#         PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
 #       add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
 #     endif()
 #   endif()
