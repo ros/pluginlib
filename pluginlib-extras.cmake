@@ -20,7 +20,7 @@ ament_register_extension("ament_package" "pluginlib"
 
 include("${pluginlib_DIR}/pluginlib_export_plugin_description_file.cmake")
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_COMPILER_IS_GNUCXX)
   # this is needed to use the experimental/filesystem on Linux, but cannot be passed with
   # ament_export_libraries() because it is not absolute and cannot be found with find_library
   list(APPEND pluginlib_LIBRARIES stdc++fs)
