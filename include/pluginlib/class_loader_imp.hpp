@@ -152,6 +152,7 @@ std::shared_ptr<T> ClassLoader<T>::createSharedInstance(const std::string & look
 }
 #endif
 
+#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
 template<class T>
 boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_name)
 /***************************************************************************/
@@ -184,6 +185,7 @@ boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_n
     throw pluginlib::CreateClassException(ex.what());
   }
 }
+#endif
 
 #if __cplusplus >= 201103L
 template<class T>
