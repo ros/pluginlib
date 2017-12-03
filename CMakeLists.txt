@@ -17,11 +17,6 @@ find_package(tinyxml2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_ve
 
 ament_export_dependencies(ament_index_cpp class_loader tinyxml2)
 ament_export_include_directories(include)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  find_library(STD_CPP_FS_PATH stdc++fs)
-  message(STATUS "STD_CPP_FS_PATH: ${STD_CPP_FS_PATH}")
-  ament_export_libraries(${STD_CPP_FS_PATH})
-endif()
 
 # target_include_directories(plugin_tool PUBLIC
 #   include
