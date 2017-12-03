@@ -25,3 +25,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # ament_export_libraries() because it is not absolute and cannot be found with find_library
   list(APPEND pluginlib_LIBRARIES stdc++fs)
 endif()
+
+# tinyxml2 exports a target, not normal library paths, so add it explicitly here
+find_package(tinyxml2 REQUIRED)  # provided either by the system or by tinyxml2_vendor
+if(TARGET tinyxml2)
+  list(APPEND pluginlib_LIBRARIES tinyxml2)
+else()
+  message(FATAL_ERROR "'tinyxml2' is unexpectedly not a target")
+endif()
