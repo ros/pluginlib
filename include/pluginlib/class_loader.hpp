@@ -91,7 +91,8 @@ public:
    * \return An instance of the class
    * \deprecated use either createInstance() or createUnmanagedInstance()
    */
-  __attribute__((deprecated)) T * createClassInstance(
+  [[deprecated]]
+  T * createClassInstance(
     const std::string & lookup_name,
     bool auto_load = true);
 
@@ -117,7 +118,7 @@ public:
    * Deprecated, use createSharedInstance() instead.
    * Same as createSharedInstance() except it returns a boost::shared_ptr.
    */
-  __attribute__((deprecated))
+  [[deprecated]]
   boost::shared_ptr<T> createInstance(const std::string & lookup_name);
 #endif
 
