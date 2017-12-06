@@ -32,6 +32,7 @@ endif()
 # However, ament_export_dependencies will not propagate this, so here we will
 # check for the tinyxml2 exported target and if found we will add it to the
 # pluginlib_LIBRARIES.
+find_package(tinyxml2 REQUIRED QUIET)
 if(TARGET tinyxml2)
   list(APPEND pluginlib_LIBRARIES tinyxml2)
 endif()
