@@ -13,9 +13,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
-find_package(tinyxml2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
+find_package(tinyxml2_vendor REQUIRED)
+find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
 
-ament_export_dependencies(ament_index_cpp class_loader tinyxml2)
+ament_export_dependencies(ament_index_cpp class_loader tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
 
 # target_include_directories(plugin_tool PUBLIC
