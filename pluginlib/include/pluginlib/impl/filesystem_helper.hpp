@@ -35,7 +35,20 @@
 #ifndef PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 #define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
-#if defined(__has_include)
+#if defined(_MSC_VER)
+#include <experimental/filesystem> // C++-standard header file name  
+#include <filesystem> // Microsoft-specific implementation header file name  
+namespace pluginlib
+{
+namespace impl
+{
+namespace fs = std::experimental::filesystem;
+}  // namespace impl
+}  // namespace pluginlib
+
+#define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+
+#elif defined(__has_include)
 #if __has_include(<filesystem>)
 # include <filesystem>
 
