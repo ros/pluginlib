@@ -19,18 +19,6 @@ find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_ve
 ament_export_dependencies(ament_index_cpp class_loader tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
 
-# target_include_directories(plugin_tool PUBLIC
-#   include
-#   ${ament_index_cpp_INCLUDE_DIRS}
-#   ${class_loader_INCLUDE_DIRS}
-#   ${tinyxml2_INCLUDE_DIRS}
-# )
-# target_link_libraries(plugin_tool
-#   ${ament_index_cpp_LIBRARIES}
-#   ${class_loader_LIBRARIES}
-#   ${tinyxml2_LIBRARIES}
-# )
-
 install(
   DIRECTORY cmake
   DESTINATION share/${PROJECT_NAME}
