@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.6 (2017-12-18)
+-------------------
 * do not use popen to solve catkin_path. (`#49 <https://github.com/ros/pluginlib/issues/49>`_)
 * switch to package format 2 (`#55 <https://github.com/ros/pluginlib/issues/55>`_)
 * Merge pull request `#54 <https://github.com/ros/pluginlib/issues/54>`_ from ros/trailing_whitespaces
