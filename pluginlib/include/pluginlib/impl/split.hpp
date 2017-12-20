@@ -40,7 +40,8 @@ namespace impl
 {
 
 inline std::vector<std::string>
-split(const std::string & input, const std::string & regex) {
+split(const std::string & input, const std::string & regex)
+{
   std::regex re(regex);
   // the -1 will cause this to return the stuff between the matches, see the submatch argument:
   //   http://en.cppreference.com/w/cpp/regex/regex_token_iterator/regex_token_iterator

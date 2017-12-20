@@ -29,7 +29,8 @@
 
 #include <gtest/gtest.h>
 
-#include <pluginlib/class_loader.hpp>
+#include <memory>
+#include <pluginlib/class_loader.hpp>  // NOLINT
 
 #include "./test_base.h"
 
