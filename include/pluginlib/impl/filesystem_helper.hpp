@@ -36,8 +36,7 @@
 #define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
 #if defined(_MSC_VER)
-#include <experimental/filesystem> // C++-standard header file name  
-#include <filesystem> // Microsoft-specific implementation header file name  
+# include <experimental/filesystem>
 namespace pluginlib
 {
 namespace impl
