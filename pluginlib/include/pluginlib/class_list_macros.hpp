@@ -46,6 +46,6 @@
  * \param base_class_type The real base class type from which class_type inherits
  */
 #define PLUGINLIB_EXPORT_CLASS(class_type, base_class_type) \
-  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type);
+  CLASS_LOADER_REGISTER_CLASS(class_type, base_class_type)
 
 #endif  // PLUGINLIB__CLASS_LIST_MACROS_HPP_

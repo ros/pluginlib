@@ -32,16 +32,18 @@
 #include <memory>
 #include <pluginlib/class_loader.hpp>  // NOLINT
 
+#include "rcutils/logging_macros.h"  // NOLINT
+
 #include "./test_base.h"
 
 TEST(PluginlibTest, unknownPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  ASSERT_THROW(test_loader.createInstance("pluginlib/foobar"), pluginlib::LibraryLoadException);
+  ASSERT_THROW(test_loader.createSharedInstance("pluginlib/foobar"), pluginlib::LibraryLoadException);
 }
 
 TEST(PluginlibTest, misspelledPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib", "test_base::Fuba");
-  ASSERT_THROW(bad_test_loader.createInstance("pluginlib/foo"), pluginlib::LibraryLoadException);
+  ASSERT_THROW(bad_test_loader.createSharedInstance("pluginlib/foo"), pluginlib::LibraryLoadException);
 }
 
 TEST(PluginlibTest, invalidPackage) {
@@ -52,14 +54,14 @@ TEST(PluginlibTest, invalidPackage) {
 
 TEST(PluginlibTest, brokenPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  ASSERT_THROW(test_loader.createInstance("pluginlib/none"), pluginlib::PluginlibException);
+  ASSERT_THROW(test_loader.createSharedInstance("pluginlib/none"), pluginlib::PluginlibException);
 }
 
 TEST(PluginlibTest, workingPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
 
   try {
-    std::shared_ptr<test_base::Fubar> foo = test_loader.createInstance("pluginlib/foo");
+    std::shared_ptr<test_base::Fubar> foo = test_loader.createSharedInstance("pluginlib/foo");
     foo->initialize(10.0);
     EXPECT_EQ(100.0, foo->result());
   } catch (pluginlib::PluginlibException & ex) {
@@ -71,60 +73,60 @@ TEST(PluginlibTest, workingPlugin) {
 }
 
 TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
-  ROS_INFO("Making the ClassLoader...");
+  RCUTILS_LOG_INFO("Making the ClassLoader...")
   pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
 
-  ROS_INFO("Instantiating plugin...");
+  RCUTILS_LOG_INFO("Instantiating plugin...")
   test_base::Fubar * inst = pl.createUnmanagedInstance("pluginlib/foo");
 
-  ROS_INFO("Deleting plugin...");
+  RCUTILS_LOG_INFO("Deleting plugin...")
   delete inst;
 
-  ROS_INFO("Checking if plugin is loaded with isClassLoaded...");
+  RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...");
   if (pl.isClassLoaded("pluginlib/foo")) {
-    ROS_INFO("Class is loaded");
+    RCUTILS_LOG_INFO("Class is loaded")
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
-  ROS_INFO("Trying to unload class with unloadLibraryForClass...");
+  RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...")
   try {
     pl.unloadLibraryForClass("pluginlib/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to.";
   }
-  ROS_INFO("Done.");
+  RCUTILS_LOG_INFO("Done.")
 }
 
 TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
-  ROS_INFO("Making the ClassLoader...");
+  RCUTILS_LOG_INFO("Making the ClassLoader...")
   pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
 
-  ROS_INFO("Instantiating plugin...");
+  RCUTILS_LOG_INFO("Instantiating plugin...")
   {
-    std::shared_ptr<test_base::Fubar> inst = pl.createInstance("pluginlib/foo");
+    std::shared_ptr<test_base::Fubar> inst = pl.createSharedInstance("pluginlib/foo");
   }
 
-  ROS_INFO("Checking if plugin is loaded with isClassLoaded...");
+  RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...")
   if (pl.isClassLoaded("pluginlib/foo")) {
-    ROS_INFO("Class is loaded");
+    RCUTILS_LOG_INFO("Class is loaded")
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
 
-  ROS_INFO("Trying to unload class with unloadLibraryForClass...");
+  RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...")
   try {
     pl.unloadLibraryForClass("pluginlib/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to.";
   }
-  ROS_INFO("Done.");
+  RCUTILS_LOG_INFO("Done.")
 }
 
 TEST(PluginlibTest, brokenXML) {
   try {
     pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar",
       "plugin_test");
-    test_loader.createInstance("pluginlib/foo");
+    test_loader.createSharedInstance("pluginlib/foo");
   } catch (pluginlib::PluginlibException & ex) {
     SUCCEED();
     return;
