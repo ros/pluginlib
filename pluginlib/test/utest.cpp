@@ -29,7 +29,8 @@
 
 #include <gtest/gtest.h>
 
-#include <pluginlib/class_loader.hpp>
+#include <memory>
+#include <pluginlib/class_loader.hpp>  // NOLINT
 
 #include "./test_base.h"
 
@@ -123,7 +124,8 @@ TEST(PluginlibTest, brokenXML) {
   try {
     pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar",
       "plugin_test");
-  } catch (pluginlib::InvalidXMLException & ex) {
+    test_loader.createInstance("pluginlib/foo");
+  } catch (pluginlib::PluginlibException & ex) {
     SUCCEED();
     return;
   }

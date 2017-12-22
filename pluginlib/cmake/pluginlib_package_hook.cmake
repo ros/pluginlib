@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# install the ament resource for the plugin descriptions exported by this package
+# install the ament resource for the plugin descriptions exported by
+# this package
 list(REMOVE_DUPLICATES __PLUGINLIB_PLUGIN_CATEGORIES)
 foreach(plugin_category ${__PLUGINLIB_PLUGIN_CATEGORIES})
   # this assumes PROJECT_NAME is the package name

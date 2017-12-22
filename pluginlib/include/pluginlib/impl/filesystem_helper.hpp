@@ -67,6 +67,7 @@ namespace fs = std::experimental::filesystem;
 #ifndef PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
 
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #define CLASS_LOADER_IMPL_OS_DIRSEP '\\'
