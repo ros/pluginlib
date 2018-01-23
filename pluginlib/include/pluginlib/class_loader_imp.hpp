@@ -376,11 +376,13 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   //
   //   - <prefix for rviz>/lib/librviz_default_plugins.so
   //   - <prefix for rviz>/lib64/librviz_default_plugins.so
+  //   - <prefix for rviz>/bin/rviz_default_plugins.dll
   //   - <prefix for rviz>/lib/rviz/librviz_default_plugins.so
   //   - <prefix for rviz>/lib64/rviz/librviz_default_plugins.so
   //
   // The extension, e.g. `.so`, might be different based on the operating
   // system, e.g. it might be `.dylib` on macOS or `.dll` on Windows.
+  // Similarly, the library might have the `lib` prefix added or removed.
   // Also, the library name might have a `d` added if the library is built
   // debug, depending on the system.
 
@@ -390,15 +392,22 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
 
   const std::string path_separator = getPathSeparator();
 
-  std::vector<std::string> all_paths;
+  std::vector<std::string> all_paths;  // result of all pairs to search
+
   std::string package_prefix = ament_index_cpp::get_package_prefix(exporting_package_name);
-  std::vector<std::string> all_paths_without_extension = {
+
+  // Setup the directories to look in.
+  std::vector<std::string> all_search_paths = {
     // for now just try lib and lib64 (and their respective "libexec" directories)
     package_prefix + path_separator + "lib",
     package_prefix + path_separator + "lib64",
+    package_prefix + path_separator + "bin",  // also look in bin, for dll's on Windows
     package_prefix + path_separator + "lib" + path_separator + exporting_package_name,
     package_prefix + path_separator + "lib64" + path_separator + exporting_package_name,
+    package_prefix + path_separator + "bin" + path_separator + exporting_package_name,
   };
+
+  // Prepare to setup the relative file paths.
   bool debug_library_suffix = (0 == class_loader::systemLibrarySuffix().compare(0, 1, "d"));
   std::string non_debug_suffix;
   if (debug_library_suffix) {
@@ -406,21 +415,52 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   } else {
     non_debug_suffix = class_loader::systemLibrarySuffix();
   }
-  std::string library_name_with_extension = library_name + non_debug_suffix;
   std::string stripped_library_name = stripAllButFileFromPath(library_name);
-  std::string stripped_library_name_with_extension = stripped_library_name + non_debug_suffix;
 
-  for (const auto & current_path : all_paths_without_extension) {
-    all_paths.push_back(current_path + path_separator + library_name_with_extension);
-    all_paths.push_back(current_path + path_separator + stripped_library_name_with_extension);
+  std::string library_name_alternative;  // either lib<library> or <library> without lib prefix
+  const char * lib_prefix = "lib";
+  if (library_name.rfind(lib_prefix, 0) == 0) {
+    library_name_alternative = library_name.substr(strlen(lib_prefix));
+    RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
+      "given plugin name '%s' should be '%s' for better portability",
+      library_name.c_str(),
+      library_name_alternative.c_str());
+  } else {
+    library_name_alternative = lib_prefix + library_name;
+  }
+  std::string stripped_library_name_alternative = stripAllButFileFromPath(library_name_alternative);
+
+  // Setup the relative file paths to pair with the search directories above.
+  std::vector<std::string> all_relative_library_paths = {
+    library_name + non_debug_suffix,
+    library_name_alternative + non_debug_suffix,
+    stripped_library_name + non_debug_suffix,
+    stripped_library_name_alternative + non_debug_suffix,
+  };
+  std::vector<std::string> all_relative_debug_library_paths = {
+    library_name + class_loader::systemLibrarySuffix(),
+    library_name_alternative + class_loader::systemLibrarySuffix(),
+    stripped_library_name + class_loader::systemLibrarySuffix(),
+    stripped_library_name_alternative + class_loader::systemLibrarySuffix(),
+  };
+
+  for (auto && current_search_path : all_search_paths) {
+    for (auto && current_library_path : all_relative_library_paths) {
+      all_paths.push_back(current_search_path + path_separator + current_library_path);
+    }
     // We're in debug mode, try debug libraries as well
     if (debug_library_suffix) {
-      all_paths.push_back(
-        current_path + path_separator + library_name + class_loader::systemLibrarySuffix());
-      all_paths.push_back(
-        current_path + path_separator + stripped_library_name +
-        class_loader::systemLibrarySuffix());
+      for (auto && current_library_path : all_relative_debug_library_paths) {
+        all_paths.push_back(current_search_path + path_separator + current_library_path);
+      }
     }
+  }
+
+  for (auto && path : all_paths) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+      "[search path for '%s']: '%s'",
+      library_name.c_str(),
+      path.c_str());
   }
 
   return all_paths;
