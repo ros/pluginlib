@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2018-02-07)
+------------------
 * Removed references to plugin_tool from CMakeLists (`#93 <https://github.com/ros/pluginlib/issues/93>`_)
 * Moved pluginlib in its own folder (port 83 to ros2 branch) (`#95 <https://github.com/ros/pluginlib/issues/95>`_)
 * Fixed most linter errors
