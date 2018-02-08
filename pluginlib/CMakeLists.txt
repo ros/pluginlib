@@ -19,18 +19,6 @@ find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_ve
 ament_export_dependencies(ament_index_cpp class_loader tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
 
-# target_include_directories(plugin_tool PUBLIC
-#   include
-#   ${ament_index_cpp_INCLUDE_DIRS}
-#   ${class_loader_INCLUDE_DIRS}
-#   ${tinyxml2_INCLUDE_DIRS}
-# )
-# target_link_libraries(plugin_tool
-#   ${ament_index_cpp_LIBRARIES}
-#   ${class_loader_LIBRARIES}
-#   ${tinyxml2_LIBRARIES}
-# )
-
 install(
   DIRECTORY cmake
   DESTINATION share/${PROJECT_NAME}
@@ -70,7 +58,7 @@ install(
 #   endif()
 
 #   include(CheckCXXCompilerFlag)
-#   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#   check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 #   if(COMPILER_SUPPORTS_CXX11)
 #     catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
 #     if(TARGET ${PROJECT_NAME}_unique_ptr_test)

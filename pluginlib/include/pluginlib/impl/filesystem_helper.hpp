@@ -35,9 +35,22 @@
 #ifndef PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 #define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
-#if defined(__has_include)
-#if __has_include(<filesystem>)
-# include <filesystem>
+
+#if _MSC_VER >= 1900
+# include <experimental/filesystem>
+namespace pluginlib
+{
+namespace impl
+{
+namespace fs = std::experimental::filesystem;
+}  // namespace impl
+}  // namespace pluginlib
+
+# define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+
+#elif defined(__has_include)
+# if __has_include(<filesystem>)
+#  include <filesystem>
 
 namespace pluginlib
 {
@@ -47,9 +60,9 @@ namespace fs = std::filesystem;
 }  // namespace impl
 }  // namespace pluginlib
 
-#define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
-#elif __has_include(<experimental/filesystem>)
-# include <experimental/filesystem>
+#  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+# elif __has_include(<experimental/filesystem>)
+#  include <experimental/filesystem>
 
 namespace pluginlib
 {
@@ -59,14 +72,15 @@ namespace fs = std::experimental::filesystem;
 }  // namespace impl
 }  // namespace pluginlib
 
-#define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
-#endif
+#  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+# endif
 #endif
 
 // The standard library does not provide it, so emulate it.
 #ifndef PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
 
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #define CLASS_LOADER_IMPL_OS_DIRSEP '\\'

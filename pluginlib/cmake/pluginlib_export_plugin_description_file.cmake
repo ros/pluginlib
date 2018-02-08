@@ -69,7 +69,7 @@ set(__PLUGINLIB_PLUGIN_CATEGORIES "")
 #   pluginlib_export_plugin_description_file(rviz "plugin_description.xml")
 #
 # This macro assumes the package name is PROJECT_NAME.
-# 
+#
 # :param plugin_category: category for the type of plugin described; used at
 #   runtime to locate all description files for that kind of plugin
 # :type plugin_category: string
