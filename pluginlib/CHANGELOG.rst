@@ -2,6 +2,18 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed references to plugin_tool from CMakeLists (`#93 <https://github.com/ros/pluginlib/issues/93>`_)
+* Moved pluginlib in its own folder (port 83 to ros2 branch) (`#95 <https://github.com/ros/pluginlib/issues/95>`_)
+* Fixed most linter errors
+* Changed behavior to continue loading classes on error.
+  * forward port of `#88 <https://github.com/ros/pluginlib/issues/88>`_
+* Fixed an issue due to Visual Studio 2015 not supporting ``__has_include`` (`#96 <https://github.com/ros/pluginlib/issues/96>`_)
+  * VS2015 and 2017 have both ``<filesystem>`` and ``<experimental/filesystem>`` but use ``std::experimental::filesystem`` in both cases for consistency.
+* Adjusted library search to work on windows, and warn about lib prefix (`#97 <https://github.com/ros/pluginlib/issues/97>`_)
+* Contributors: William Woodall
+
 1.11.0 (2017-07-27)
 -------------------
 * Switch to Tinyxml2 (`#59 <https://github.com/ros/pluginlib/issues/59>`_)
