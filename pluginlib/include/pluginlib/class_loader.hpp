@@ -42,7 +42,7 @@
 #include <boost/shared_ptr.hpp>
 #endif
 
-#include "class_loader/multi_library_class_loader.h"
+#include "class_loader/multi_library_class_loader.hpp"
 #include "pluginlib/class_desc.hpp"
 #include "pluginlib/class_loader_base.hpp"
 #include "pluginlib/exceptions.hpp"
