@@ -37,7 +37,7 @@
 #ifndef PLUGINLIB__CLASS_LIST_MACROS_HPP_
 #define PLUGINLIB__CLASS_LIST_MACROS_HPP_
 
-#include <class_loader/class_loader.h>
+#include <class_loader/class_loader.hpp>
 
 /// Register a class with class loader to effectively export it for plugin loading later.
 /**
