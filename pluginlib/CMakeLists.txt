@@ -11,9 +11,6 @@ catkin_package(
   DEPENDS Boost TinyXML2
 )
 
-install(DIRECTORY include/pluginlib/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-
 if(CATKIN_ENABLE_TESTING)
   include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${TinyXML2_INCLUDE_DIRS})
 
@@ -37,3 +34,9 @@ if(CATKIN_ENABLE_TESTING)
   endif()
 
 endif()
+
+install(DIRECTORY include/pluginlib/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
+install(PROGRAMS scripts/pluginlib_headers_update.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
