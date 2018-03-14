@@ -32,8 +32,6 @@
 #ifndef PLUGINLIB__CLASS_LOADER_IMP_H_
 #define PLUGINLIB__CLASS_LOADER_IMP_H_
 
-// *INDENT-OFF* (prevent uncrustify from adding indention below)
-#error Header <pluginlib/class_loader_imp.h> is deprecated, \
-but this file should never be included directly, include <pluginlib/class_loader.hpp> instead.
+#include "./class_loader_imp.hpp"
 
 #endif  // PLUGINLIB__CLASS_LOADER_IMP_H_
