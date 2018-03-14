@@ -2,6 +2,16 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [warning fix]Cherry-pick `#103 <https://github.com/ros/pluginlib/issues/103>`_ to melodic-devel (`#105 <https://github.com/ros/pluginlib/issues/105>`_)
+* [migration helper] provide a script to convert include statements to use new headers (`#104 <https://github.com/ros/pluginlib/issues/104>`_)
+* [migration] use new class_loader headers and fix deprecation warnings (`#101 <https://github.com/ros/pluginlib/issues/101>`_)
+* [bugfix] Continue loading classes on error (`#85 <https://github.com/ros/pluginlib/issues/85>`_) (`#88 <https://github.com/ros/pluginlib/issues/88>`_)
+* [style] Fix cpplint and lint_cmake errors (`#84 <https://github.com/ros/pluginlib/issues/84>`_)
+* move pluginlib in its own folder (`#83 <https://github.com/ros/pluginlib/issues/83>`_)
+* Contributors: Mikael Arguedas
+
 1.11.0 (2017-07-27)
 -------------------
 * Switch to Tinyxml2 (`#59 <https://github.com/ros/pluginlib/issues/59>`_)
