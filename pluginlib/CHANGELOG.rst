@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.12.0 (2018-03-14)
+-------------------
 * [warning fix]Cherry-pick `#103 <https://github.com/ros/pluginlib/issues/103>`_ to melodic-devel (`#105 <https://github.com/ros/pluginlib/issues/105>`_)
 * [migration helper] provide a script to convert include statements to use new headers (`#104 <https://github.com/ros/pluginlib/issues/104>`_)
 * [migration] use new class_loader headers and fix deprecation warnings (`#101 <https://github.com/ros/pluginlib/issues/101>`_)
