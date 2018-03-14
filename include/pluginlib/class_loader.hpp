@@ -26,15 +26,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PLUGINLIB_CLASS_LOADER_H
-#define PLUGINLIB_CLASS_LOADER_H
+#ifndef PLUGINLIB__CLASS_LOADER_HPP_
+#define PLUGINLIB__CLASS_LOADER_HPP_
 
 #include "boost/algorithm/string.hpp"
 #include "class_loader/multi_library_class_loader.h"
 #include <map>
-#include "pluginlib/class_desc.h"
-#include "pluginlib/class_loader_base.h"
-#include "pluginlib/pluginlib_exceptions.h"
+#include "pluginlib/class_desc.hpp"
+#include "pluginlib/class_loader_base.hpp"
+#include "pluginlib/exceptions.hpp"
 #include "ros/console.h"
 #include "ros/package.h"
 #include "tinyxml.h"
@@ -311,6 +311,6 @@ namespace pluginlib
     };
 };
 
-#include "class_loader_imp.h" //Note: The implementation of the methods is in a separate file for clarity
+#include "class_loader_imp.hpp" //Note: The implementation of the methods is in a separate file for clarity
 
-#endif //PLUGINLIB_CLASS_LOADER_H
+#endif  // PLUGINLIB__CLASS_LOADER_HPP_

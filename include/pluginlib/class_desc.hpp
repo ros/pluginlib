@@ -33,8 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 *********************************************************************/
-#ifndef PLUGINLIB_CLASS_DESC_H_
-#define PLUGINLIB_CLASS_DESC_H_
+#ifndef PLUGINLIB__CLASS_DESC_HPP_
+#define PLUGINLIB__CLASS_DESC_HPP_
+
 namespace pluginlib {
   /**
    * @class ClassDesc
@@ -74,4 +75,5 @@ namespace pluginlib {
       std::string plugin_manifest_path_;
   };
 };
-#endif
+
+#endif  // PLUGINLIB_CLASS_DESC_HPP_

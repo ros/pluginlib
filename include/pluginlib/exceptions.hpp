@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLUGINLIB_EXCEPTIONS_H_DEFINED
-#define PLUGINLIB_EXCEPTIONS_H_DEFINED
+#ifndef PLUGINLIB__EXCEPTIONS_HPP_
+#define PLUGINLIB__EXCEPTIONS_HPP_
 
 #include <stdexcept>
 
@@ -88,4 +88,4 @@ class CreateClassException: public PluginlibException
 
 }
 
-#endif
+#endif  // PLUGINLIB__EXCEPTIONS_HPP_

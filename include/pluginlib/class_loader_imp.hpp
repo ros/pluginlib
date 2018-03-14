@@ -36,8 +36,8 @@
 
 //NOTE: this should really never be included on its own, but just in case someone is bad we'll guard
 
-#ifndef PLUGINLIB_CLASS_LOADER_IMP_H_
-#define PLUGINLIB_CLASS_LOADER_IMP_H_
+#ifndef PLUGINLIB__CLASS_LOADER_IMP_HPP_
+#define PLUGINLIB__CLASS_LOADER_IMP_HPP_
 
 #include <cstdlib>
 #include <boost/algorithm/string.hpp>
@@ -738,4 +738,4 @@ namespace pluginlib
 
 
 
-#endif
+#endif  // PLUGINLIB__CLASS_LOADER_IMP_HPP_
