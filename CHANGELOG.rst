@@ -2,6 +2,13 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Provide a script to convert include statements to use new headers (`#107 <https://github.com/ros/pluginlib/issues/107>`_)
+* docs: fix minor typo (`#100 <https://github.com/ros/pluginlib/issues/100>`_)
+  Replace wrong/outdated `manifext.xml` with `package.xml` in the docstring of the constructor.
+* Contributors: Alireza, Mikael Arguedas
+
 1.11.2 (2017-11-15)
 -------------------
 * Fix cpplint and lint_cmake errors (backport 84) (`#87 <https://github.com/ros/pluginlib/issues/87>`_)
