@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.10.7 (2018-03-16)
+-------------------
 * Provide a script to convert include statements to use new headers (`#108 <https://github.com/ros/pluginlib/issues/108>`_)
 * Provide alternative headers for multi distro support (`#106 <https://github.com/ros/pluginlib/issues/106>`_)
 * Contributors: Mikael Arguedas, William Woodall
