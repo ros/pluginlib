@@ -2,6 +2,12 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Provide a script to convert include statements to use new headers (`#108 <https://github.com/ros/pluginlib/issues/108>`_)
+* Provide alternative headers for multi distro support (`#106 <https://github.com/ros/pluginlib/issues/106>`_)
+* Contributors: Mikael Arguedas, William Woodall
+
 1.10.6 (2017-12-18)
 -------------------
 * do not use popen to solve catkin_path. (`#49 <https://github.com/ros/pluginlib/issues/49>`_)
