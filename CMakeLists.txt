@@ -29,7 +29,7 @@ install(DIRECTORY include/pluginlib/
 install(FILES share/pluginlib/typed_class_loader_template.cpp
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-install(PROGRAMS scripts/plugin_macro_update
+install(PROGRAMS scripts/plugin_macro_update scripts/pluginlib_headers_migration.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 if(CATKIN_ENABLE_TESTING)
