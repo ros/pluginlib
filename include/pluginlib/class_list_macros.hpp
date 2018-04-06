@@ -37,7 +37,7 @@
 #ifndef PLUGINLIB__CLASS_LIST_MACROS_HPP_
 #define PLUGINLIB__CLASS_LIST_MACROS_HPP_
 
-#include <class_loader/class_loader.h>
+#include <class_loader/class_loader.hpp>
 
 /**
  * \def PLUGINLIB_REGISTER_CLASS(class_name, class_type, base_class_type)
