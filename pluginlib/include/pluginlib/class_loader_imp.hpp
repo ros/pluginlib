@@ -63,27 +63,6 @@ const std::string os_pathsep(";");  // NOLINT
 const std::string os_pathsep(":");  // NOLINT
 #endif
 
-namespace
-{
-std::vector<std::string> catkinFindLib()
-{
-  std::vector<std::string> lib_paths;
-  const char * env = std::getenv("CMAKE_PREFIX_PATH");
-  if (env) {
-    std::string env_catkin_prefix_paths(env);
-    std::vector<std::string> catkin_prefix_paths;
-    boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
-    BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
-      boost::filesystem::path path(catkin_prefix_path);
-      boost::filesystem::path lib("lib");
-      lib_paths.push_back((path / lib).string());
-    }
-  }
-  return lib_paths;
-}
-
-}  // namespace
-
 namespace pluginlib
 {
 template<class T>
@@ -323,7 +302,19 @@ template<class T>
 std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
 /***************************************************************************/
 {
-  return catkinFindLib();
+  std::vector<std::string> lib_paths;
+  const char * env = std::getenv("CMAKE_PREFIX_PATH");
+  if (env) {
+    std::string env_catkin_prefix_paths(env);
+    std::vector<std::string> catkin_prefix_paths;
+    boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
+    BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
+      boost::filesystem::path path(catkin_prefix_path);
+      boost::filesystem::path lib("lib");
+      lib_paths.push_back((path / lib).string());
+    }
+  }
+  return lib_paths;
 }
 
 template<class T>
