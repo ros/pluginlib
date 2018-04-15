@@ -32,10 +32,6 @@
 #ifndef PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 #define PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
 
-// *INDENT-OFF* (prevent uncrustify from adding indention below)
-#warning Including header <pluginlib/pluginlib_exceptions.h> is deprecated, \
-include <pluginlib/exceptions.hpp> instead.
-
 #include "./exceptions.hpp"
 
 #endif  // PLUGINLIB__PLUGINLIB_EXCEPTIONS_H_
