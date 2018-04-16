@@ -32,10 +32,6 @@
 #ifndef PLUGINLIB__CLASS_LOADER_H_
 #define PLUGINLIB__CLASS_LOADER_H_
 
-// *INDENT-OFF* (prevent uncrustify from adding indention below)
-#warning Including header <pluginlib/class_loader.h> is deprecated, \
-include <pluginlib/class_loader.hpp> instead.
-
 #include "./class_loader.hpp"
 
 #endif  // PLUGINLIB__CLASS_LOADER_H_
