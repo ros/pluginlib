@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.12.1 (2018-04-27)
+-------------------
 * [warning fix] remove deprecation warning until users are required to change code (`#115 <https://github.com/ros/pluginlib/issues/115>`_)
 * [warning fix] move catkinFindLib implementation from anonymous namespace to getCatkinLibraryPaths (`#113 <https://github.com/ros/pluginlib/issues/113>`_)
 * Contributors: Mikael Arguedas
