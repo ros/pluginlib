@@ -49,7 +49,7 @@ namespace fs = std::experimental::filesystem;
 # define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
 
 #elif defined(__has_include)
-# if __has_include(<filesystem>)
+# if __has_include(<filesystem>) && __cplusplus >= 201703L
 #  include <filesystem>
 
 namespace pluginlib
