@@ -36,8 +36,9 @@
 #define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
 
-#if _MSC_VER >= 1900
-# include <experimental/filesystem>
+#if defined(_MSC_VER)
+# if _MSC_VER >= 1900
+#  include <experimental/filesystem>
 namespace pluginlib
 {
 namespace impl
@@ -46,7 +47,8 @@ namespace fs = std::experimental::filesystem;
 }  // namespace impl
 }  // namespace pluginlib
 
-# define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+#  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+# endif
 
 #elif defined(__has_include)
 # if __has_include(<filesystem>) && __cplusplus >= 201703L
