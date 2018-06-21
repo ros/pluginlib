@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2018-06-21)
+------------------
 * Fix compile error with gcc 8.1.0 (`#116 <https://github.com/ros/pluginlib/issues/116>`_)
 * remove extra semicolon to fix pedantic warning (`#103 <https://github.com/ros/pluginlib/issues/103>`_)
 * use new class_loader header names (`#99 <https://github.com/ros/pluginlib/issues/99>`_)
