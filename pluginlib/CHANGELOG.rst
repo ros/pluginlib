@@ -2,6 +2,16 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix compile error with gcc 8.1.0 (`#116 <https://github.com/ros/pluginlib/issues/116>`_)
+* remove extra semicolon to fix pedantic warning (`#103 <https://github.com/ros/pluginlib/issues/103>`_)
+* use new class_loader header names (`#99 <https://github.com/ros/pluginlib/issues/99>`_)
+* adjust library search to work on windows, warn about lib prefix (`#97 <https://github.com/ros/pluginlib/issues/97>`_)
+* vs2015 doesnt support __has_include, VS2015 and 2017 have both <files… (`#96 <https://github.com/ros/pluginlib/issues/96>`_)
+* move pluginlib in its own folder (port 83 to ros2 branch) (`#95 <https://github.com/ros/pluginlib/issues/95>`_)
+* Contributors: Mikael Arguedas, William Woodall, jerry73204
+
 1.11.0 (2017-07-27)
 -------------------
 * Switch to Tinyxml2 (`#59 <https://github.com/ros/pluginlib/issues/59>`_)
