@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2018-07-17)
+------------------
+* export rcutils (`#120 <https://github.com/ros/pluginlib/issues/120>`_)
+* Contributors: Karsten Knese
+
 2.1.0 (2018-06-21)
 ------------------
 * Fix compile error with gcc 8.1.0 (`#116 <https://github.com/ros/pluginlib/issues/116>`_)
