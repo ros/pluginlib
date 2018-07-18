@@ -86,7 +86,7 @@ macro(pluginlib_export_plugin_description_file plugin_category relative_filename
 
   set(relative_dir "")
   get_filename_component(relative_dir "${relative_filename}" DIRECTORY)
-  install(FILES ${relative_filename} DESTINATION share/${relative_dir}/${PROJECT_NAME})
+  install(FILES ${relative_filename} DESTINATION share/${PROJECT_NAME}/${relative_dir})
 
   # this accumulated value is written to the ament index resource file in the
   # ament_package() call via the pluginlib hook
