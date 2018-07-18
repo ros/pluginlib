@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.1 (2018-07-17)
+------------------
 * export rcutils (`#120 <https://github.com/ros/pluginlib/issues/120>`_)
 * Contributors: Karsten Knese
 
