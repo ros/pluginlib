@@ -84,7 +84,9 @@ macro(pluginlib_export_plugin_description_file plugin_category relative_filename
     message(FATAL_ERROR "Given plugin description file '${abs_filename}' does not exist")
   endif()
 
-  install(FILES ${relative_filename} DESTINATION share/${PROJECT_NAME})
+  set(relative_dir "")
+  get_filename_component(relative_dir "${relative_filename}" DIRECTORY)
+  install(FILES ${relative_filename} DESTINATION share/${relative_dir}/${PROJECT_NAME})
 
   # this accumulated value is written to the ament index resource file in the
   # ament_package() call via the pluginlib hook
