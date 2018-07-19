@@ -547,7 +547,11 @@ std::string ClassLoader<T>::getPathSeparator()
 /***************************************************************************/
 {
 #if BOOST_FILESYSTEM_VERSION >= 3
+#ifdef _WIN32
+  return boost::filesystem::path("/").string();
+#else
   return boost::filesystem::path("/").native();
+#endif
 #else
   return boost::filesystem::path("/").external_file_string();
 #endif
