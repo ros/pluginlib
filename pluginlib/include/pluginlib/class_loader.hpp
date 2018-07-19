@@ -90,7 +90,7 @@ public:
    * \return An instance of the class
    * \deprecated use either createInstance() or createUnmanagedInstance()
    */
-  ROS_DEPRECATED T * createClassInstance(
+  [[deprecated]] T * createClassInstance(
     const std::string & lookup_name,
     bool auto_load = true);
 
