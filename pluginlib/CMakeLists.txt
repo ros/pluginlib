@@ -16,6 +16,11 @@ if(CATKIN_ENABLE_TESTING)
 
   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
   target_link_libraries(test_plugins ${class_loader_LIBRARIES})
+  if(WIN32)
+    # On Windows, default library runtime output set to CATKIN_GLOBAL_BIN_DESTINATION,
+    # change it back to CATKIN_PACKAGE_LIB_DESTINATION to match the library path described in plugin description file
+    set_target_properties(test_plugins PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
+  endif()
 
   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
   if(TARGET ${PROJECT_NAME}_utest)

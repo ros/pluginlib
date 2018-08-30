@@ -413,8 +413,42 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Class %s maps to library %s in classes_available_.",
     lookup_name.c_str(), library_name.c_str());
 
+  std::string library_path = getClassLibraryPathFromLibraryName(library_name, it->second.package_);
+
+#ifdef _WIN32
+  // Windows does not add 'lib' prefix to libary name, remove the prefix and try again
+  if ("" == library_path) {
+    std::string only_path;
+    std::string only_file;
+    size_t c = library_name.find_last_of(getPathSeparator());
+    if (std::string::npos == c) {
+      only_path = "";
+      only_file = library_name;
+    } else {
+      only_path = library_name.substr(0, c + 1);
+      only_file = library_name.substr(c + 1, library_name.size());
+    }
+
+    const std::string lib_suffix = "lib";
+    if (boost::starts_with(only_file, lib_suffix)) {
+      only_file = only_file.substr(lib_suffix.length());
+      if (!only_file.empty()) {
+        const std::string new_library_name = only_path + only_file;
+        library_path = getClassLibraryPathFromLibraryName(new_library_name, it->second.package_);
+      }
+    }
+  }
+#endif
+
+  return library_path;
+}
+
+template<class T>
+std::string ClassLoader<T>::getClassLibraryPathFromLibraryName(const std::string & library_name, const std::string & package_name)
+/***************************************************************************/
+{
   std::vector<std::string> paths_to_try =
-    getAllLibraryPathsToTry(library_name, it->second.package_);
+    getAllLibraryPathsToTry(library_name, package_name);
 
   ROS_DEBUG_NAMED("pluginlib.ClassLoader",
     "Iterating through all possible paths where %s could be located...",
