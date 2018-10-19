@@ -7,7 +7,7 @@
     The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure.
     To work, these tools require plugin providers to register their plugins in the package.xml of their package.
   </description>
-  <maintainer email="mikael@osrfoundation.org">Mikael Arguedas</maintainer>
+  <maintainer email="stevenragnarok@osrfoundation.org">Steven! Ragnarök</maintainer>
   <license>BSD</license>
 
   <url>http://www.ros.org/wiki/pluginlib</url>
