@@ -25,6 +25,7 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
     ament_target_dependencies(${PROJECT_NAME}_unique_ptr_test
       pluginlib rcutils test_pluginlib_fixture)
+    target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}_utest
@@ -33,5 +34,6 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}_utest)
     ament_target_dependencies(${PROJECT_NAME}_utest
       pluginlib rcutils test_pluginlib_fixture)
+    target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   endif()
 endif()
