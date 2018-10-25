@@ -34,28 +34,28 @@
 #include "./test_base.h"
 
 TEST(PluginlibUniquePtrTest, unknownPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  ASSERT_THROW(test_loader.createUniqueInstance("pluginlib/foobar"),
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
+  ASSERT_THROW(test_loader.createUniqueInstance("test_pluginlib_fixture/foobar"),
     pluginlib::LibraryLoadException);
 }
 
 
 TEST(PluginlibUniquePtrTest, misspelledPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib", "test_base::Fuba");
+  pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("test_pluginlib_fixture", "test_base::Fuba");
   ASSERT_THROW(bad_test_loader.createUniqueInstance(
       "pluginlib/foo"), pluginlib::LibraryLoadException);
 }
 
 TEST(PluginlibTest, brokenPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
-  ASSERT_THROW(test_loader.createUniqueInstance("pluginlib/none"), pluginlib::PluginlibException);
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
+  ASSERT_THROW(test_loader.createUniqueInstance("test_pluginlib_fixture/none"), pluginlib::PluginlibException);
 }
 
 TEST(PluginlibUniquePtrTest, workingPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
 
   try {
-    pluginlib::UniquePtr<test_base::Fubar> foo = test_loader.createUniqueInstance("pluginlib/foo");
+    pluginlib::UniquePtr<test_base::Fubar> foo = test_loader.createUniqueInstance("test_pluginlib_fixture/foo");
     foo->initialize(10.0);
     EXPECT_EQ(100.0, foo->result());
   } catch (pluginlib::PluginlibException & ex) {
@@ -67,28 +67,28 @@ TEST(PluginlibUniquePtrTest, workingPlugin) {
 }
 
 TEST(PluginlibUniquePtrTest, createUniqueInstanceAndUnloadLibrary) {
-  ROS_INFO("Making the ClassLoader...");
-  pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
+  std::cout << "Making the ClassLoader..." << std::endl;
+  pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib_fixture", "test_base::Fubar");
 
-  ROS_INFO("Instantiating plugin...");
+  std::cout << "Instantiating plugin..." << std::endl;
   {
-    pluginlib::UniquePtr<test_base::Fubar> inst = pl.createUniqueInstance("pluginlib/foo");
+    pluginlib::UniquePtr<test_base::Fubar> inst = pl.createUniqueInstance("test_pluginlib_fixture/foo");
   }
 
-  ROS_INFO("Checking if plugin is loaded with isClassLoaded...");
-  if (pl.isClassLoaded("pluginlib/foo")) {
-    ROS_INFO("Class is loaded");
+  std::cout << "Checking if plugin is loaded with isClassLoaded..." << std::endl;
+  if (pl.isClassLoaded("test_pluginlib_fixture/foo")) {
+    std::cout << "Class is loaded" << std::endl;;
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
 
-  ROS_INFO("Trying to unload class with unloadLibraryForClass...");
+  std::cout << "Trying to unload class with unloadLibraryForClass..." << std::endl;
   try {
-    pl.unloadLibraryForClass("pluginlib/foo");
+    pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to.";
   }
-  ROS_INFO("Done.");
+  std::cout << "Done." << std::endl;
 }
 
 // Run all the tests that were declared with TEST()

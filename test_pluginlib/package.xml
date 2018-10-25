@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>test_pluginlib</name>
+  <version>2.1.1</version>
+  <description>
+    Test package for the pluginlib package.
+  </description>
+  <maintainer email="stevenragnarok@osrfoundation.org">Steven! Ragnarök</maintainer>
+  <license>BSD</license>
+
+  <author>Eitan Marder-Eppstein</author>
+  <author>Tully Foote</author>
+  <author>Dirk Thomas</author>
+  <author>Mirza Shah</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>test_pluginlib_fixture</test_depend>
+  <test_depend>pluginlib</test_depend>
+  <test_depend>rcutils</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
