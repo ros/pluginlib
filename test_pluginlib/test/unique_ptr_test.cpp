@@ -67,28 +67,28 @@ TEST(PluginlibUniquePtrTest, workingPlugin) {
 }
 
 TEST(PluginlibUniquePtrTest, createUniqueInstanceAndUnloadLibrary) {
-  std::cout << "Making the ClassLoader..." << std::endl;
+  RCUTILS_LOG_INFO("Making the ClassLoader...");
   pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib_fixture", "test_base::Fubar");
 
-  std::cout << "Instantiating plugin..." << std::endl;
+  RCUTILS_LOG_INFO("Instantiating plugin...");
   {
     pluginlib::UniquePtr<test_base::Fubar> inst = pl.createUniqueInstance("test_pluginlib_fixture/foo");
   }
 
-  std::cout << "Checking if plugin is loaded with isClassLoaded..." << std::endl;
+  RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...");
   if (pl.isClassLoaded("test_pluginlib_fixture/foo")) {
-    std::cout << "Class is loaded" << std::endl;;
+    RCUTILS_LOG_INFO("Class is loaded");
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
 
-  std::cout << "Trying to unload class with unloadLibraryForClass..." << std::endl;
+  RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
   try {
     pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to.";
   }
-  std::cout << "Done." << std::endl;
+  RCUTILS_LOG_INFO("Done.");
 }
 
 // Run all the tests that were declared with TEST()

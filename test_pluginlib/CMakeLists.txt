@@ -26,4 +26,12 @@ if(BUILD_TESTING)
     ament_target_dependencies(${PROJECT_NAME}_unique_ptr_test
       pluginlib rcutils test_pluginlib_fixture)
   endif()
+
+  ament_add_gtest(${PROJECT_NAME}_utest
+    test/utest.cpp
+  )
+  if(TARGET ${PROJECT_NAME}_utest)
+    ament_target_dependencies(${PROJECT_NAME}_utest
+      pluginlib rcutils test_pluginlib_fixture)
+  endif()
 endif()
