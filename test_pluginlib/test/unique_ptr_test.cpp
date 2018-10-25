@@ -31,7 +31,7 @@
 
 #include <pluginlib/class_loader.hpp>
 
-#include "./test_base.h"
+#include <test_pluginlib_fixture/test_base.h>
 
 TEST(PluginlibUniquePtrTest, unknownPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
