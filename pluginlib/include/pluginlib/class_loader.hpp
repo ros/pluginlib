@@ -34,6 +34,13 @@
 #include <string>
 #include <vector>
 
+/* This is a workaround to MSVC incorrectly reporting the __cplusplus version
+ * as explained in:
+ * https://blogs.msdn.microsoft.com/vcblog/2018/04/09/msvc-now-correctly-reports-__cplusplus/
+ *
+ * I'm hesitant to currently switch on the /Zc:__cplusplus switch, as there are
+ * reports of code (incorrectly) assuming it should always be set to 199711L.
+ */
 #if defined(_MSC_VER)
 # define HAS_CPP11_MEMORY (_MSC_VER >= 1900)
 #else
