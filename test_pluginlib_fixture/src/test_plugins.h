@@ -33,10 +33,11 @@
 #include <cmath>
 
 #include <test_pluginlib_fixture/test_base.h>
+#include <test_pluginlib_fixture/visibility_control.hpp>
 
 namespace test_plugins
 {
-class Bar : public test_base::Fubar
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Bar : public test_base::Fubar
 {
 public:
   Bar() {}
@@ -60,7 +61,7 @@ private:
   double foo_;
 };
 
-class Foo : public test_base::Fubar
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Foo : public test_base::Fubar
 {
 public:
   Foo() {}

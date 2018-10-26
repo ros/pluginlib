@@ -34,7 +34,13 @@
 #include <string>
 #include <vector>
 
-#if __cplusplus >= 201103L
+#if defined(_MSC_VER)
+# define HAS_CPP11_MEMORY (_MSC_VER >= 1900)
+#else
+# define HAS_CPP11_MEMORY (__cplusplus >= 201103L)
+#endif
+
+#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 # include <memory>
 #endif
 
@@ -51,7 +57,7 @@
 namespace pluginlib
 {
 
-#if __cplusplus >= 201103L
+#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 template<typename T>
 using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
 #endif
@@ -96,7 +102,7 @@ public:
     const std::string & lookup_name,
     bool auto_load = true);
 
-#if __cplusplus >= 201103L
+#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
   /// Create an instance of a desired class.
   /**
    * Implicitly calls loadLibraryForClass() to increment the library counter.
@@ -122,7 +128,7 @@ public:
   boost::shared_ptr<T> createInstance(const std::string & lookup_name);
 #endif
 
-#if __cplusplus >= 201103L
+#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
   /// Create an instance of a desired class.
   /**
    * Implicitly calls loadLibraryForClass() to increment the library counter.

@@ -20,8 +20,11 @@ if(BUILD_TESTING)
   find_package(tinyxml2_vendor REQUIRED)
   find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
 
-  add_library(${PROJECT_NAME} SHARED test/test_plugins.cpp)
+  add_library(${PROJECT_NAME} SHARED src/test_plugins.cpp)
   target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
 
   ament_target_dependencies(${PROJECT_NAME}
     "pluginlib"

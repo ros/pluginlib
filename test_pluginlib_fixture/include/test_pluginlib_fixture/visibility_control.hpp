@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Willow Garage, Inc.
+ * Copyright (c) 2018, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,22 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TEST_PLUGINLIB_FIXTURE__TEST_BASE_H_
-#define TEST_PLUGINLIB_FIXTURE__TEST_BASE_H_
+#ifndef TEST_PLUGINLIB_FIXTURE__VISIBILITY_CONTROL_HPP_
+#define TEST_PLUGINLIB_FIXTURE__VISIBILITY_CONTROL_HPP_
 
-#include <test_pluginlib_fixture/visibility_control.hpp>
+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
+//     https://gcc.gnu.org/wiki/Visibility
 
-namespace test_base
-{
-class TEST_PLUGINLIB_FIXTURE_PUBLIC Fubar
-{
-public:
-  virtual void initialize(double foo) = 0;
-  virtual double result() = 0;
-  virtual ~Fubar() {}
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define TEST_PLUGINLIB_FIXTURE_EXPORT __attribute__ ((dllexport))
+    #define TEST_PLUGINLIB_FIXTURE_IMPORT __attribute__ ((dllimport))
+  #else
+    #define TEST_PLUGINLIB_FIXTURE_EXPORT __declspec(dllexport)
+    #define TEST_PLUGINLIB_FIXTURE_IMPORT __declspec(dllimport)
+  #endif
+  #ifdef TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY
+    #define TEST_PLUGINLIB_FIXTURE_PUBLIC TEST_PLUGINLIB_FIXTURE_EXPORT
+  #else
+    #define TEST_PLUGINLIB_FIXTURE_PUBLIC TEST_PLUGINLIB_FIXTURE_IMPORT
+  #endif
+  #define TEST_PLUGINLIB_FIXTURE_PUBLIC_TYPE TEST_PLUGINLIB_FIXTURE_PUBLIC
+  #define TEST_PLUGINLIB_FIXTURE_LOCAL
+#else
+  #define TEST_PLUGINLIB_FIXTURE_EXPORT __attribute__ ((visibility("default")))
+  #define TEST_PLUGINLIB_FIXTURE_IMPORT
+  #if __GNUC__ >= 4
+    #define TEST_PLUGINLIB_FIXTURE_PUBLIC __attribute__ ((visibility("default")))
+    #define TEST_PLUGINLIB_FIXTURE_LOCAL  __attribute__ ((visibility("hidden")))
+  #else
+    #define TEST_PLUGINLIB_FIXTURE_PUBLIC
+    #define TEST_PLUGINLIB_FIXTURE_LOCAL
+  #endif
+  #define TEST_PLUGINLIB_FIXTURE_PUBLIC_TYPE
+#endif
 
-protected:
-  Fubar() {}
-};
-}  // namespace test_base
-#endif  // TEST_BASE_H_
+#endif  // TEST_PLUGINLIB_FIXTURE__VISIBILITY_CONTROL_HPP_
