@@ -28,7 +28,7 @@
  */
 
 #include <pluginlib/class_list_macros.hpp>
-#include "./test_base.h"
+#include <test_pluginlib_fixture/test_base.h>
 #include "test_plugins.h"  // NOLINT
 
 PLUGINLIB_EXPORT_CLASS(test_plugins::Foo, test_base::Fubar)

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>test_pluginlib_fixture</name>
+  <version>2.1.1</version>
+  <description>
+    Test library fixture for testing the pluginlib package.
+  </description>
+  <maintainer email="stevenragnarok@osrfoundation.org">Steven! Ragnarök</maintainer>
+  <license>BSD</license>
+
+  <author>Eitan Marder-Eppstein</author>
+  <author>Tully Foote</author>
+  <author>Dirk Thomas</author>
+  <author>Mirza Shah</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>ament_index_cpp</depend>
+  <depend>class_loader</depend>
+  <depend>pluginlib</depend>
+  <depend>rcutils</depend>
+  <depend>tinyxml2_vendor</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <test_pluginlib_fixture plugin="${prefix}/test_plugins.xml" />
+  </export>
+</package>

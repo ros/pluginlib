@@ -27,20 +27,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TEST_BASE_H_
-#define TEST_BASE_H_
+#ifndef TEST_PLUGINS_H_
+#define TEST_PLUGINS_H_
 
-namespace test_base
+#include <cmath>
+
+#include <test_pluginlib_fixture/test_base.h>
+#include <test_pluginlib_fixture/visibility_control.hpp>
+
+namespace test_plugins
 {
-class Fubar
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Bar : public test_base::Fubar
 {
 public:
-  virtual void initialize(double foo) = 0;
-  virtual double result() = 0;
-  virtual ~Fubar() {}
+  Bar() {}
 
-protected:
-  Fubar() {}
+  void initialize(double foo)
+  {
+    foo_ = foo;
+  }
+
+  double result()
+  {
+    return 0.5 * foo_ * getBar();
+  }
+
+  double getBar()
+  {
+    return sqrt((foo_ * foo_) - ((foo_ / 2) * (foo_ / 2)));
+  }
+
+private:
+  double foo_;
 };
-}  // namespace test_base
-#endif  // TEST_BASE_H_
+
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Foo : public test_base::Fubar
+{
+public:
+  Foo() {}
+
+  void initialize(double foo)
+  {
+    foo_ = foo;
+  }
+
+  double result()
+  {
+    return foo_ * foo_;
+  }
+
+private:
+  double foo_;
+};
+}  // namespace test_plugins
+#endif  // TEST_PLUGINS_H_
