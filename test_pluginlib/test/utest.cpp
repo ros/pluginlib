@@ -92,7 +92,7 @@ TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
   try {
     pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
   } catch (pluginlib::PluginlibException & e) {
-    FAIL() << "Could not unload library when I should be able to.";
+    FAIL() << "Could not unload library when I should be able to. " << e.what();
   }
   RCUTILS_LOG_INFO("Done.");
 }
@@ -117,7 +117,7 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
   try {
     pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
   } catch (pluginlib::PluginlibException & e) {
-    FAIL() << "Could not unload library when I should be able to.";
+    FAIL() << "Could not unload library when I should be able to." << e.what();
   }
   RCUTILS_LOG_INFO("Done.");
 }
@@ -127,7 +127,7 @@ TEST(PluginlibTest, brokenXML) {
     pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar",
       "plugin_test");
     test_loader.createSharedInstance("test_pluginlib_fixture/foo");
-  } catch (pluginlib::PluginlibException & ex) {
+  } catch (pluginlib::PluginlibException & /*ex*/) {
     SUCCEED();
     return;
   }

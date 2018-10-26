@@ -86,7 +86,7 @@ TEST(PluginlibUniquePtrTest, createUniqueInstanceAndUnloadLibrary) {
   try {
     pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
   } catch (pluginlib::PluginlibException & e) {
-    FAIL() << "Could not unload library when I should be able to.";
+    FAIL() << "Could not unload library when I should be able to. " << e.what();
   }
   RCUTILS_LOG_INFO("Done.");
 }
