@@ -2,6 +2,14 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+2.2.0 (2018-11-20)
+------------------
+* Reorganized tests into fixture and consumer packages. (`#130 <https://github.com/ros/pluginlib/issues/130>`_)
+* Updated maintainer (`#129 <https://github.com/ros/pluginlib/issues/129>`_)
+* Fixed plugin description installation to relative subdirectory (`#122 <https://github.com/ros/pluginlib/issues/122>`_)
+* Contributors: Michael Carroll, Mikael Arguedas
+
 2.1.1 (2018-07-17)
 ------------------
 * export rcutils (`#120 <https://github.com/ros/pluginlib/issues/120>`_)
