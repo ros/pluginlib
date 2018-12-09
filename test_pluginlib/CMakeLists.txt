@@ -37,3 +37,5 @@ if(BUILD_TESTING)
     target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   endif()
 endif()
+
+ament_package()
