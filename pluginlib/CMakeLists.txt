@@ -36,6 +36,7 @@ if(BUILD_TESTING)
 
   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
 
+  # Write the necessary files for ament to detect a package.
   file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/")
   file(COPY test/package.xml DESTINATION "${prefix}/share/pluginlib/")
   file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__pluginlib__plugin/pluginlib"
@@ -55,11 +56,13 @@ if(BUILD_TESTING)
       ${rcutils_INCLUDE_DIRS}
       ${TinyXML2_INCLUDE_DIRS}
     )
+
+  # The $<$<CONFIG:Debug>:> prevents MSVC from making Release/Debug dirs.
   set_target_properties(
     test_plugins PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
+    LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
+    RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin/$<$<CONFIG:Debug>:>"
   )
 
   ament_add_gtest(${PROJECT_NAME}_unique_ptr_test
