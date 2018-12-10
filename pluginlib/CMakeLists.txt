@@ -40,6 +40,7 @@ if(BUILD_TESTING)
     "\${prefix}/test/test_plugins.xml\n")
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
+  target_link_libraries(test_plugins ${class_loader_LIBRARIES})
   target_compile_definitions(test_plugins PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   target_compile_definitions(test_plugins PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
   target_include_directories(test_plugins
