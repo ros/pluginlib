@@ -34,7 +34,7 @@
 
 #include "rcutils/logging_macros.h"  // NOLINT
 
-#include <test_pluginlib_fixture/test_base.h>
+#include <test_base.h>
 
 TEST(PluginlibTest, unknownPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");

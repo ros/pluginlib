@@ -27,22 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TEST_PLUGINLIB_FIXTURE__TEST_BASE_H_
-#define TEST_PLUGINLIB_FIXTURE__TEST_BASE_H_
+#include <pluginlib/class_list_macros.hpp>
+#include <test_base.h>
+#include "test_plugins.h"  // NOLINT
 
-#include <test_pluginlib_fixture/visibility_control.hpp>
-
-namespace test_base
-{
-class TEST_PLUGINLIB_FIXTURE_PUBLIC Fubar
-{
-public:
-  virtual void initialize(double foo) = 0;
-  virtual double result() = 0;
-  virtual ~Fubar() {}
-
-protected:
-  Fubar() {}
-};
-}  // namespace test_base
-#endif  // TEST_BASE_H_
+PLUGINLIB_EXPORT_CLASS(test_plugins::Foo, test_base::Fubar)
+PLUGINLIB_EXPORT_CLASS(test_plugins::Bar, test_base::Fubar)
