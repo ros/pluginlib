@@ -37,13 +37,13 @@
 #include <test_base.h>
 
 TEST(PluginlibTest, unknownPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
   ASSERT_THROW(test_loader.createSharedInstance("pluginlib/foobar"), pluginlib::LibraryLoadException);
 }
 
 TEST(PluginlibTest, misspelledPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("test_pluginlib_fixture", "test_base::Fuba");
-  ASSERT_THROW(bad_test_loader.createSharedInstance("test_pluginlib_fixture/foo"), pluginlib::LibraryLoadException);
+  pluginlib::ClassLoader<test_base::Fubar> bad_test_loader("pluginlib", "test_base::Fuba");
+  ASSERT_THROW(bad_test_loader.createSharedInstance("pluginlib/foo"), pluginlib::LibraryLoadException);
 }
 
 TEST(PluginlibTest, invalidPackage) {
@@ -53,15 +53,15 @@ TEST(PluginlibTest, invalidPackage) {
 }
 
 TEST(PluginlibTest, brokenPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
-  ASSERT_THROW(test_loader.createSharedInstance("test_pluginlib_fixture/none"), pluginlib::PluginlibException);
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
+  ASSERT_THROW(test_loader.createSharedInstance("pluginlib/none"), pluginlib::PluginlibException);
 }
 
 TEST(PluginlibTest, workingPlugin) {
-  pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar");
+  pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar");
 
   try {
-    std::shared_ptr<test_base::Fubar> foo = test_loader.createSharedInstance("test_pluginlib_fixture/foo");
+    std::shared_ptr<test_base::Fubar> foo = test_loader.createSharedInstance("pluginlib/foo");
     foo->initialize(10.0);
     EXPECT_EQ(100.0, foo->result());
   } catch (pluginlib::PluginlibException & ex) {
@@ -74,23 +74,23 @@ TEST(PluginlibTest, workingPlugin) {
 
 TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
-  pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib_fixture", "test_base::Fubar");
+  pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
 
   RCUTILS_LOG_INFO("Instantiating plugin...");
-  test_base::Fubar * inst = pl.createUnmanagedInstance("test_pluginlib_fixture/foo");
+  test_base::Fubar * inst = pl.createUnmanagedInstance("pluginlib/foo");
 
   RCUTILS_LOG_INFO("Deleting plugin...");
   delete inst;
 
   RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...");
-  if (pl.isClassLoaded("test_pluginlib_fixture/foo")) {
+  if (pl.isClassLoaded("pluginlib/foo")) {
     RCUTILS_LOG_INFO("Class is loaded");
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
   RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
   try {
-    pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
+    pl.unloadLibraryForClass("pluginlib/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to. " << e.what();
   }
@@ -99,15 +99,15 @@ TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
 
 TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
-  pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib_fixture", "test_base::Fubar");
+  pluginlib::ClassLoader<test_base::Fubar> pl("pluginlib", "test_base::Fubar");
 
   RCUTILS_LOG_INFO("Instantiating plugin...");
   {
-    std::shared_ptr<test_base::Fubar> inst = pl.createSharedInstance("test_pluginlib_fixture/foo");
+    std::shared_ptr<test_base::Fubar> inst = pl.createSharedInstance("pluginlib/foo");
   }
 
   RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...");
-  if (pl.isClassLoaded("test_pluginlib_fixture/foo")) {
+  if (pl.isClassLoaded("pluginlib/foo")) {
     RCUTILS_LOG_INFO("Class is loaded");
   } else {
     FAIL() << "Library containing class should be loaded but isn't.";
@@ -115,7 +115,7 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
 
   RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
   try {
-    pl.unloadLibraryForClass("test_pluginlib_fixture/foo");
+    pl.unloadLibraryForClass("pluginlib/foo");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to." << e.what();
   }
@@ -124,9 +124,9 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
 
 TEST(PluginlibTest, brokenXML) {
   try {
-    pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib_fixture", "test_base::Fubar",
+    pluginlib::ClassLoader<test_base::Fubar> test_loader("pluginlib", "test_base::Fubar",
       "plugin_test");
-    test_loader.createSharedInstance("test_pluginlib_fixture/foo");
+    test_loader.createSharedInstance("pluginlib/foo");
   } catch (pluginlib::PluginlibException & /*ex*/) {
     SUCCEED();
     return;

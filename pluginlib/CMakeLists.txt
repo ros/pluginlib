@@ -35,9 +35,12 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
-  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/test")
-  file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__plugin/pluginlib"
-    "\${prefix}/test/test_plugins.xml\n")
+
+  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/")
+  file(COPY test/package.xml DESTINATION "${prefix}/share/pluginlib/")
+  file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__pluginlib__plugin/pluginlib"
+    "share/pluginlib/test_plugins.xml\n")
+  file(WRITE "${prefix}/share/ament_index/resource_index/packages/pluginlib" "")
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
   target_link_libraries(test_plugins ${class_loader_LIBRARIES})
@@ -62,6 +65,7 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}_unique_ptr_test
     test/unique_ptr_test.cpp
     APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
+    ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
     target_include_directories(${PROJECT_NAME}_unique_ptr_test
@@ -88,6 +92,7 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}_utest
     test/utest.cpp
     APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
+    ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_utest)
     target_include_directories(${PROJECT_NAME}_utest
