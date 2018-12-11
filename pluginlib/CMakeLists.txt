@@ -30,32 +30,27 @@ install(
   DESTINATION include
 )
 
-
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
 
   # Write the necessary files for ament to detect a package.
-  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/")
-  file(COPY test/package.xml DESTINATION "${prefix}/share/pluginlib/")
-  file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__pluginlib__plugin/pluginlib"
-    "share/pluginlib/test_plugins.xml\n")
-  file(WRITE "${prefix}/share/ament_index/resource_index/packages/pluginlib" "")
+  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/test_pluginlib/")
+  file(COPY test/package.xml DESTINATION "${prefix}/share/test_pluginlib/")
+  file(WRITE "${prefix}/share/ament_index/resource_index/test_pluginlib__pluginlib__plugin/pluginlib"
+    "share/test_pluginlib/test_plugins.xml\n")
+  file(WRITE "${prefix}/share/ament_index/resource_index/packages/test_pluginlib" "")
+
+  include_directories(include test/include)
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
-  target_link_libraries(test_plugins ${class_loader_LIBRARIES})
   target_compile_definitions(test_plugins PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   target_compile_definitions(test_plugins PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
-  target_include_directories(test_plugins
-      PUBLIC
-      include
-      test/include
-      ${ament_index_cpp_INCLUDE_DIRS}
-      ${class_loader_INCLUDE_DIRS}
-      ${rcutils_INCLUDE_DIRS}
-      ${TinyXML2_INCLUDE_DIRS}
-    )
+  ament_target_dependencies(
+    test_plugins
+    class_loader
+  )
 
   # The $<$<CONFIG:Debug>:> prevents MSVC from making Release/Debug dirs.
   set_target_properties(
@@ -71,21 +66,15 @@ if(BUILD_TESTING)
     ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-    target_include_directories(${PROJECT_NAME}_unique_ptr_test
-      PUBLIC
-      include
-      test/include
-      ${ament_index_cpp_INCLUDE_DIRS}
-      ${class_loader_INCLUDE_DIRS}
-      ${rcutils_INCLUDE_DIRS}
-      ${TinyXML2_INCLUDE_DIRS}
+    ament_target_dependencies(
+      ${PROJECT_NAME}_unique_ptr_test
+      class_loader
+      ament_index_cpp
+      rcutils
     )
+    target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-    target_link_libraries(${PROJECT_NAME}_unique_ptr_test
-      ${ament_index_cpp_LIBRARIES}
-      ${class_loader_LIBRARIES}
-      ${rcutils_LIBRARIES}
-      ${TinyXML2_LIBRARIES})
+
     if(CMAKE_COMPILER_IS_GNUCXX)
       target_link_libraries(${PROJECT_NAME}_unique_ptr_test stdc++fs)
     endif()
@@ -98,21 +87,16 @@ if(BUILD_TESTING)
     ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_utest)
-    target_include_directories(${PROJECT_NAME}_utest
-      PUBLIC
-      include
-      test/include
-      ${ament_index_cpp_INCLUDE_DIRS}
-      ${class_loader_INCLUDE_DIRS}
-      ${rcutils_INCLUDE_DIRS}
-      ${TinyXML2_INCLUDE_DIRS}
+    ament_target_dependencies(
+      ${PROJECT_NAME}_utest
+      class_loader
+      ament_index_cpp
+      rcutils
+      tinyxml2_vendor
+      tinyxml2
     )
+    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-    target_link_libraries(${PROJECT_NAME}_utest
-      ${ament_index_cpp_LIBRARIES}
-      ${class_loader_LIBRARIES}
-      ${rcutils_LIBRARIES}
-      ${TinyXML2_LIBRARIES})
     if(CMAKE_COMPILER_IS_GNUCXX)
       target_link_libraries(${PROJECT_NAME}_utest stdc++fs)
     endif()

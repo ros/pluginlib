@@ -1,34 +1,12 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
-  <name>pluginlib</name>
+  <name>test_pluginlib</name>
   <version>2.2.0</version>
   <description>
-    The pluginlib package provides tools for writing and dynamically loading plugins using the ROS build infrastructure.
-    To work, these tools require plugin providers to register their plugins in the package.xml of their package.
+    This tests pluginlib.
   </description>
-  <maintainer email="stevenragnarok@osrfoundation.org">Steven! Ragnarök</maintainer>
-  <license>BSD</license>
-
-  <url>http://www.ros.org/wiki/pluginlib</url>
-  <url type="bugtracker">https://github.com/ros/pluginlib/issues</url>
-  <url type="repository">https://github.com/ros/pluginlib</url>
-  <author>Eitan Marder-Eppstein</author>
-  <author>Tully Foote</author>
-  <author>Dirk Thomas</author>
-  <author>Mirza Shah</author>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <depend>ament_index_cpp</depend>
-  <depend>class_loader</depend>
-  <depend>rcutils</depend>
-  <depend>tinyxml2_vendor</depend>
-
-  <test_depend>ament_cmake_gtest</test_depend>
-
   <export>
-    <build_type>ament_cmake</build_type>
     <pluginlib plugin="${prefix}/test_plugins.xml" />
   </export>
 </package>
