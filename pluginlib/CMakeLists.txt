@@ -66,11 +66,18 @@ if(BUILD_TESTING)
     ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
+    get_cmake_property(_variableNames VARIABLES)
+    list (SORT _variableNames)
+    foreach (_variableName ${_variableNames})
+      message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+
     ament_target_dependencies(
       ${PROJECT_NAME}_unique_ptr_test
       class_loader
       ament_index_cpp
       rcutils
+      TinyXML2
     )
     target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
@@ -92,8 +99,7 @@ if(BUILD_TESTING)
       class_loader
       ament_index_cpp
       rcutils
-      tinyxml2_vendor
-      tinyxml2
+      TinyXML2
     )
     target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
