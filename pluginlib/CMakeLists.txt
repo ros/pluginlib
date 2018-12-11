@@ -53,7 +53,11 @@ if(BUILD_TESTING)
     class_loader
   )
 
-  # The $<$<CONFIG:Debug>:> prevents MSVC from making Release/Debug dirs.
+  # Use a generator expression so that the specified folder is used directly, without any
+  # configuration-dependent suffix.
+  #
+  # See https://cmake.org/cmake/help/v3.8/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html
+  # Ref: https://stackoverflow.com/a/45871818
   set_target_properties(
     test_plugins PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
