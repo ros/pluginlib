@@ -30,47 +30,85 @@ install(
   DESTINATION include
 )
 
-# if(BUILD_TESTING)
-#   add_library(test_plugins EXCLUDE_FROM_ALL SHARED test/test_plugins.cpp)
-#   target_include_directories(test_plugins PUBLIC
-#     include
-#     ${ament_index_cpp_INCLUDE_DIRS}
-#     ${class_loader_INCLUDE_DIRS}
-#     ${tinyxml2_INCLUDE_DIRS}
-#   )
-#   # place the library in an FHS compliant layout in the build space
-#   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
-#   set_target_properties(
-#     test_plugins PROPERTIES
-#     ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib"
-#     LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib"
-#     RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin"
-#   )
-#   # place the plugin manifest in an FHS compliant layout in the build space
-#   file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/pluginlib/test")
-#   # create an entry in the ament index for the exported plugins
-#   file(WRITE "${prefix}/share/ament_index/resource_index/pluginlib__plugin/pluginlib"
-#     "\${prefix}/test/test_plugins.xml\n")
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
 
-#   catkin_add_gtest(${PROJECT_NAME}_utest test/utest.cpp)
-#   if(TARGET ${PROJECT_NAME}_utest)
-#     target_link_libraries(${PROJECT_NAME}_utest ${tinyxml2_LIBRARIES} ${catkin_LIBRARIES})
-#     add_dependencies(${PROJECT_NAME}_utest test_plugins)
-#   endif()
+  set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
 
-#   include(CheckCXXCompilerFlag)
-#   check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-#   if(COMPILER_SUPPORTS_CXX11)
-#     catkin_add_gtest(${PROJECT_NAME}_unique_ptr_test test/unique_ptr_test.cpp)
-#     if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-#       target_link_libraries(${PROJECT_NAME}_unique_ptr_test
-#         ${tinyxml2_LIBRARIES} ${catkin_LIBRARIES})
-#       set_target_properties(${PROJECT_NAME}_unique_ptr_test
-#         PROPERTIES COMPILE_FLAGS -std=c++11 LINK_FLAGS -std=c++11)
-#       add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
-#     endif()
-#   endif()
-# endif()
+  # Write the necessary files for ament to detect a package.
+  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/test_pluginlib/")
+  configure_file(test/test_package.xml "${prefix}/share/test_pluginlib/package.xml" COPYONLY)
+
+  file(WRITE "${prefix}/share/ament_index/resource_index/test_pluginlib__pluginlib__plugin/pluginlib"
+    "share/test_pluginlib/test_plugins.xml\n")
+  file(WRITE "${prefix}/share/ament_index/resource_index/packages/test_pluginlib" "")
+
+  include_directories(include test/include)
+
+  add_library(test_plugins SHARED ./test/test_plugins.cpp)
+  target_compile_definitions(test_plugins PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+  target_compile_definitions(test_plugins PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
+  ament_target_dependencies(
+    test_plugins
+    class_loader
+  )
+
+  # Use a generator expression so that the specified folder is used directly, without any
+  # configuration-dependent suffix.
+  #
+  # See https://cmake.org/cmake/help/v3.8/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html
+  # Ref: https://stackoverflow.com/a/45871818
+  set_target_properties(
+    test_plugins PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
+    LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
+    RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin/$<$<CONFIG:Debug>:>"
+  )
+
+  ament_add_gtest(${PROJECT_NAME}_unique_ptr_test
+    test/unique_ptr_test.cpp
+    APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
+    ENV AMENT_PREFIX_PATH=${prefix}
+  )
+  if(TARGET ${PROJECT_NAME}_unique_ptr_test)
+    ament_target_dependencies(
+      ${PROJECT_NAME}_unique_ptr_test
+      class_loader
+      ament_index_cpp
+      rcutils
+      TinyXML2
+    )
+    target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES})
+    target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      target_link_libraries(${PROJECT_NAME}_unique_ptr_test stdc++fs)
+    endif()
+    add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}_utest
+    test/utest.cpp
+    APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
+    ENV AMENT_PREFIX_PATH=${prefix}
+  )
+  if(TARGET ${PROJECT_NAME}_utest)
+    ament_target_dependencies(
+      ${PROJECT_NAME}_utest
+      class_loader
+      ament_index_cpp
+      rcutils
+      TinyXML2
+    )
+    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES})
+    target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      target_link_libraries(${PROJECT_NAME}_utest stdc++fs)
+    endif()
+    add_dependencies(${PROJECT_NAME}_utest test_plugins)
+  endif()
+
+endif()
 
 ament_package(
   CONFIG_EXTRAS "pluginlib-extras.cmake"
