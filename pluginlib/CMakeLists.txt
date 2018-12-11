@@ -37,7 +37,8 @@ if(BUILD_TESTING)
 
   # Write the necessary files for ament to detect a package.
   file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/test_pluginlib/")
-  file(COPY test/package.xml DESTINATION "${prefix}/share/test_pluginlib/")
+  configure_file(test/test_package.xml "${prefix}/share/test_pluginlib/package.xml" COPYONLY)
+
   file(WRITE "${prefix}/share/ament_index/resource_index/test_pluginlib__pluginlib__plugin/pluginlib"
     "share/test_pluginlib/test_plugins.xml\n")
   file(WRITE "${prefix}/share/ament_index/resource_index/packages/test_pluginlib" "")
