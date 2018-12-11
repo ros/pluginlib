@@ -71,12 +71,6 @@ if(BUILD_TESTING)
     ENV AMENT_PREFIX_PATH=${prefix}
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
-    get_cmake_property(_variableNames VARIABLES)
-    list (SORT _variableNames)
-    foreach (_variableName ${_variableNames})
-      message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
-
     ament_target_dependencies(
       ${PROJECT_NAME}_unique_ptr_test
       class_loader
