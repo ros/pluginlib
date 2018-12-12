@@ -78,7 +78,6 @@ if(BUILD_TESTING)
       rcutils
       TinyXML2
     )
-    target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
     if(CMAKE_COMPILER_IS_GNUCXX)
@@ -100,8 +99,8 @@ if(BUILD_TESTING)
       rcutils
       TinyXML2
     )
-    target_link_libraries(${PROJECT_NAME}_utest ${TinyXML2_LIBRARIES})
     target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
     if(CMAKE_COMPILER_IS_GNUCXX)
       target_link_libraries(${PROJECT_NAME}_utest stdc++fs)
     endif()
