@@ -3,6 +3,12 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.2.1 (2018-12-13)
+------------------
+* Removed extraneous link lines. (`#135 <https://github.com/ros/pluginlib/issues/135>`_)
+* Collapsed testing packages back into pluginlib package. (`#134 <https://github.com/ros/pluginlib/issues/134>`_)
+* Contributors: Michael Carroll
+
 2.2.0 (2018-11-20)
 ------------------
 * Reorganized tests into fixture and consumer packages. (`#130 <https://github.com/ros/pluginlib/issues/130>`_)
