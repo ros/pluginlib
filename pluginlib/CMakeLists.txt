@@ -86,6 +86,7 @@ if(BUILD_TESTING)
       class_loader
       ament_index_cpp
       rcutils
+      tinyxml2_vendor
       TinyXML2
     )
     target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
@@ -107,6 +108,7 @@ if(BUILD_TESTING)
       class_loader
       ament_index_cpp
       rcutils
+      tinyxml2_vendor
       TinyXML2
     )
     target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
