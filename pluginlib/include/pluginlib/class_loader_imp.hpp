@@ -417,7 +417,7 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
 
 #ifdef _WIN32
   // Windows does not add 'lib' prefix to libary name, remove the prefix and try again
-  if ("" == library_path) {
+  if (library_path.empty()) {
     std::string only_path;
     std::string only_file;
     size_t c = library_name.find_last_of(getPathSeparator());

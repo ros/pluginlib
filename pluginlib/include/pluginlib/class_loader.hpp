@@ -288,11 +288,9 @@ private:
     const std::string & library_name,
     const std::string & exporting_package_name);
 
-#ifdef _WIN32
   std::string getClassLibraryPathFromLibraryName(
     const std::string & library_name,
     const std::string & package_name);
-#endif
 
   /// Return the paths where libraries are installed according to the Catkin build system.
   std::vector<std::string> getCatkinLibraryPaths();
