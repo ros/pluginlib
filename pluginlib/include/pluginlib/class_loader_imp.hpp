@@ -310,7 +310,12 @@ std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
     boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
     BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
       boost::filesystem::path path(catkin_prefix_path);
-      boost::filesystem::path lib("lib");
+#if WIN32
+	  boost::filesystem::path bin("bin");
+	  lib_paths.push_back((path / bin).string());
+#endif
+
+	  boost::filesystem::path lib("lib");
       lib_paths.push_back((path / lib).string());
     }
   }
