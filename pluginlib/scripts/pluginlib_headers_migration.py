@@ -34,7 +34,6 @@
 # Run this script to update legacy pluginlib include statements
 # to utilize the new pluginlib headers.
 
-from __future__ import print_function
 
 import subprocess
 
@@ -58,8 +57,8 @@ sed_cmd_prefix = ' -exec sed -i \' s'
 sed_cmd_suffix = ' {} \; '
 sed_separator = '@'
 full_cmd = cmd
-for old_header, new_header in header_mappings.iteritems():
-    for leading_token, ending_token in include_tokens.iteritems():
+for old_header, new_header in header_mappings.items():
+    for leading_token, ending_token in include_tokens.items():
         full_cmd += \
             sed_cmd_prefix + sed_separator + \
             include_prefix + leading_token + old_header + ending_token + sed_separator + \
