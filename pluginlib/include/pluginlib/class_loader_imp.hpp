@@ -100,7 +100,7 @@ ClassLoader<T>::~ClassLoader()
 /***************************************************************************/
 {
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Destroying ClassLoader, base = %s, address = %p",
-    getBaseClassType().c_str(), this);
+    ClassLoader<T>::getBaseClassType().c_str(), this);
 }
 
 
