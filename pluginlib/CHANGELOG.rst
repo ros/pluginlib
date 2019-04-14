@@ -3,6 +3,13 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.3.0 (2019-04-14)
+------------------
+* Updated build to choose the appropriate library for experimental filesystem, based on the compiler and standard library. (`#146 <https://github.com/ros/pluginlib/issues/146>`_)
+* Added stdc++fs as a target link library for clang compiler on linux. (`#144 <https://github.com/ros/pluginlib/issues/144>`_)
+* Added Michael as maintainer (for build e-mails). (`#137 <https://github.com/ros/pluginlib/issues/137>`_)
+* Contributors: Emerson Knapp, Michael Carroll, bhatsach
+
 2.2.1 (2018-12-13)
 ------------------
 * Removed extraneous link lines. (`#135 <https://github.com/ros/pluginlib/issues/135>`_)
