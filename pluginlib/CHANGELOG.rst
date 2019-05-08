@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.3.1 (2019-05-08)
+------------------
+* [ros2] Cast pointers to void * when using %p (`#152 <https://github.com/ros/pluginlib/issues/152>`_)
+* Contributors: Shane Loretz
+
 2.3.0 (2019-04-14)
 ------------------
 * Updated build to choose the appropriate library for experimental filesystem, based on the compiler and standard library. (`#146 <https://github.com/ros/pluginlib/issues/146>`_)
