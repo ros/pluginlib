@@ -35,3 +35,7 @@ if(UNIX AND NOT APPLE)
   # ament_export_libraries() because it is not absolute and cannot be found with find_library
   list(APPEND pluginlib_LIBRARIES ${FILESYSTEM_LIB})
 endif()
+
+find_package(tinyxml2_vendor REQUIRED)
+find_package(TinyXML2 REQUIRED)
+list(APPEND pluginlib_LIBRARIES ${TinyXML2_LIBRARIES})
