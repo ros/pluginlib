@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.3.2 (2019-07-30)
+------------------
+* Export tinyxml2 libraries downstream. (`#162 <https://github.com/ros/pluginlib/issues/162>`_)
+* Contributors: Esteve Fernandez
+
 2.3.1 (2019-05-08)
 ------------------
 * [ros2] Cast pointers to void * when using %p (`#152 <https://github.com/ros/pluginlib/issues/152>`_)
