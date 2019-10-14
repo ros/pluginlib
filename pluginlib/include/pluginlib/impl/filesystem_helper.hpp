@@ -36,21 +36,7 @@
 #define PLUGINLIB__IMPL__FILESYSTEM_HELPER_HPP_
 
 
-#if defined(_MSC_VER)
-# if _MSC_VER >= 1900
-#  include <experimental/filesystem>
-namespace pluginlib
-{
-namespace impl
-{
-namespace fs = std::experimental::filesystem;
-}  // namespace impl
-}  // namespace pluginlib
-
-#  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
-# endif
-
-#elif defined(__has_include)
+#if defined(__has_include)
 # if __has_include(<filesystem>) && __cplusplus >= 201703L
 #  include <filesystem>
 
@@ -64,6 +50,9 @@ namespace fs = std::filesystem;
 
 #  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
 # elif __has_include(<experimental/filesystem>)
+// MSVC deprecates <experimental/filesystem> and in favor of <filesystem>
+// use this macro to acknowledge this deprecation and unblock the build break
+#  define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #  include <experimental/filesystem>
 
 namespace pluginlib
