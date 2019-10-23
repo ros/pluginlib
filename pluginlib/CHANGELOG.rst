@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.4.1 (2019-10-23)
+------------------
+* Avoid build break for Visual Studio 2019 v16.3 (`#166 <https://github.com/ros/pluginlib/issues/166>`_)
+* Contributors: Sean Yen, Steven! Ragnarök
+
 2.4.0 (2019-09-18)
 ------------------
 * Export tinyxml2 libraries downstream. (`#154 <https://github.com/ros/pluginlib/issues/154>`_)
