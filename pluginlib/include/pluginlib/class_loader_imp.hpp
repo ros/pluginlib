@@ -51,6 +51,7 @@
 #include "boost/bind.hpp"
 #include "boost/filesystem.hpp"
 #include "boost/foreach.hpp"
+#include "boost/predef/architecture.h"
 #include "class_loader/class_loader.hpp"
 
 #include "ros/package.h"
@@ -61,6 +62,13 @@
 const std::string os_pathsep(";");  // NOLINT
 #else
 const std::string os_pathsep(":");  // NOLINT
+#endif
+
+#if BOOST_ARCH_ARM == BOOST_VERSION_NUMBER(8, 0, 0) \
+    || defined(BOOST_ARCH_X86_64)
+#define PLUGINLIB_ARCH_BITS 64
+#else
+#define PLUGINLIB_ARCH_BITS 32
 #endif
 
 namespace pluginlib
@@ -323,7 +331,11 @@ std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
       boost::filesystem::path bin("bin");
       lib_paths.push_back((path / bin).string());
 #endif
-      boost::filesystem::path lib("lib");
+      boost::filesystem::path lib;
+      if (PLUGINLIB_ARCH_BITS == 64)
+        lib = "lib64";
+      else
+        lib = "lib";
       lib_paths.push_back((path / lib).string());
     }
   }
