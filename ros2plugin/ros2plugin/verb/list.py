@@ -21,7 +21,7 @@ from ament_index_python import get_package_prefix
 from ament_index_python import PackageNotFoundError
 from ros2cli.node.strategy import add_arguments
 
-from ros2plugin.api import get_registered_plugin_ressources
+from ros2plugin.api import get_registered_plugin_resources
 from ros2plugin.verb import VerbExtension
 
 
@@ -41,28 +41,28 @@ class ListVerb(VerbExtension):
             help='Name of the package to list plugins from')
 
     def main(self, *, args):
-        plugin_ressources = get_registered_plugin_ressources()
+        plugin_resources = get_registered_plugin_resources()
 
         if args.package:
-            plugin_ressources
+            plugin_resources
 
         if args.packages:
-            for package_name, package_plugin_ressources in sorted(plugin_ressources):
+            for package_name, package_plugin_resources in sorted(plugin_resources):
                 print(package_name + ':')
-                if any(package_plugin_ressources):
-                    print(*['\t' + r for r in package_plugin_ressources], sep='\n')
+                if any(package_plugin_resources):
+                    print(*['\t' + r for r in package_plugin_resources], sep='\n')
             return
 
-        for package_name, package_plugin_ressources in sorted(plugin_ressources):
+        for package_name, package_plugin_resources in sorted(plugin_resources):
             plugins = []
             print(package_name + ':')
-            for package_plugin_ressource in package_plugin_ressources:
+            for package_plugin_resource in package_plugin_resources:
                 try:
                     package_prefix = get_package_prefix(package_name)
                 except PackageNotFoundError:
                     print('Package ' + package_name + ' not found.')
 
-                plugin_xml = os.path.join(package_prefix, package_plugin_ressource)
+                plugin_xml = os.path.join(package_prefix, package_plugin_resource)
                 if not os.path.isfile(plugin_xml):
                     print('XML manifest ' + os.path.basename(plugin_xml) + ' not found.')
 
