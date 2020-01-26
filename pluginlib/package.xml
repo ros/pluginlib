@@ -22,7 +22,8 @@
 
   <build_depend>cmake_modules</build_depend>
 
-  <depend>boost</depend>
+  <depend>libboost-filesystem-dev</depend>
+  <depend>libboost-system-dev</depend>
   <depend>class_loader</depend>
   <depend>rosconsole</depend>
   <depend version_gte="1.11.1">roslib</depend>
