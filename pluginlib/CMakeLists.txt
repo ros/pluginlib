@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(pluginlib)
 
 find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib cmake_modules)
-find_package(Boost REQUIRED COMPONENTS filesystem system)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(TinyXML2 REQUIRED)
 
 catkin_package(
