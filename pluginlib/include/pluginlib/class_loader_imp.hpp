@@ -681,7 +681,13 @@ void ClassLoader<T>::processSingleXMLPluginFile(
 
   tinyxml2::XMLElement * library = config;
   while (library != NULL) {
-    std::string library_path = library->Attribute("path");
+    const char* path = library->Attribute("path");
+    if (NULL == path) {
+      ROS_ERROR_NAMED("pluginlib.ClassLoader",
+        "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
+      continue;
+    }
+    std::string library_path(path);
     if (0 == library_path.size()) {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
         "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
