@@ -295,7 +295,16 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
     return "";
   }
 
-  return package_name_node->GetText();
+  const char* package_name_node_txt = package_name_node->GetText();
+  if (NULL == package_name_node_txt) {
+    ROS_ERROR_NAMED("pluginlib.ClassLoader",
+      "package.xml at %s has an invalid <name> tag! Cannot determine package "
+      "which exports plugin.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  return package_name_node_txt;
 }
 
 template<class T>
