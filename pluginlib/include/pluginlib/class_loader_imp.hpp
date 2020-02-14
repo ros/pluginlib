@@ -695,8 +695,15 @@ void ClassLoader<T>::processSingleXMLPluginFile(
             "' has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
-  if (!(strcmp(config->Value(), "library") == 0 ||
-    strcmp(config->Value(), "class_libraries") == 0))
+  const char* config_value = config->Value();
+  if (NULL == config_value) {
+      throw pluginlib::InvalidXMLException(
+              "XML Document '" + xml_file +
+              "' has an invalid Root Element. This likely means the XML is malformed or missing.");
+      return;
+  }
+  if (!(strcmp(config_value, "library") == 0 ||
+    strcmp(config_value, "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
             "The XML document '" + xml_file + "' given to add must have either \"library\" or "
@@ -704,7 +711,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     return;
   }
   // Step into the filter list if necessary
-  if (strcmp(config->Value(), "class_libraries") == 0) {
+  if (strcmp(config_value, "class_libraries") == 0) {
     config = config->FirstChildElement("library");
   }
 
