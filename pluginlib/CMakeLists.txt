@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(pluginlib)
 
 find_package(catkin REQUIRED COMPONENTS class_loader rosconsole roslib cmake_modules)
