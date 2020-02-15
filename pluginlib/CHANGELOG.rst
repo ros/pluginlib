@@ -2,6 +2,20 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.2 (2020-02-14)
+-------------------
+* Add bin to library search path on Windows. (`#145 <https://github.com/ros/pluginlib/issues/145>`_)
+* Bump minimum CMake version to avoid CMP0048 warning. (`#173 <https://github.com/ros/pluginlib/issues/173>`_)
+* Check for NULL in XMLElement::Attribute. (`#163 <https://github.com/ros/pluginlib/issues/163>`_)
+* Check for NULL in XMLElement::GetText. (`#159 <https://github.com/ros/pluginlib/issues/159>`_)
+* Check for NULL in XMLNode::Value. (`#158 <https://github.com/ros/pluginlib/issues/158>`_)
+* Update header migration script for Python 3. (`#148 <https://github.com/ros/pluginlib/issues/148>`_)
+* Make Steven! Ragnarok the maintainer. (`#129 <https://github.com/ros/pluginlib/issues/129>`_)
+* Fix spelling Attirbute=>Attribute. (`#128 <https://github.com/ros/pluginlib/issues/128>`_)
+* Link test_plugins against class_loader for Windows compilation. (`#125 <https://github.com/ros/pluginlib/issues/125>`_)
+* Fix build issue when build on Windows (`#123 <https://github.com/ros/pluginlib/issues/123>`_)
+* Contributors: James Xu, Jeremie Deray, Johnson Shih, Markus Grimm, Mikael Arguedas, Shane Loretz, josch
+
 1.12.1 (2018-04-27)
 -------------------
 * [warning fix] remove deprecation warning until users are required to change code (`#115 <https://github.com/ros/pluginlib/issues/115>`_)
