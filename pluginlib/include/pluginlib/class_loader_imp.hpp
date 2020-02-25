@@ -368,8 +368,6 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
     stripped_library_name_win32 = stripped_library_name_win32.substr(lib_suffix.length());
     stripped_library_name_with_extension_win32 = stripped_library_name_with_extension_win32.substr(lib_suffix.length());
   }
-  ROS_INFO_STREAM("stripped_library_name_win32: " << stripped_library_name_win32);
-  ROS_INFO_STREAM("stripped_library_name_with_extension_win32: " << stripped_library_name_with_extension_win32);
 #endif
 
   const std::string path_separator = getPathSeparator();
