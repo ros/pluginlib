@@ -357,12 +357,28 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   std::string stripped_library_name = stripAllButFileFromPath(library_name);
   std::string stripped_library_name_with_extension = stripped_library_name + non_debug_suffix;
 
+#ifdef _WIN32
+  // try to strip the leading `lib` from the library path.
+  // Windows doesn't have the `lib` prefix convention for shared libraries.
+  const std::string lib_suffix = "lib";
+  std::string stripped_library_name_win32 = stripped_library_name;
+  std::string stripped_library_name_with_extension_win32 = stripped_library_name + non_debug_suffix;
+  if (boost::starts_with(stripped_library_name, lib_suffix))
+  {
+    stripped_library_name_win32 = stripped_library_name_win32.substr(lib_suffix.length());
+    stripped_library_name_with_extension_win32 = stripped_library_name_with_extension_win32.substr(lib_suffix.length());
+  }
+#endif
+
   const std::string path_separator = getPathSeparator();
 
   for (unsigned int c = 0; c < all_paths_without_extension.size(); c++) {
     std::string current_path = all_paths_without_extension.at(c);
     all_paths.push_back(current_path + path_separator + library_name_with_extension);
     all_paths.push_back(current_path + path_separator + stripped_library_name_with_extension);
+#ifdef _WIN32
+    all_paths.push_back(current_path + path_separator + stripped_library_name_with_extension_win32);
+#endif
     // We're in debug mode, try debug libraries as well
     if (debug_library_suffix) {
       all_paths.push_back(
@@ -370,6 +386,11 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
       all_paths.push_back(
         current_path + path_separator + stripped_library_name +
         class_loader::systemLibrarySuffix());
+#ifdef _WIN32
+      all_paths.push_back(
+        current_path + path_separator + stripped_library_name_win32 +
+        class_loader::systemLibrarySuffix());
+#endif
     }
   }
 
@@ -805,7 +826,7 @@ std::string ClassLoader<T>::stripAllButFileFromPath(const std::string & path)
   if (std::string::npos == c) {
     return path;
   } else {
-    return path.substr(c, path.size());
+    return path.substr(c + 1);
   }
 }
 
