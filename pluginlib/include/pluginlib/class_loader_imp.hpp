@@ -81,7 +81,7 @@ ClassLoader<T>::ClassLoader(
   /***************************************************************************/
 {
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Creating ClassLoader, base = %s, address = %p",
-    base_class.c_str(), this);
+    base_class.c_str(), static_cast<void *>(this));
   if (ros::package::getPath(package_).empty()) {
     throw pluginlib::ClassLoaderException("Unable to find package: " + package_);
   }
@@ -92,7 +92,7 @@ ClassLoader<T>::ClassLoader(
   classes_available_ = determineAvailableClasses(plugin_xml_paths_);
   ROS_DEBUG_NAMED("pluginlib.ClassLoader",
     "Finished constructring ClassLoader, base = %s, address = %p",
-    base_class.c_str(), this);
+    base_class.c_str(), static_cast<void *>(this));
 }
 
 template<class T>
@@ -100,7 +100,7 @@ ClassLoader<T>::~ClassLoader()
 /***************************************************************************/
 {
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Destroying ClassLoader, base = %s, address = %p",
-    getBaseClassType().c_str(), this);
+    getBaseClassType().c_str(), static_cast<void *>(this));
 }
 
 
@@ -123,7 +123,7 @@ T * ClassLoader<T>::createClassInstance(const std::string & lookup_name, bool au
     ROS_DEBUG_NAMED("pluginlib.ClassLoader",
       "Attempting to create instance through low-level MultiLibraryClassLoader...");
     T * obj = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
-    ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Instance created with object pointer = %p", obj);
+    ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Instance created with object pointer = %p", static_cast<void *>(obj));
 
     return obj;
   } catch (const class_loader::CreateClassException & ex) {
