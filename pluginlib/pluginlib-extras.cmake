@@ -31,6 +31,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=li
     # Starting at LLVM 9.0 filesystem is built in
     set(FILESYSTEM_LIB)
   endif()
+endif()
 
 if(UNIX AND NOT APPLE)
   # this is needed to use the experimental/filesystem on Linux, but cannot be passed with
