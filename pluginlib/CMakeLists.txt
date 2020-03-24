@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(pluginlib)
 
-# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(NOT WIN32)
@@ -33,7 +32,9 @@ install(
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9))
+    set(FILESYSTEM_LIB)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
       set(FILESYSTEM_LIB c++experimental)
     else()
