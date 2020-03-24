@@ -33,6 +33,8 @@ install(
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
+  # NOTE this block is also defined in pluginlib-extras.cmake
+  # changes here need to be duplicated there
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
       # Before LLVM 7.0, filesystem is part of experimental
