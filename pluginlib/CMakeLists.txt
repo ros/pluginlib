@@ -35,7 +35,7 @@ if(BUILD_TESTING)
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
-      # Filesystem introduced to experimental in LLVM 7.0
+      # Before LLVM 7.0, filesystem is part of experimental
       set(FILESYSTEM_LIB c++experimental)
     elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
       # Before LLVM 9.0 you have to manually link the fs library
