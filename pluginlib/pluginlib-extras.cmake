@@ -20,6 +20,10 @@ ament_register_extension("ament_package" "pluginlib"
 
 include("${pluginlib_DIR}/pluginlib_export_plugin_description_file.cmake")
 
+if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
     # Before LLVM 7.0, filesystem is part of experimental
