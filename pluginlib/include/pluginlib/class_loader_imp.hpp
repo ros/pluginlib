@@ -463,7 +463,7 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
         all_paths.push_back(current_search_path + path_separator + current_library_path);
       }
     }
-  } catch (const std::runtime_error& ex) {
+  } catch (const std::runtime_error & ex) {
     throw std::runtime_error{ex.what()};
   }
 
