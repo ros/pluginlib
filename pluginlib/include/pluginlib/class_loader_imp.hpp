@@ -458,7 +458,6 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
       for (auto && current_library_path : all_relative_library_paths) {
         all_paths.push_back(current_search_path + path_separator + current_library_path);
       }
-      // We're in debug mode, try debug libraries as well
       for (auto && current_library_path : all_relative_debug_library_paths) {
         all_paths.push_back(current_search_path + path_separator + current_library_path);
       }
