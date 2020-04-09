@@ -68,7 +68,6 @@
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
 #include "class_loader/class_loader.hpp"
-#include "rcpputils/shared_library.hpp"
 #include "rcutils/logging_macros.h"
 
 #include "./class_loader.hpp"
@@ -424,6 +423,14 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
     package_prefix + path_separator + "bin" + path_separator + exporting_package_name,
   };
 
+  // Prepare to setup the relative file paths.
+  bool debug_library_suffix = (0 == class_loader::systemLibrarySuffix().compare(0, 1, "d"));
+  std::string non_debug_suffix;
+  if (debug_library_suffix) {
+    non_debug_suffix = class_loader::systemLibrarySuffix().substr(1);
+  } else {
+    non_debug_suffix = class_loader::systemLibrarySuffix();
+  }
   std::string stripped_library_name = stripAllButFileFromPath(library_name);
 
   std::string library_name_alternative;  // either lib<library> or <library> without lib prefix
@@ -439,31 +446,30 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   }
   std::string stripped_library_name_alternative = stripAllButFileFromPath(library_name_alternative);
 
-  try {
-    // Setup the relative file paths to pair with the search directories above.
-    std::vector<std::string> all_relative_library_paths = {
-      rcpputils::get_platform_library_name(library_name),
-      rcpputils::get_platform_library_name(library_name_alternative),
-      rcpputils::get_platform_library_name(stripped_library_name),
-      rcpputils::get_platform_library_name(stripped_library_name_alternative)
-    };
-    std::vector<std::string> all_relative_debug_library_paths = {
-      rcpputils::get_platform_library_name(library_name, true),
-      rcpputils::get_platform_library_name(library_name_alternative, true),
-      rcpputils::get_platform_library_name(stripped_library_name, true),
-      rcpputils::get_platform_library_name(stripped_library_name_alternative, true)
-    };
+  // Setup the relative file paths to pair with the search directories above.
+  std::vector<std::string> all_relative_library_paths = {
+    library_name + non_debug_suffix,
+    library_name_alternative + non_debug_suffix,
+    stripped_library_name + non_debug_suffix,
+    stripped_library_name_alternative + non_debug_suffix,
+  };
+  std::vector<std::string> all_relative_debug_library_paths = {
+    library_name + class_loader::systemLibrarySuffix(),
+    library_name_alternative + class_loader::systemLibrarySuffix(),
+    stripped_library_name + class_loader::systemLibrarySuffix(),
+    stripped_library_name_alternative + class_loader::systemLibrarySuffix(),
+  };
 
-    for (auto && current_search_path : all_search_paths) {
-      for (auto && current_library_path : all_relative_library_paths) {
-        all_paths.push_back(current_search_path + path_separator + current_library_path);
-      }
+  for (auto && current_search_path : all_search_paths) {
+    for (auto && current_library_path : all_relative_library_paths) {
+      all_paths.push_back(current_search_path + path_separator + current_library_path);
+    }
+    // We're in debug mode, try debug libraries as well
+    if (debug_library_suffix) {
       for (auto && current_library_path : all_relative_debug_library_paths) {
         all_paths.push_back(current_search_path + path_separator + current_library_path);
       }
     }
-  } catch (const std::runtime_error & ex) {
-    throw std::runtime_error{ex.what()};
   }
 
   for (auto && path : all_paths) {

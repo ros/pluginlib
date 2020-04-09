@@ -14,11 +14,10 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
 find_package(rcutils REQUIRED)
-find_package(rcpputils REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
 
-ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
+ament_export_dependencies(ament_index_cpp class_loader rcutils tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
 
 install(
@@ -93,7 +92,6 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}_unique_ptr_test
       class_loader
       ament_index_cpp
-      rcpputils
       rcutils
       TinyXML2
     )
@@ -115,7 +113,6 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}_utest
       class_loader
       ament_index_cpp
-      rcpputils
       rcutils
       TinyXML2
     )
