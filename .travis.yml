@@ -1,0 +1,64 @@
+sudo: required
+language: generic
+os:
+  - linux
+  - osx
+dist: bionic
+env:
+  global:
+    - AMENT_WS=~/ament_ws
+    - AMENT_WS_SRC=${AMENT_WS}/src
+before_install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        bash ./.travis/wait_for_apt.sh
+    fi
+install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        sudo apt-get update -qq
+        sudo apt-get install cmake cppcheck libxml2-utils python3 python3-pip python3-empy python3-pyparsing python3-setuptools wget libtinyxml2-dev
+    else
+        brew update
+        brew outdated cmake || brew upgrade cmake || brew install cmake
+        brew install cppcheck console_bridge tinyxml2
+        brew unlink python@2
+        brew outdated python3 || brew upgrade python3 || brew install python3
+    fi
+  - python3 --version
+  - sudo -H python3 -m pip install -U setuptools pip pyparsing
+  - sudo -H python3 -m pip install catkin_pkg EmPy
+  - sudo -H python3 -m pip install -U colcon-bash colcon-core colcon-defaults colcon-library-path colcon-metadata colcon-output colcon-package-information colcon-package-selection colcon-parallel-executor colcon-python-setup-py colcon-recursive-crawl colcon-test-result colcon-cmake colcon-ros
+  - sudo -H python3 -m pip install -U flake8 flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest pytest-repeat pytest-rerunfailures pytest-cov pytest-runner setuptools
+script:
+  - mkdir -p $AMENT_WS_SRC/ament
+  - mkdir -p $AMENT_WS_SRC/osrf
+  - mkdir -p $AMENT_WS_SRC/ros2
+  # Fetch dependencies into the workspace
+  - cd $AMENT_WS_SRC/ament
+  - git clone https://github.com/ament/ament_cmake.git
+  - git clone https://github.com/ament/ament_index.git
+  - git clone https://github.com/ament/ament_lint.git
+  - git clone https://github.com/ament/ament_package.git
+  - git clone https://github.com/ament/googletest.git
+  - git clone https://github.com/ament/uncrustify_vendor.git
+  - cd $AMENT_WS_SRC/osrf
+  - git clone https://github.com/osrf/osrf_testing_tools_cpp.git
+  - cd $AMENT_WS_SRC/ros2
+  - git clone https://github.com/ros/class_loader.git -b ros2
+  - git clone https://github.com/ros2/ament_cmake_ros.git
+  - git clone https://github.com/ros2/console_bridge_vendor.git
+  - git clone https://github.com/ros2/launch.git
+  - git clone https://github.com/ros2/python_cmake_module.git
+  - git clone https://github.com/ros2/rcutils.git
+  - git clone https://github.com/ros2/rcpputils.git
+  - git clone https://github.com/ros2/tinyxml2_vendor.git
+  - cd $AMENT_WS
+  # Link source into workspace's source space
+  - ln -s $TRAVIS_BUILD_DIR ./src
+  # Build
+  - colcon build --packages-up-to pluginlib --packages-skip pluginlib
+  - colcon build --packages-select pluginlib --event-handlers console_direct+
+  # Test
+  - colcon test --packages-select pluginlib --event-handlers console_direct+
+  - colcon test-result --test-result-base build
