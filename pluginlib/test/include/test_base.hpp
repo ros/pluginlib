@@ -30,9 +30,22 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <pluginlib/class_list_macros.hpp>
-#include <test_base.hpp>
-#include "test_plugins.hpp"  // NOLINT
+#ifndef TEST_BASE_HPP_
+#define TEST_BASE_HPP_
 
-PLUGINLIB_EXPORT_CLASS(test_plugins::Foo, test_base::Fubar)
-PLUGINLIB_EXPORT_CLASS(test_plugins::Bar, test_base::Fubar)
+#include <visibility_control.hpp>
+
+namespace test_base
+{
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Fubar
+{
+public:
+  virtual void initialize(double foo) = 0;
+  virtual double result() = 0;
+  virtual ~Fubar() {}
+
+protected:
+  Fubar() {}
+};
+}  // namespace test_base
+#endif  // TEST_BASE_HPP_

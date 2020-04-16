@@ -6,6 +6,8 @@
   <description>
     This tests pluginlib.
   </description>
+  <maintainer email="foo@openrobotics.org">Foo bar</maintainer>
+  <license>BSD</license>
   <export>
     <pluginlib plugin="${prefix}/test_plugins.xml" />
   </export>

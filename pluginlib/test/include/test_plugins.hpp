@@ -30,9 +30,57 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <pluginlib/class_list_macros.hpp>
-#include <test_base.hpp>
-#include "test_plugins.hpp"  // NOLINT
+#ifndef TEST_PLUGINS_HPP_
+#define TEST_PLUGINS_HPP_
 
-PLUGINLIB_EXPORT_CLASS(test_plugins::Foo, test_base::Fubar)
-PLUGINLIB_EXPORT_CLASS(test_plugins::Bar, test_base::Fubar)
+#include <test_base.hpp>
+#include <visibility_control.hpp>
+
+#include <cmath>
+
+namespace test_plugins
+{
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Bar : public test_base::Fubar
+{
+public:
+  Bar() {}
+
+  void initialize(double foo)
+  {
+    foo_ = foo;
+  }
+
+  double result()
+  {
+    return 0.5 * foo_ * getBar();
+  }
+
+  double getBar()
+  {
+    return sqrt((foo_ * foo_) - ((foo_ / 2) * (foo_ / 2)));
+  }
+
+private:
+  double foo_;
+};
+
+class TEST_PLUGINLIB_FIXTURE_PUBLIC Foo : public test_base::Fubar
+{
+public:
+  Foo() {}
+
+  void initialize(double foo)
+  {
+    foo_ = foo;
+  }
+
+  double result()
+  {
+    return foo_ * foo_;
+  }
+
+private:
+  double foo_;
+};
+}  // namespace test_plugins
+#endif  // TEST_PLUGINS_HPP_
