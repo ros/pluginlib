@@ -126,6 +126,18 @@ TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
     FAIL() << "Library containing class should be loaded but isn't.";
   }
 
+  EXPECT_STREQ(pl.getClassPackage("test_pluginlib/foo").c_str(), "test_pluginlib");
+  EXPECT_STREQ(pl.getClassPackage("test_pluginlib/fuu").c_str(), "");
+  EXPECT_EQ(pl.getPluginXmlPaths().size(), 1u);
+  EXPECT_STRNE(pl.getPluginXmlPaths()[0].c_str(), "");
+  EXPECT_STREQ(pl.getName("test_pluginlib/foo").c_str(), "foo");
+  EXPECT_STREQ(pl.getName("test_pluginlib/fuu").c_str(), "fuu");
+  EXPECT_TRUE(pl.isClassAvailable("test_pluginlib/foo"));
+  EXPECT_FALSE(pl.isClassAvailable("test_pluginlib/fuzz"));
+  EXPECT_EQ(pl.getRegisteredLibraries().size(), 1u);
+  EXPECT_STRNE(pl.getRegisteredLibraries()[0].c_str(), "");
+  EXPECT_STRNE(pl.getPluginManifestPath("test_pluginlib/bar").c_str(), "");
+
   RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
   try {
     pl.unloadLibraryForClass("test_pluginlib/foo");
