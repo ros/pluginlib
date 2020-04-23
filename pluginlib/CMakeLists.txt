@@ -18,8 +18,18 @@ find_package(rcpputils REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
 
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE
+  "$<INSTALL_INTERFACE:include>")
+ament_target_dependencies(${PROJECT_NAME} INTERFACE
+  ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
 ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
+ament_export_targets(${PROJECT_NAME})
+
+install(
+  TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
+)
 
 install(
   DIRECTORY cmake
