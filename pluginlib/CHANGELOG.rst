@@ -3,6 +3,13 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.5.0 (2020-04-25)
+------------------
+* Export CMake targets in a addition to include directories / libraries. (`#188 <https://github.com/ros/pluginlib/issues/188>`_)
+* Use rcpputils for library names. (`#186 <https://github.com/ros/pluginlib/issues/186>`_)
+* Fix filesystem linking on clang9. (`#183 <https://github.com/ros/pluginlib/issues/183>`_)
+* Contributors: Alejandro Hernández Cordero, Dirk Thomas, Emerson Knapp
+
 2.4.1 (2019-10-23)
 ------------------
 * Avoid build break for Visual Studio 2019 v16.3 (`#166 <https://github.com/ros/pluginlib/issues/166>`_)
