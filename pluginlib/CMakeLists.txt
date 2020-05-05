@@ -21,8 +21,9 @@ find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_ve
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
   "$<INSTALL_INTERFACE:include>")
+target_link_libraries(${PROJECT_NAME} INTERFACE tinyxml2::tinyxml2)
 ament_target_dependencies(${PROJECT_NAME} INTERFACE
-  ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
+  ament_index_cpp class_loader rcutils rcpputils)
 ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
 ament_export_include_directories(include)
 ament_export_targets(${PROJECT_NAME})
