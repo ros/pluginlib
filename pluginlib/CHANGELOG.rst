@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.5.1 (2020-05-07)
+------------------
+* Add missing export of stdc++fs and TinyXML2 via modern CMake (`#189 <https://github.com/ros/pluginlib/issues/189>`_)
+* Contributors: Dirk Thomas
+
 2.5.0 (2020-04-25)
 ------------------
 * Export CMake targets in a addition to include directories / libraries. (`#188 <https://github.com/ros/pluginlib/issues/188>`_)
