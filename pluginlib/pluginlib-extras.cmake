@@ -45,9 +45,4 @@ find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)
 list(APPEND pluginlib_LIBRARIES ${TinyXML2_LIBRARIES})
 
-add_library(tinyxml2_vendor INTERFACE)
-target_include_directories(tinyxml2_vendor INTERFACE
-  ${TinyXML2_INCLUDE_DIRS})
-target_link_libraries(tinyxml2_vendor INTERFACE
-  ${TinyXML2_LIBRARIES})
-list(APPEND pluginlib_TARGETS tinyxml2_vendor)
+list(APPEND pluginlib_TARGETS tinyxml2)
