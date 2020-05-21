@@ -295,7 +295,16 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
     return "";
   }
 
-  return package_name_node->GetText();
+  const char* package_name_node_txt = package_name_node->GetText();
+  if (NULL == package_name_node_txt) {
+    ROS_ERROR_NAMED("pluginlib.ClassLoader",
+      "package.xml at %s has an invalid <name> tag! Cannot determine package "
+      "which exports plugin.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  return package_name_node_txt;
 }
 
 template<class T>
@@ -310,6 +319,10 @@ std::vector<std::string> ClassLoader<T>::getCatkinLibraryPaths()
     boost::split(catkin_prefix_paths, env_catkin_prefix_paths, boost::is_any_of(os_pathsep));
     BOOST_FOREACH(std::string catkin_prefix_path, catkin_prefix_paths) {
       boost::filesystem::path path(catkin_prefix_path);
+#if _WIN32
+      boost::filesystem::path bin("bin");
+      lib_paths.push_back((path / bin).string());
+#endif
       boost::filesystem::path lib("lib");
       lib_paths.push_back((path / lib).string());
     }
@@ -650,8 +663,15 @@ void ClassLoader<T>::processSingleXMLPluginFile(
             "' has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
-  if (!(strcmp(config->Value(), "library") == 0 ||
-    strcmp(config->Value(), "class_libraries") == 0))
+  const char* config_value = config->Value();
+  if (NULL == config_value) {
+      throw pluginlib::InvalidXMLException(
+              "XML Document '" + xml_file +
+              "' has an invalid Root Element. This likely means the XML is malformed or missing.");
+      return;
+  }
+  if (!(strcmp(config_value, "library") == 0 ||
+    strcmp(config_value, "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
             "The XML document '" + xml_file + "' given to add must have either \"library\" or "
@@ -659,13 +679,19 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     return;
   }
   // Step into the filter list if necessary
-  if (strcmp(config->Value(), "class_libraries") == 0) {
+  if (strcmp(config_value, "class_libraries") == 0) {
     config = config->FirstChildElement("library");
   }
 
   tinyxml2::XMLElement * library = config;
   while (library != NULL) {
-    std::string library_path = library->Attribute("path");
+    const char* path = library->Attribute("path");
+    if (NULL == path) {
+      ROS_ERROR_NAMED("pluginlib.ClassLoader",
+        "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
+      continue;
+    }
+    std::string library_path(path);
     if (0 == library_path.size()) {
       ROS_ERROR_NAMED("pluginlib.ClassLoader",
         "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
