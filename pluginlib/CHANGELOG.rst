@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2020-05-21)
+-------------------
+* Declare specific boost dependencies (`#171 <https://github.com/ros/pluginlib/issues/171>`_)
+* Contributors: Mikael Arguedas
+
 1.12.2 (2020-02-14)
 -------------------
 * Add bin to library search path on Windows. (`#145 <https://github.com/ros/pluginlib/issues/145>`_)
