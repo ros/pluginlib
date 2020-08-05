@@ -169,41 +169,6 @@ std::shared_ptr<T> ClassLoader<T>::createSharedInstance(const std::string & look
 }
 #endif
 
-#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
-template<class T>
-boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_name)
-/***************************************************************************/
-{
-  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-    "Attempting to create managed instance for class %s.",
-    lookup_name.c_str());
-
-  if (!isClassLoaded(lookup_name)) {
-    loadLibraryForClass(lookup_name);
-  }
-
-  try {
-    std::string class_type = getClassType(lookup_name);
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "%s maps to real class type %s",
-      lookup_name.c_str(), class_type.c_str());
-
-    boost::shared_ptr<T> obj = lowlevel_class_loader_.createInstance<T>(class_type);
-
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "boost::shared_ptr to object of real type %s created.",
-      class_type.c_str());
-
-    return obj;
-  } catch (const class_loader::CreateClassException & ex) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Exception raised by low-level multi-library class loader when attempting "
-      "to create instance of class %s.",
-      lookup_name.c_str());
-    throw pluginlib::CreateClassException(ex.what());
-  }
-}
-#endif
-
 #if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 template<class T>
 UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name)

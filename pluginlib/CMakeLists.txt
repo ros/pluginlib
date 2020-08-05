@@ -96,7 +96,6 @@ if(BUILD_TESTING)
   include_directories(include test/include)
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
-  target_compile_definitions(test_plugins PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
   target_compile_definitions(test_plugins PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
   ament_target_dependencies(
     test_plugins
@@ -129,7 +128,6 @@ if(BUILD_TESTING)
       rcutils
       TinyXML2
     )
-    target_compile_definitions(${PROJECT_NAME}_unique_ptr_test PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
     if(UNIX AND NOT APPLE)
       target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${FILESYSTEM_LIB})
@@ -151,7 +149,6 @@ if(BUILD_TESTING)
       rcutils
       TinyXML2
     )
-    target_compile_definitions(${PROJECT_NAME}_utest PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
     if(UNIX AND NOT APPLE)
       target_link_libraries(${PROJECT_NAME}_utest ${FILESYSTEM_LIB})
