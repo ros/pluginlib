@@ -51,10 +51,6 @@
 # include <memory>
 #endif
 
-#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
-#include <boost/shared_ptr.hpp>
-#endif
-
 #include "class_loader/multi_library_class_loader.hpp"
 #include "pluginlib/class_desc.hpp"
 #include "pluginlib/class_loader_base.hpp"
@@ -123,16 +119,6 @@ public:
    * \return An instance of the class
    */
   std::shared_ptr<T> createSharedInstance(const std::string & lookup_name);
-#endif
-
-#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
-  /// Create an instance of a desired class.
-  /**
-   * Deprecated, use createSharedInstance() instead.
-   * Same as createSharedInstance() except it returns a boost::shared_ptr.
-   */
-  [[deprecated]]
-  boost::shared_ptr<T> createInstance(const std::string & lookup_name);
 #endif
 
 #if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
