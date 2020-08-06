@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+4.0.0 (2020-08-06)
+------------------
+* Remove deprecated boost functions (`#199 <https://github.com/ros/pluginlib/issues/199>`_)
+* Contributors: Shane Loretz
+
 2.5.2 (2020-05-26)
 ------------------
 * Link against tinyxml2 correctly (`#190 <https://github.com/ros/pluginlib/issues/190>`_)
