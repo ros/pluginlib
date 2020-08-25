@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+4.1.0 (2020-08-25)
+------------------
+* Add function for same-package pluginlib tests (`#201 <https://github.com/ros/pluginlib/issues/201>`_)
+* Contributors: Shane Loretz
+
 4.0.0 (2020-08-06)
 ------------------
 * Remove deprecated boost functions (`#199 <https://github.com/ros/pluginlib/issues/199>`_)
