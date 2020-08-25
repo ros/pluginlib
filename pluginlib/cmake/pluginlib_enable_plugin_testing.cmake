@@ -12,29 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Set variable for accessing template
+# Set variable for accessing template inside function scope
 set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 #
 # Enable testing plugins by mock-installing needed files to the build folder.
 #
 # Pluginlib needs a certain folder structure in the ament_index to recognize
-# the existance of a package and it's exported plugins.
-# This structure must exist at test time in order for unit tests that load
-# plugins to use them.
+# the existance of a package and its exported plugins.
+# This structure must exist at test time in order for unit tests to load
+# plugins.
 # The macro `pluginlib_export_plugin_description_file()` sets up this structure
 # in the install space, but a package's install space is not accessible to it
 # when its own unit tests are run.
 # This function sets up the structure in the build space so that unit tests
 # can load plugins from the same package they reside in.
 #
-# The inputs to this function is everything required by pluginlib to recognize
-# a package and its plugins.
+# The input to this function is everything required by pluginlib to recognize a
+# package and its plugins.
 # The output of this function is two CMake variables.
 # One CMake variable holds a path to be appended to the environment variable
-# `AMENT_PREFIX_PATH` given to the test.
-# Another CMake variable holds the name of a CMake target the test needs to
-# depend on to ensure the plugin environment has been created.
+# `AMENT_PREFIX_PATH` used by the test.
+# Another CMake variable holds the name of a CMake target that must be
+# depended on to ensure the mock environment has been created before the test
+# runs.
 #
 # CMake macros provided by ament_cmake for creating tests have an argument
 # called APPEND_ENV that should be used for modifying `AMENT_PREFIX_PATH`.
@@ -42,10 +43,10 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 # install environment has been created.
 #
 #   pluginlib_enable_plugin_testing(...
-#     CMAKE_TARGET_VAR my_mock_install_cmake_target
-#     AMENT_PREFIX_PATH_VAR my_mock_installed_package_path
+#     CMAKE_TARGET_VAR mock_install_target
+#     AMENT_PREFIX_PATH_VAR mock_install_path
 #     ...)
-#   ament_add_[some kind of test](some_test_target
+#   ament_add_[some kind of test](some_test_target ...
 #     APPEND_ENV AMENT_PREFIX_PATH="${my_mock_installed_package_path}"
 #     ...)
 #   add_dependencies(some_test_target "${my_mock_install_cmake_target}")
@@ -53,6 +54,9 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 # This function must only be called once for each unique combination of
 # "PACKAGE_NAME" and "PLUGIN_CATEGORY".
 #
+# :param CMAKE_TARGET_VAR: the name of the target that creates the mock install
+#   environment.
+# :type CMAKE_TARGET_VAR: string
 # :param AMENT_PREFIX_PATH_VAR: the name of the variable that will contain the
 #   mock installation path for tests to use after this function is run.
 # :type AMENT_PREFIX_PATH_VAR: string
@@ -119,13 +123,13 @@ function(pluginlib_enable_plugin_testing)
   endif()
 
   #####
-  # Plan how to create mock install space
+  # Plan out mock install space before configuring things to create it
   #####
 
   # Lists of equal size
   # If input_files is not "", then copy that to the path in "output_files"
   # If input_files is "", then write string from input_content to the path in "output_files"
-  # FOOBAR is a workaround to enable appending empty elements to list
+  # FOOBAR is a workaround to enable appending empty elements when the list is empty
   set(input_content "FOOBAR")
   set(input_files "FOOBAR")
   set(output_files "FOOBAR")
@@ -133,7 +137,7 @@ function(pluginlib_enable_plugin_testing)
   # Each "PACKAGE_NAME" goes to it's own folder
   set(prefix "${CMAKE_CURRENT_BINARY_DIR}/pluginlib_enable_plugin_testing/install/${ARG_PACKAGE_NAME}__${ARG_PLUGIN_CATEGORY}")
 
-  # Install package.xml using directory to expected directory
+  # Install package.xml, renaming to just `package.xml` if needed
   set(fake_install_dir "${prefix}/share/${ARG_PACKAGE_NAME}/")
   list(APPEND input_files "${ARG_PACKAGE_XML}")
   list(APPEND input_content "")
@@ -144,7 +148,7 @@ function(pluginlib_enable_plugin_testing)
   list(APPEND input_content "")
   list(APPEND output_files "${prefix}/share/ament_index/resource_index/packages/${ARG_PACKAGE_NAME}")
 
-  # Write the plugin descriptions in share
+  # Write the plugin descriptions in share/
   set(ament_index_plugin_content "")
   foreach(plugin_description_path "${ARG_PLUGIN_DESCRIPTIONS}")
     list(APPEND input_files "${plugin_description_path}")
@@ -156,7 +160,7 @@ function(pluginlib_enable_plugin_testing)
   # Get rid of leading newline
   string(STRIP "${ament_index_plugin_content}" ament_index_plugin_content)
 
-  # One file says were all description files are put
+  # Write one file that says where all of this package's plugin description files are
   list(APPEND input_files "")
   list(APPEND input_content "${ament_index_plugin_content}")
   list(APPEND output_files "${prefix}/share/ament_index/resource_index/${ARG_PLUGIN_CATEGORY}__pluginlib__plugin/${ARG_PACKAGE_NAME}")
@@ -171,14 +175,14 @@ function(pluginlib_enable_plugin_testing)
   #####
 
   list(LENGTH output_files num_output_files)
-  # RANGE iterates [0, stop_value] so subtract 1 to avoid out of range
+  # subtract 1 to avoid looping out of range
   math(EXPR range_stop "${num_output_files} - 1")
   foreach(idx RANGE ${range_stop})
     list(GET input_files ${idx} input_file)
     list(GET input_content ${idx} content)
     list(GET output_files ${idx} output_file)
 
-    # Make the directory at configure time
+    # Make the directory at configure time because configure_file() does not make directories
     get_filename_component(output_dir "${output_file}" DIRECTORY)
     file(MAKE_DIRECTORY "${output_dir}")
 
@@ -197,9 +201,9 @@ function(pluginlib_enable_plugin_testing)
     endif()
   endforeach()
 
-  # Copy library targets at build time
+  # Copy library targets at build time; but make directory at configure time
+  # because `cmake -E copy` does not make directories
   file(MAKE_DIRECTORY "${prefix}/lib")
-  set(output_libraries "")
   foreach(plugin_library "${ARG_PLUGIN_LIBRARIES}")
     set(output_library "${prefix}/lib/$<TARGET_FILE:${plugin_library}>")
     add_custom_command(TARGET "${plugin_library}"
