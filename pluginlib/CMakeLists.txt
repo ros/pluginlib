@@ -83,16 +83,6 @@ if(BUILD_TESTING)
     set(FILESYSTEM_LIB stdc++fs)
   endif()
 
-  set(prefix "${CMAKE_CURRENT_BINARY_DIR}/prefix")
-
-  # Write the necessary files for ament to detect a package.
-  file(COPY test/test_plugins.xml DESTINATION "${prefix}/share/test_pluginlib/")
-  configure_file(test/test_package.xml "${prefix}/share/test_pluginlib/package.xml" COPYONLY)
-
-  file(WRITE "${prefix}/share/ament_index/resource_index/test_pluginlib__pluginlib__plugin/pluginlib"
-    "share/test_pluginlib/test_plugins.xml\n")
-  file(WRITE "${prefix}/share/ament_index/resource_index/packages/test_pluginlib" "")
-
   include_directories(include test/include)
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
@@ -102,22 +92,21 @@ if(BUILD_TESTING)
     class_loader
   )
 
-  # Use a generator expression so that the specified folder is used directly, without any
-  # configuration-dependent suffix.
-  #
-  # See https://cmake.org/cmake/help/v3.8/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html
-  # Ref: https://stackoverflow.com/a/45871818
-  set_target_properties(
-    test_plugins PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
-    LIBRARY_OUTPUT_DIRECTORY "${prefix}/lib/$<$<CONFIG:Debug>:>"
-    RUNTIME_OUTPUT_DIRECTORY "${prefix}/bin/$<$<CONFIG:Debug>:>"
+  include("cmake/pluginlib_enable_plugin_testing.cmake")
+  pluginlib_enable_plugin_testing(
+    CMAKE_TARGET_VAR mock_install_target
+    AMENT_PREFIX_PATH_VAR mock_install_path
+    PACKAGE_NAME "test_pluginlib"
+    PACKAGE_XML "test/test_package.xml"
+    PLUGIN_CATEGORY "test_pluginlib"
+    PLUGIN_DESCRIPTIONS "test/test_plugins.xml"
+    PLUGIN_LIBRARIES test_plugins
   )
 
   ament_add_gtest(${PROJECT_NAME}_unique_ptr_test
     test/unique_ptr_test.cpp
     APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
-    ENV AMENT_PREFIX_PATH=${prefix}
+    APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
     ament_target_dependencies(
@@ -132,13 +121,12 @@ if(BUILD_TESTING)
     if(UNIX AND NOT APPLE)
       target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${FILESYSTEM_LIB})
     endif()
-    add_dependencies(${PROJECT_NAME}_unique_ptr_test test_plugins)
+    add_dependencies(${PROJECT_NAME}_unique_ptr_test "${mock_install_target}")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}_utest
     test/utest.cpp
-    APPEND_LIBRARY_DIRS "$<TARGET_FILE_DIR:test_plugins>"
-    ENV AMENT_PREFIX_PATH=${prefix}
+    APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
   )
   if(TARGET ${PROJECT_NAME}_utest)
     ament_target_dependencies(
@@ -153,7 +141,7 @@ if(BUILD_TESTING)
     if(UNIX AND NOT APPLE)
       target_link_libraries(${PROJECT_NAME}_utest ${FILESYSTEM_LIB})
     endif()
-    add_dependencies(${PROJECT_NAME}_utest test_plugins)
+    add_dependencies(${PROJECT_NAME}_utest "${mock_install_target}")
   endif()
 
 endif()
