@@ -47,9 +47,9 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 #     AMENT_PREFIX_PATH_VAR mock_install_path
 #     ...)
 #   ament_add_[some kind of test](some_test_target ...
-#     APPEND_ENV AMENT_PREFIX_PATH="${my_mock_installed_package_path}"
+#     APPEND_ENV AMENT_PREFIX_PATH="${mock_install_path}"
 #     ...)
-#   add_dependencies(some_test_target "${my_mock_install_cmake_target}")
+#   add_dependencies(some_test_target "${mock_install_target}")
 #
 # This function must only be called once for each unique combination of
 # "PACKAGE_NAME" and "PLUGIN_CATEGORY".
