@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+4.1.1 (2020-08-27)
+------------------
+* Fix cmake 3.5 compatibility (`#203 <https://github.com/ros/pluginlib/issues/203>`_)
+* Contributors: Karsten Knese
+
 4.1.0 (2020-08-25)
 ------------------
 * Add function for same-package pluginlib tests (`#201 <https://github.com/ros/pluginlib/issues/201>`_)
