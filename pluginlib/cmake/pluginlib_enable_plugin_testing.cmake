@@ -166,9 +166,9 @@ function(pluginlib_enable_plugin_testing)
   list(APPEND output_files "${prefix}/share/ament_index/resource_index/${ARG_PLUGIN_CATEGORY}__pluginlib__plugin/${ARG_PACKAGE_NAME}")
 
   # Get rid of FOOBAR
-  list(POP_FRONT input_files)
-  list(POP_FRONT input_content)
-  list(POP_FRONT output_files)
+  list(REMOVE_AT input_files 0)
+  list(REMOVE_AT input_content 0)
+  list(REMOVE_AT output_files 0)
 
   #####
   # Create commands to generate mock install space at build time
