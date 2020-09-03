@@ -38,6 +38,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=li
     # Starting at LLVM 9.0 filesystem is built in
     set(FILESYSTEM_LIB)
   endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "QCC")
+  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
+    set(FILESYSTEM_LIB c++fs)
+  else()
+    set(FILESYSTEM_LIB)
+  endif()
 else()
   set(FILESYSTEM_LIB stdc++fs)
 endif()
