@@ -26,6 +26,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=li
   else()
     set(FILESYSTEM_LIB c++fs)
   endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "QCC")
+  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
+    set(FILESYSTEM_LIB c++fs)
+  else()
+    set(FILESYSTEM_LIB)
+  endif
 else()
   set(FILESYSTEM_LIB stdc++fs)
 endif()
