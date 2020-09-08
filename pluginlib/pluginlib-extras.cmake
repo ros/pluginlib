@@ -31,7 +31,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "QCC")
     set(FILESYSTEM_LIB c++fs)
   else()
     set(FILESYSTEM_LIB)
-  endif
+  endif()
 else()
   set(FILESYSTEM_LIB stdc++fs)
 endif()
