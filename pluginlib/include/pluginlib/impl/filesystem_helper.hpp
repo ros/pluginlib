@@ -49,7 +49,7 @@ namespace fs = std::filesystem;
 }  // namespace pluginlib
 
 #  define PLUGINLIB__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
-# elif __has_include(<experimental/filesystem>)
+# elif __has_include(<experimental/filesystem>) && __clang_major__ < 10
 // MSVC deprecates <experimental/filesystem> and in favor of <filesystem>
 // use this macro to acknowledge this deprecation and unblock the build break
 #  define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
