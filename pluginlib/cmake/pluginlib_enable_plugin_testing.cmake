@@ -205,7 +205,6 @@ function(pluginlib_enable_plugin_testing)
   # because `cmake -E copy` does not make directories
   file(MAKE_DIRECTORY "${prefix}/lib")
   foreach(plugin_library "${ARG_PLUGIN_LIBRARIES}")
-    set(output_library "${prefix}/lib/$<TARGET_FILE:${plugin_library}>")
     add_custom_command(TARGET "${plugin_library}"
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${plugin_library}>
