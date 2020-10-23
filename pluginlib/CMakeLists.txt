@@ -27,34 +27,6 @@ ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml
 ament_export_include_directories(include)
 ament_export_targets(${PROJECT_NAME})
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
-    # Before LLVM 7.0, filesystem is part of experimental
-    set(FILESYSTEM_LIB c++experimental)
-  elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-    # Before LLVM 9.0 you have to manually link the fs library
-    set(FILESYSTEM_LIB c++fs)
-  else()
-    # Starting at LLVM 9.0 filesystem is built in
-    set(FILESYSTEM_LIB)
-  endif()
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "QCC")
-  if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
-    set(FILESYSTEM_LIB c++fs)
-  else()
-    set(FILESYSTEM_LIB)
-  endif()
-else()
-  set(FILESYSTEM_LIB stdc++fs)
-endif()
-
-if(UNIX AND NOT APPLE)
-  # this is needed to use the experimental/filesystem on Linux, but cannot be passed with
-  # ament_export_libraries() because it is not absolute and cannot be found with find_library
-  target_link_libraries(${PROJECT_NAME}
-    INTERFACE ${FILESYSTEM_LIB})
-endif()
-
 install(
   TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
 )
@@ -71,23 +43,6 @@ install(
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
-
-  # NOTE this block is also defined in pluginlib-extras.cmake
-  # changes here need to be duplicated there
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
-      # Before LLVM 7.0, filesystem is part of experimental
-      set(FILESYSTEM_LIB c++experimental)
-    elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-      # Before LLVM 9.0 you have to manually link the fs library
-      set(FILESYSTEM_LIB c++fs)
-    else()
-      # Starting at LLVM 9.0 filesystem is built in
-      set(FILESYSTEM_LIB)
-    endif()
-  else()
-    set(FILESYSTEM_LIB stdc++fs)
-  endif()
 
   include_directories(include test/include)
 
@@ -124,9 +79,6 @@ if(BUILD_TESTING)
       TinyXML2
     )
 
-    if(UNIX AND NOT APPLE)
-      target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${FILESYSTEM_LIB})
-    endif()
     add_dependencies(${PROJECT_NAME}_unique_ptr_test "${mock_install_target}")
   endif()
 
@@ -144,9 +96,6 @@ if(BUILD_TESTING)
       TinyXML2
     )
 
-    if(UNIX AND NOT APPLE)
-      target_link_libraries(${PROJECT_NAME}_utest ${FILESYSTEM_LIB})
-    endif()
     add_dependencies(${PROJECT_NAME}_utest "${mock_install_target}")
   endif()
 
