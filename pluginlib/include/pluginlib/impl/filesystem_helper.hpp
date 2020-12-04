@@ -53,6 +53,11 @@ namespace fs = std::filesystem;
 // MSVC deprecates <experimental/filesystem> and in favor of <filesystem>
 // use this macro to acknowledge this deprecation and unblock the build break
 #  define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+// Clang 9.0 deprecates experimental/filesystem in favor of C++17's
+// std::filesystem. Since pluginlib currently targets C++14 but needs to
+// support recent clang releases this acknowledges and suppresses the
+// deprecation error.
+#  define _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM
 #  include <experimental/filesystem>
 
 namespace pluginlib
