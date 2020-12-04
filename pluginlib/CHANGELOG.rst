@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.4.2 (2020-12-04)
+------------------
+* Fix filesystem linking on clang9 (`#183 <https://github.com/ros/pluginlib/issues/183>`_) (`#185 <https://github.com/ros/pluginlib/issues/185>`_)
+* Contributors: Jose Pardeiro
+
 2.4.1 (2019-10-23)
 ------------------
 * Avoid build break for Visual Studio 2019 v16.3 (`#166 <https://github.com/ros/pluginlib/issues/166>`_)
