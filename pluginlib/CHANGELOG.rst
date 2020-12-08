@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.5.3 (2020-12-08)
+------------------
+* Add QNX C++ fs library compiler option (`#205 <https://github.com/ros/pluginlib/issues/205>`_) (`#213 <https://github.com/ros/pluginlib/issues/213>`_)
+* Contributors: Ahmed Sobhy
+
 2.5.2 (2020-05-26)
 ------------------
 * Link against tinyxml2 correctly (`#190 <https://github.com/ros/pluginlib/issues/190>`_)
