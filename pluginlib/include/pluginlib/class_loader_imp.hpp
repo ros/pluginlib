@@ -48,7 +48,6 @@
 #include <vector>
 
 #include "boost/algorithm/string.hpp"
-#include "boost/bind.hpp"
 #include "boost/filesystem.hpp"
 #include "boost/foreach.hpp"
 #include "class_loader/class_loader.hpp"
