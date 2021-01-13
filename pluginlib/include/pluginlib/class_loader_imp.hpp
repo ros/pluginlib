@@ -68,11 +68,11 @@
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
 #include "class_loader/class_loader.hpp"
+#include "rcpputils/filesystem_helper.hpp"
 #include "rcpputils/shared_library.hpp"
 #include "rcutils/logging_macros.h"
 
 #include "./class_loader.hpp"
-#include "./impl/filesystem_helper.hpp"
 #include "./impl/split.hpp"
 
 #ifdef _WIN32
@@ -510,7 +510,7 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
     library_name.c_str());
   for (auto it = paths_to_try.begin(); it != paths_to_try.end(); it++) {
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", it->c_str());
-    if (pluginlib::impl::fs::exists(*it)) {
+    if (rcpputils::fs::exists(*it)) {
       RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
         library_name.c_str(), it->c_str());
       return *it;
@@ -587,12 +587,12 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 2. Extract name of package from package.xml
 
   std::string package_name;
-  pluginlib::impl::fs::path p(plugin_xml_file_path);
-  pluginlib::impl::fs::path parent = p.parent_path();
+  rcpputils::fs::path p(plugin_xml_file_path);
+  rcpputils::fs::path parent = p.parent_path();
 
   // Figure out exactly which package the passed XML file is exported by.
   while (true) {
-    if (pluginlib::impl::fs::exists(parent / "package.xml")) {
+    if (rcpputils::fs::exists(parent / "package.xml")) {
       std::string package_file_path = (parent / "package.xml").string();
       return extractPackageNameFromPackageXML(package_file_path);
     }
@@ -613,7 +613,7 @@ template<class T>
 std::string ClassLoader<T>::getPathSeparator()
 /***************************************************************************/
 {
-  return std::string(1, pluginlib::impl::fs::path::preferred_separator);
+  return std::string(1, rcpputils::fs::kPreferredSeparator);
 }
 
 
@@ -647,7 +647,7 @@ template<class T>
 std::string ClassLoader<T>::joinPaths(const std::string & path1, const std::string & path2)
 /***************************************************************************/
 {
-  pluginlib::impl::fs::path p1(path1);
+  rcpputils::fs::path p1(path1);
   return (p1 / path2).string();
 }
 
