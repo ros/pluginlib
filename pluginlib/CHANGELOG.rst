@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.0.0 (2021-01-25)
+------------------
 * Use rcpputils for the filesystem implementation. (`#212 <https://github.com/ros/pluginlib/issues/212>`_)
 * Contributors: Chris Lalancette
 
