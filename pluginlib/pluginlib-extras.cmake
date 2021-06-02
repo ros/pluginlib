@@ -19,6 +19,7 @@ ament_register_extension("ament_package" "pluginlib"
   "pluginlib_package_hook.cmake")
 
 include("${pluginlib_DIR}/pluginlib_export_plugin_description_file.cmake")
+include("${pluginlib_DIR}/pluginlib_enable_plugin_testing.cmake")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
