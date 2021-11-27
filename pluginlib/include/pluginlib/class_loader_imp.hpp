@@ -496,24 +496,24 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
       lookup_name.c_str());
     return "";
   }
-  ClassMapIterator it = classes_available_.find(lookup_name);
-  std::string library_name = it->second.library_name_;
+  ClassMapIterator class_it = classes_available_.find(lookup_name);
+  std::string library_name = class_it->second.library_name_;
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Class %s maps to library %s in classes_available_.",
     lookup_name.c_str(), library_name.c_str());
 
   std::vector<std::string> paths_to_try =
-    getAllLibraryPathsToTry(library_name, it->second.package_);
+    getAllLibraryPathsToTry(library_name, class_it->second.package_);
 
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Iterating through all possible paths where %s could be located...",
     library_name.c_str());
-  for (auto it = paths_to_try.begin(); it != paths_to_try.end(); it++) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", it->c_str());
-    if (rcpputils::fs::exists(*it)) {
+  for (auto path_it = paths_to_try.begin(); path_it != paths_to_try.end(); path_it++) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", path_it->c_str());
+    if (rcpputils::fs::exists(*path_it)) {
       RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
-        library_name.c_str(), it->c_str());
-      return *it;
+        library_name.c_str(), path_it->c_str());
+      return *path_it;
     }
   }
   return "";
