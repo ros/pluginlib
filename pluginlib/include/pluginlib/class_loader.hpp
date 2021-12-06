@@ -31,25 +31,9 @@
 #define PLUGINLIB__CLASS_LOADER_HPP_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-
-/* This is a workaround to MSVC incorrectly reporting the __cplusplus version
- * as explained in:
- * https://blogs.msdn.microsoft.com/vcblog/2018/04/09/msvc-now-correctly-reports-__cplusplus/
- *
- * I'm hesitant to currently switch on the /Zc:__cplusplus switch, as there are
- * reports of code (incorrectly) assuming it should always be set to 199711L.
- */
-#if defined(_MSC_VER)
-# define HAS_CPP11_MEMORY (_MSC_VER >= 1900)
-#else
-# define HAS_CPP11_MEMORY (__cplusplus >= 201103L)
-#endif
-
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
-# include <memory>
-#endif
 
 #include "class_loader/multi_library_class_loader.hpp"
 #include "pluginlib/class_desc.hpp"
@@ -60,10 +44,8 @@
 namespace pluginlib
 {
 
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 template<typename T>
 using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
-#endif
 
 /// A class to help manage and load classes.
 template<class T>
@@ -105,7 +87,6 @@ public:
     const std::string & lookup_name,
     bool auto_load = true);
 
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
   /// Create an instance of a desired class.
   /**
    * Implicitly calls loadLibraryForClass() to increment the library counter.
@@ -119,9 +100,7 @@ public:
    * \return An instance of the class
    */
   std::shared_ptr<T> createSharedInstance(const std::string & lookup_name);
-#endif
 
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
   /// Create an instance of a desired class.
   /**
    * Implicitly calls loadLibraryForClass() to increment the library counter.
@@ -139,7 +118,6 @@ public:
    * \return An instance of the class
    */
   UniquePtr<T> createUniqueInstance(const std::string & lookup_name);
-#endif
 
   /// Create an instance of a desired class.
   /**
