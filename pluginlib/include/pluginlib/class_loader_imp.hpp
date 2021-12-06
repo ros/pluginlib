@@ -517,10 +517,10 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
 /***************************************************************************/
 {
   if (classes_available_.find(lookup_name) == classes_available_.end()) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Class %s has no mapping in classes_available_.",
-      lookup_name.c_str());
-    return "";
+    std::ostringstream error_msg;
+    error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+      ". Make sure the plugin description XML file has the correct name of the library.";
+    throw pluginlib::LibraryLoadException(error_msg.str());
   }
   ClassMapIterator it = classes_available_.find(lookup_name);
   std::string library_name = it->second.library_name_;
@@ -542,7 +542,10 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
       return *it;
     }
   }
-  return "";
+  std::ostringstream error_msg;
+  error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+    ". Make sure that the library '" << library_name << "' actually exists.";
+  throw pluginlib::LibraryLoadException(error_msg.str());
 }
 
 template<class T>
@@ -690,16 +693,6 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
   }
 
   std::string library_path = getClassLibraryPath(lookup_name);
-  if ("" == library_path) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "No path could be found to the library containing %s.",
-      lookup_name.c_str());
-    std::ostringstream error_msg;
-    error_msg << "Could not find library corresponding to plugin " << lookup_name <<
-      ". Make sure the plugin description XML file has the correct name of the "
-      "library and that the library actually exists.";
-    throw pluginlib::LibraryLoadException(error_msg.str());
-  }
 
   try {
     lowlevel_class_loader_.loadLibrary(library_path);
