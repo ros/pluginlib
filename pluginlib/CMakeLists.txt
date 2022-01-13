@@ -79,6 +79,8 @@ if(BUILD_TESTING)
     APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
   )
   if(TARGET ${PROJECT_NAME}_utest)
+    # Used, but not linked to test ${PROJECT_NAME}'s exports:
+    #   rcutils::rcutils
     target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})
     add_dependencies(${PROJECT_NAME}_utest "${mock_install_target}")
   endif()
