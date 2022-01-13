@@ -393,31 +393,27 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   }
   std::string stripped_library_name_alternative = stripAllButFileFromPath(library_name_alternative);
 
-  try {
-    // Setup the relative file paths to pair with the search directories above.
-    std::vector<std::string> all_relative_library_paths = {
-      rcpputils::get_platform_library_name(library_name),
-      rcpputils::get_platform_library_name(library_name_alternative),
-      rcpputils::get_platform_library_name(stripped_library_name),
-      rcpputils::get_platform_library_name(stripped_library_name_alternative)
-    };
-    std::vector<std::string> all_relative_debug_library_paths = {
-      rcpputils::get_platform_library_name(library_name, true),
-      rcpputils::get_platform_library_name(library_name_alternative, true),
-      rcpputils::get_platform_library_name(stripped_library_name, true),
-      rcpputils::get_platform_library_name(stripped_library_name_alternative, true)
-    };
+  // Setup the relative file paths to pair with the search directories above.
+  std::vector<std::string> all_relative_library_paths = {
+    rcpputils::get_platform_library_name(library_name),
+    rcpputils::get_platform_library_name(library_name_alternative),
+    rcpputils::get_platform_library_name(stripped_library_name),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative)
+  };
+  std::vector<std::string> all_relative_debug_library_paths = {
+    rcpputils::get_platform_library_name(library_name, true),
+    rcpputils::get_platform_library_name(library_name_alternative, true),
+    rcpputils::get_platform_library_name(stripped_library_name, true),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative, true)
+  };
 
-    for (auto && current_search_path : all_search_paths) {
-      for (auto && current_library_path : all_relative_library_paths) {
-        all_paths.push_back(current_search_path + path_separator + current_library_path);
-      }
-      for (auto && current_library_path : all_relative_debug_library_paths) {
-        all_paths.push_back(current_search_path + path_separator + current_library_path);
-      }
+  for (auto && current_search_path : all_search_paths) {
+    for (auto && current_library_path : all_relative_library_paths) {
+      all_paths.push_back(current_search_path + path_separator + current_library_path);
     }
-  } catch (const std::runtime_error & ex) {
-    throw std::runtime_error{ex.what()};
+    for (auto && current_library_path : all_relative_debug_library_paths) {
+      all_paths.push_back(current_search_path + path_separator + current_library_path);
+    }
   }
 
   for (auto && path : all_paths) {
