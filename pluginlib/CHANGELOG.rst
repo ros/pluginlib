@@ -3,6 +3,12 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+2.5.4 (2022-01-31)
+------------------
+* Enable plugin testing (`#202 <https://github.com/ros/pluginlib/issues/202>`_)
+* Make the default filesystem lib c++fs unless otherwise specified (`#214 <https://github.com/ros/pluginlib/issues/214>`_)
+* Contributors: Ahmed Sobhy, Karsten Knese, Shane Loretz
+
 2.5.3 (2020-12-08)
 ------------------
 * Add QNX C++ fs library compiler option (`#205 <https://github.com/ros/pluginlib/issues/205>`_) (`#213 <https://github.com/ros/pluginlib/issues/213>`_)
