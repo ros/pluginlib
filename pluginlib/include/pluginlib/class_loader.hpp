@@ -70,12 +70,15 @@ public:
    * \param attrib_name The attribute to search for in manifext.xml files, defaults to "plugin"
    * \param plugin_xml_paths The list of paths of plugin.xml files, defaults to be crawled via
    *   ros::package::getPlugins()
+   * \param enable_ondemand_loadunload Set this argument to true to enable automatic library
+   *   loading/unloading
    * \throws pluginlib::ClassLoaderException if package manifest cannot be found
    */
   ClassLoader(
     std::string package, std::string base_class,
     std::string attrib_name = std::string("plugin"),
-    std::vector<std::string> plugin_xml_paths = std::vector<std::string>());
+    std::vector<std::string> plugin_xml_paths = std::vector<std::string>(),
+    bool enable_ondemand_loadunload = false);
 
   ~ClassLoader();
 

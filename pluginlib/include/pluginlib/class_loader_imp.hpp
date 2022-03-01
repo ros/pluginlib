@@ -68,16 +68,12 @@ namespace pluginlib
 template<class T>
 ClassLoader<T>::ClassLoader(
   std::string package, std::string base_class, std::string attrib_name,
-  std::vector<std::string> plugin_xml_paths)
+  std::vector<std::string> plugin_xml_paths, bool enable_ondemand_loadunload)
 : plugin_xml_paths_(plugin_xml_paths),
   package_(package),
   base_class_(base_class),
   attrib_name_(attrib_name),
-  // NOTE: The parameter to the class loader enables/disables on-demand class
-  // loading/unloading.
-  // Leaving it off for now... libraries will be loaded immediately and won't
-  // be unloaded until class loader is destroyed or force unload.
-  lowlevel_class_loader_(false)
+  lowlevel_class_loader_(enable_ondemand_loadunload)
   /***************************************************************************/
 {
   ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Creating ClassLoader, base = %s, address = %p",
