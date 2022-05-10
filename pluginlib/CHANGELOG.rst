@@ -3,6 +3,9 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.2.0 (2022-05-10)
+------------------
+
 5.1.0 (2022-01-14)
 ------------------
 * Install includes to include/${PROJECT_NAME} and remove ament_target_dependencies calls (`#226 <https://github.com/ros/pluginlib/issues/226>`_)
