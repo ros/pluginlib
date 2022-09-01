@@ -77,7 +77,11 @@ public:
     std::string attrib_name = std::string("plugin"),
     std::vector<std::string> plugin_xml_paths = std::vector<std::string>());
 
-  ~ClassLoader();
+  /// The destructor attempts to unload all libraries which are still loaded.
+  /**
+   * \throws class_loader::LibraryUnloadException if unloading a library fails
+   */
+  ~ClassLoader() override;
 
   /// Create an instance of a desired class, optionally loading the associated library too.
   /**
