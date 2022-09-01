@@ -39,5 +39,5 @@ endif()
 install(DIRECTORY include/pluginlib/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(PROGRAMS scripts/pluginlib_headers_migration.py
+catkin_install_python(PROGRAMS scripts/pluginlib_headers_migration.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
