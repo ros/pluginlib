@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.0.1 (2022-12-02)
+------------------
+* extend termination condition to avoid infinite loop if package.xml is not found (`#243 <https://github.com/ros/pluginlib/issues/243>`_)
+* Contributors: Alberto Soragna
+
 5.0.0 (2021-01-25)
 ------------------
 * Use rcpputils for the filesystem implementation. (`#212 <https://github.com/ros/pluginlib/issues/212>`_)
