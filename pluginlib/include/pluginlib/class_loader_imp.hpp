@@ -597,11 +597,13 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
       return extractPackageNameFromPackageXML(package_file_path);
     }
 
-    // Recursive case - hop one folder up
+    // Recursive case - hop one folder up and store current parent
+    // parent_path() returns the current path if we reached the root.
+    p = parent;
     parent = parent.parent_path();
 
     // Base case - reached root and cannot find what we're looking for
-    if (parent.string().empty()) {
+    if (parent.string().empty() || (p == parent)) {
       return "";
     }
   }
