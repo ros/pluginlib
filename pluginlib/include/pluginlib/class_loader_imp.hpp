@@ -436,10 +436,13 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
     it++)
   {
     ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", it->c_str());
-    if (boost::filesystem::exists(*it)) {
-      ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
-        library_name.c_str(), it->c_str());
-      return *it;
+    boost::system::error_code error_code; // pass an error code to avoid throwing.
+    if (boost::filesystem::exists(*it, error_code)) {
+      if (error_code.value() == boost::system::errc::success) {
+        ROS_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
+          library_name.c_str(), it->c_str());
+        return *it;
+      }
     }
   }
   return "";
