@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Update maintainers
+* Contributors: Audrow Nash
+
 5.2.1 (2022-09-13)
 ------------------
 
