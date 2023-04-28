@@ -3,6 +3,9 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+
 5.2.2 (2023-03-01)
 ------------------
 * Update maintainers
