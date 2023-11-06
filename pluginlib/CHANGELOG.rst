@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.3.1 (2023-11-06)
+------------------
 * Fix wShadow compile warning (`#250 <https://github.com/ros/pluginlib/issues/250>`_)
 * Contributors: Steve Macenski
 
