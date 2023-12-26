@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.4.0 (2023-12-26)
+------------------
 * Update to C++17 (`#251 <https://github.com/ros/pluginlib/issues/251>`_)
 * Contributors: Chris Lalancette
 
