@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Update to C++17 (`#251 <https://github.com/ros/pluginlib/issues/251>`_)
+* Contributors: Chris Lalancette
+
 5.3.1 (2023-11-06)
 ------------------
 * Fix wShadow compile warning (`#250 <https://github.com/ros/pluginlib/issues/250>`_)
