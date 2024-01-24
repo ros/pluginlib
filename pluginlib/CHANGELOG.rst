@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.4.1 (2024-01-24)
+------------------
 * Remove redundant throw of a std::runtime_error (`#232 <https://github.com/ros/pluginlib/issues/232>`_)
 * Contributors: Hunter L. Allen
 
