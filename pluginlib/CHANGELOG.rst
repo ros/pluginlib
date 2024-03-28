@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Switch from rcpputils::fs to std::filesystem (`#254 <https://github.com/ros/pluginlib/issues/254>`_)
+* Contributors: Christophe Bedard
+
 5.4.1 (2024-01-24)
 ------------------
 * Remove redundant throw of a std::runtime_error (`#232 <https://github.com/ros/pluginlib/issues/232>`_)
