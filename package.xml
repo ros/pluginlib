@@ -8,10 +8,9 @@
     To work, these tools require plugin providers to register their plugins in the package.xml of their package.
   </description>
 
-  <maintainer email="clalancette@openrobotics.org">Chris Lalancette</maintainer>
+  <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
   <license>BSD</license>
-  <url>http://www.ros.org/wiki/pluginlib</url>
   <url type="bugtracker">https://github.com/ros/pluginlib/issues</url>
   <url type="repository">https://github.com/ros/pluginlib</url>
 
@@ -31,6 +30,8 @@
   <depend>tinyxml2_vendor</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
