@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.5.2 (2024-11-20)
+------------------
 * Fix Minor Spelling Mistakes (`#260 <https://github.com/ros/pluginlib/issues/260>`_)
 * Contributors: David V. Lu!!
 
