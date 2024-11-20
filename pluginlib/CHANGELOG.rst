@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+Forthcoming
+-----------
+* Fix Minor Spelling Mistakes (`#260 <https://github.com/ros/pluginlib/issues/260>`_)
+* Contributors: David V. Lu!!
+
 5.5.1 (2024-07-08)
 ------------------
 * Removed deprecated method (`#256 <https://github.com/ros/pluginlib/issues/256>`_)
