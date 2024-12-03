@@ -46,12 +46,15 @@ install(
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 
-  include_directories(include test/include)
+  find_package(ament_cmake_gtest REQUIRED)
 
   add_library(test_plugins SHARED ./test/test_plugins.cpp)
   target_compile_definitions(test_plugins PRIVATE "TEST_PLUGINLIB_FIXTURE_BUILDING_LIBRARY")
+  target_include_directories(test_plugins PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
   target_link_libraries(test_plugins ${PROJECT_NAME})
 
   include("cmake/pluginlib_enable_plugin_testing.cmake")
@@ -72,6 +75,8 @@ if(BUILD_TESTING)
   )
   if(TARGET ${PROJECT_NAME}_unique_ptr_test)
     target_link_libraries(${PROJECT_NAME}_unique_ptr_test ${PROJECT_NAME})
+    target_include_directories(${PROJECT_NAME}_unique_ptr_test PRIVATE
+      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
     add_dependencies(${PROJECT_NAME}_unique_ptr_test "${mock_install_target}")
   endif()
 
@@ -84,6 +89,8 @@ if(BUILD_TESTING)
     #   rcutils::rcutils
     target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})
     add_dependencies(${PROJECT_NAME}_utest "${mock_install_target}")
+    target_include_directories(${PROJECT_NAME}_utest PRIVATE
+      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
   endif()
 
 endif()

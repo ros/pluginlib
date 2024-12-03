@@ -119,7 +119,8 @@ function(pluginlib_enable_plugin_testing)
 
   set(target_name "pluginlib_enable_plugin_testing__${ARG_PLUGIN_CATEGORY}__${ARG_PACKAGE_NAME}")
   if(TARGET "${target_name}")
-    message(FATAL_ERROR "pluginlib_enable_plugin_testing has already been called with category '${ARG_PLUGIN_CATEGORY}' and package name '${ARG_PACKAGE_NAME}'")
+    message(FATAL_ERROR "pluginlib_enable_plugin_testing has already been called with "
+      "category '${ARG_PLUGIN_CATEGORY}' and package name '${ARG_PACKAGE_NAME}'")
   endif()
 
   #####

@@ -6,6 +6,8 @@
   <description>
     This tests pluginlib.
   </description>
+  <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
+  <license>BSD</license>
   <export>
     <pluginlib plugin="${prefix}/test_plugins.xml" />
   </export>
