@@ -3,8 +3,8 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+5.6.0 (2024-12-20)
+------------------
 * Heavily cleanup pluginlib. (`#265 <https://github.com/ros/pluginlib/issues/265>`_)
 * Remove CODEOWNERS and mirror-rolling-to-main workflow (`#268 <https://github.com/ros/pluginlib/issues/268>`_)
 * Contributors: Alejandro Hernández Cordero, Chris Lalancette
