@@ -137,6 +137,16 @@ TEST(PluginlibTest, brokenXML) {
   ADD_FAILURE() << "Didn't throw exception as expected";
 }
 
+TEST(PluginlibTest, Splitting) {
+  pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib", "test_base::Fubar");
+  EXPECT_EQ(pl.getName("foo::bar"), "bar");
+  EXPECT_EQ(pl.getName("foo/bar"), "bar");
+  EXPECT_EQ(pl.getName("foo/bar:baz"), "baz");
+  EXPECT_EQ(pl.getName("foo:bar/baz"), "baz");
+  EXPECT_EQ(pl.getName("foo"), "foo");
+  EXPECT_EQ(pl.getName(""), "");
+}
+
 // Run all the tests that were declared with TEST()
 int main(int argc, char ** argv)
 {

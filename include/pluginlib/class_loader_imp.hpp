@@ -29,6 +29,7 @@
 #ifndef PLUGINLIB__CLASS_LOADER_IMP_HPP_
 #define PLUGINLIB__CLASS_LOADER_IMP_HPP_
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <list>
@@ -49,7 +50,6 @@
 #include "rcutils/logging_macros.h"
 
 #include "./class_loader.hpp"
-#include "./impl/split.hpp"
 
 #ifdef _WIN32
 #define CLASS_LOADER_IMPL_OS_PATHSEP ";"
@@ -507,8 +507,22 @@ std::string ClassLoader<T>::getName(const std::string & lookup_name)
 /***************************************************************************/
 {
   // remove the package name to get the raw plugin name
-  std::vector<std::string> result = pluginlib::impl::split(lookup_name, "/|:");
-  return result.back();
+  auto last_slash = lookup_name.find_last_of('/');
+  auto last_colon = lookup_name.find_last_of(':');
+  if (last_slash == std::string::npos && last_colon == std::string::npos) {
+    // no matches
+    return lookup_name;
+  }
+  if (last_slash == std::string::npos) {
+    // only colon matched
+    return lookup_name.substr(last_colon + 1);
+  }
+  if (last_colon == std::string::npos) {
+    // only slash matched
+    return lookup_name.substr(last_slash + 1);
+  }
+  // both matched, return shorter suffix
+  return lookup_name.substr(std::max(last_slash, last_colon) + 1);
 }
 
 template<class T>
