@@ -3,6 +3,11 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.1.1 (2025-03-25)
+------------------
+* Fix wShadow compile warning (`#250 <https://github.com/ros/pluginlib/issues/250>`_) (`#266 <https://github.com/ros/pluginlib/issues/266>`_)
+* Contributors: Wiktor Bajor
+
 5.1.0 (2022-01-14)
 ------------------
 * Install includes to include/${PROJECT_NAME} and remove ament_target_dependencies calls (`#226 <https://github.com/ros/pluginlib/issues/226>`_)
