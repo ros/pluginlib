@@ -2,6 +2,14 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Documented possible exception being thrown in ClassLoader destructor. (`#234 <https://github.com/ros/pluginlib/issues/234>`_)
+* Avoid throwing on symlink loops. (`#244 <https://github.com/ros/pluginlib/issues/244>`_)
+* Drop unused include (`#233 <https://github.com/ros/pluginlib/issues/233>`_)
+* Use `ifdef` instead of `if` for win32 (`#238 <https://github.com/ros/pluginlib/issues/238>`_)
+* Contributors: Ivor Wanders, Jochen Sprickerhof, Matthijs van der Burgh, Remo Diethelm
+
 1.13.0 (2020-05-21)
 -------------------
 * Declare specific boost dependencies (`#171 <https://github.com/ros/pluginlib/issues/171>`_)
