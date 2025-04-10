@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.13.1 (2025-04-10)
+-------------------
 * Documented possible exception being thrown in ClassLoader destructor. (`#234 <https://github.com/ros/pluginlib/issues/234>`_)
 * Avoid throwing on symlink loops. (`#244 <https://github.com/ros/pluginlib/issues/244>`_)
 * Drop unused include (`#233 <https://github.com/ros/pluginlib/issues/233>`_)
