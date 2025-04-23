@@ -20,20 +20,20 @@
 
   <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
 
+  <depend>class_loader</depend>
+  <depend>rosconsole</depend>
+  <depend version_gte="1.11.1">roslib</depend>
+  <depend>tinyxml2</depend>
+
   <build_depend>cmake_modules</build_depend>
   <build_depend>libboost-dev</build_depend>
   <build_depend>libboost-filesystem-dev</build_depend>
-  <build_depend>class_loader</build_depend>
-  <build_depend>rosconsole</build_depend>
-  <build_depend version_gte="1.11.1">roslib</build_depend>
-  <build_depend>tinyxml2</build_depend>
 
   <build_export_depend>libboost-dev</build_export_depend>
   <build_export_depend>libboost-filesystem-dev</build_export_depend>
-  <build_export_depend>class_loader</build_export_depend>
-  <build_export_depend>rosconsole</build_export_depend>
-  <build_export_depend version_gte="1.11.1">roslib</build_export_depend>
-  <build_export_depend>tinyxml2</build_export_depend>
+
+  <exec_depend>boost</exec_depend>
+  <exec_depend>libboost-filesystem</exec_depend>
 
   <export>
     <pluginlib plugin="${prefix}/test/test_plugins.xml"/>
