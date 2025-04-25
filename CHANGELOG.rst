@@ -3,6 +3,9 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.7.0 (2025-04-25)
+------------------
+
 5.6.0 (2024-12-20)
 ------------------
 * Heavily cleanup pluginlib. (`#265 <https://github.com/ros/pluginlib/issues/265>`_)
