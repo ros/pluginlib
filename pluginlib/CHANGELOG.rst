@@ -2,8 +2,8 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.13.2 (2025-04-26)
+-------------------
 * fix shebang line for python3 (`#197 <https://github.com/ros/pluginlib/issues/197>`_)
 * Fix warnings reported by Wformat. Printouts with format '%p' should be void pointers. Add static_cast's. (`#179 <https://github.com/ros/pluginlib/issues/179>`_)
 * Fix runtime dependencies (`#257 <https://github.com/ros/pluginlib/issues/257>`_)
