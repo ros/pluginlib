@@ -2,6 +2,13 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix shebang line for python3 (`#197 <https://github.com/ros/pluginlib/issues/197>`_)
+* Fix warnings reported by Wformat. Printouts with format '%p' should be void pointers. Add static_cast's. (`#179 <https://github.com/ros/pluginlib/issues/179>`_)
+* Fix runtime dependencies (`#257 <https://github.com/ros/pluginlib/issues/257>`_)
+* Contributors: Atsushi Watanabe, Gabriel Hottiger, Mikael Arguedas
+
 1.13.1 (2025-04-10)
 -------------------
 * Documented possible exception being thrown in ClassLoader destructor. (`#234 <https://github.com/ros/pluginlib/issues/234>`_)
