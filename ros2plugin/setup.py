@@ -31,7 +31,7 @@ setup(
 The package provides the plugin command for the ROS 2 command line tools.""",
     license='Apache License, Version 2.0',
     extras_require={
-        'test' : [
+        'test': [
             'pytest',
         ],
     },
