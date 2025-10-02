@@ -38,12 +38,6 @@ target_include_directories(list_plugins PUBLIC
 target_link_libraries(list_plugins
   ${PROJECT_NAME}
 )
-ament_target_dependencies(list_plugins
-  ament_index_cpp
-  class_loader
-  rcpputils
-  rcutils
-)
 install(TARGETS list_plugins
         DESTINATION lib/${PROJECT_NAME}
 )
