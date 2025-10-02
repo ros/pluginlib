@@ -1,77 +1,54 @@
-/*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2008, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of Willow Garage, Inc. nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-*********************************************************************/
+// Copyright 2008, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef PLUGINLIB__CLASS_LOADER_IMP_HPP_
 #define PLUGINLIB__CLASS_LOADER_IMP_HPP_
 
 #include <cstdlib>
+#include <filesystem>
 #include <list>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
-/* This is a workaround to MSVC incorrectly reporting the __cplusplus version
- * as explained in:
- * https://blogs.msdn.microsoft.com/vcblog/2018/04/09/msvc-now-correctly-reports-__cplusplus/
- *
- * I'm hesitant to currently switch on the /Zc:__cplusplus switch, as there are
- * reports of code (incorrectly) assuming it should always be set to 199711L.
- */
-#if defined(_MSC_VER)
-# define HAS_CPP11_MEMORY (_MSC_VER >= 1900)
-#else
-# define HAS_CPP11_MEMORY (__cplusplus >= 201103L)
-#endif
-
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
-# include <memory>
-#endif
-
 #include "ament_index_cpp/get_package_prefix.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
 #include "class_loader/class_loader.hpp"
+#include "rcpputils/shared_library.hpp"
 #include "rcutils/logging_macros.h"
 
 #include "./class_loader.hpp"
-#include "./impl/filesystem_helper.hpp"
 #include "./impl/split.hpp"
 
 #ifdef _WIN32
@@ -127,83 +104,13 @@ ClassLoader<T>::~ClassLoader()
     getBaseClassType().c_str(), static_cast<void *>(this));
 }
 
-
-template<class T>
-T * ClassLoader<T>::createClassInstance(const std::string & lookup_name, bool auto_load)
-/***************************************************************************/
-{
-  // Note: This method is deprecated
-  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-    "In deprecated call createClassInstance(), lookup_name = %s, auto_load = %i.",
-    (lookup_name.c_str()), auto_load);
-
-  if (auto_load && !isClassLoaded(lookup_name)) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Autoloading class library before attempting to create instance.");
-    loadLibraryForClass(lookup_name);
-  }
-
-  try {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Attempting to create instance through low-level MultiLibraryClassLoader...");
-    T * obj = lowlevel_class_loader_.createUnmanagedInstance<T>(getClassType(lookup_name));
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Instance created with object pointer = %p", static_cast<void *>(obj));
-
-    return obj;
-  } catch (const class_loader::CreateClassException & ex) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "CreateClassException about to be raised for class %s",
-      lookup_name.c_str());
-    throw pluginlib::CreateClassException(ex.what());
-  }
-}
-
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 template<class T>
 std::shared_ptr<T> ClassLoader<T>::createSharedInstance(const std::string & lookup_name)
 /***************************************************************************/
 {
   return createUniqueInstance(lookup_name);
 }
-#endif
 
-#ifndef PLUGINLIB__DISABLE_BOOST_FUNCTIONS
-template<class T>
-boost::shared_ptr<T> ClassLoader<T>::createInstance(const std::string & lookup_name)
-/***************************************************************************/
-{
-  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-    "Attempting to create managed instance for class %s.",
-    lookup_name.c_str());
-
-  if (!isClassLoaded(lookup_name)) {
-    loadLibraryForClass(lookup_name);
-  }
-
-  try {
-    std::string class_type = getClassType(lookup_name);
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "%s maps to real class type %s",
-      lookup_name.c_str(), class_type.c_str());
-
-    boost::shared_ptr<T> obj = lowlevel_class_loader_.createInstance<T>(class_type);
-
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "boost::shared_ptr to object of real type %s created.",
-      class_type.c_str());
-
-    return obj;
-  } catch (const class_loader::CreateClassException & ex) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Exception raised by low-level multi-library class loader when attempting "
-      "to create instance of class %s.",
-      lookup_name.c_str());
-    throw pluginlib::CreateClassException(ex.what());
-  }
-}
-#endif
-
-#if defined(HAS_CPP11_MEMORY) && HAS_CPP11_MEMORY
 template<class T>
 UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name)
 {
@@ -235,7 +142,6 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
     throw pluginlib::CreateClassException(ex.what());
   }
 }
-#endif
 
 template<class T>
 T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name)
@@ -370,7 +276,16 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
     return "";
   }
 
-  return package_name_node->GetText();
+  const char * package_name_node_txt = package_name_node->GetText();
+  if (NULL == package_name_node_txt) {
+    RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+      "package.xml at %s has an invalid <name> tag! Cannot determine package "
+      "which exports plugin.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  return package_name_node_txt;
 }
 
 template<class T>
@@ -423,14 +338,6 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
     package_prefix + path_separator + "bin" + path_separator + exporting_package_name,
   };
 
-  // Prepare to setup the relative file paths.
-  bool debug_library_suffix = (0 == class_loader::systemLibrarySuffix().compare(0, 1, "d"));
-  std::string non_debug_suffix;
-  if (debug_library_suffix) {
-    non_debug_suffix = class_loader::systemLibrarySuffix().substr(1);
-  } else {
-    non_debug_suffix = class_loader::systemLibrarySuffix();
-  }
   std::string stripped_library_name = stripAllButFileFromPath(library_name);
 
   std::string library_name_alternative;  // either lib<library> or <library> without lib prefix
@@ -448,27 +355,24 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
 
   // Setup the relative file paths to pair with the search directories above.
   std::vector<std::string> all_relative_library_paths = {
-    library_name + non_debug_suffix,
-    library_name_alternative + non_debug_suffix,
-    stripped_library_name + non_debug_suffix,
-    stripped_library_name_alternative + non_debug_suffix,
+    rcpputils::get_platform_library_name(library_name),
+    rcpputils::get_platform_library_name(library_name_alternative),
+    rcpputils::get_platform_library_name(stripped_library_name),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative)
   };
   std::vector<std::string> all_relative_debug_library_paths = {
-    library_name + class_loader::systemLibrarySuffix(),
-    library_name_alternative + class_loader::systemLibrarySuffix(),
-    stripped_library_name + class_loader::systemLibrarySuffix(),
-    stripped_library_name_alternative + class_loader::systemLibrarySuffix(),
+    rcpputils::get_platform_library_name(library_name, true),
+    rcpputils::get_platform_library_name(library_name_alternative, true),
+    rcpputils::get_platform_library_name(stripped_library_name, true),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative, true)
   };
 
   for (auto && current_search_path : all_search_paths) {
     for (auto && current_library_path : all_relative_library_paths) {
       all_paths.push_back(current_search_path + path_separator + current_library_path);
     }
-    // We're in debug mode, try debug libraries as well
-    if (debug_library_suffix) {
-      for (auto && current_library_path : all_relative_debug_library_paths) {
-        all_paths.push_back(current_search_path + path_separator + current_library_path);
-      }
+    for (auto && current_library_path : all_relative_debug_library_paths) {
+      all_paths.push_back(current_search_path + path_separator + current_library_path);
     }
   }
 
@@ -523,10 +427,10 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
 /***************************************************************************/
 {
   if (classes_available_.find(lookup_name) == classes_available_.end()) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "Class %s has no mapping in classes_available_.",
-      lookup_name.c_str());
-    return "";
+    std::ostringstream error_msg;
+    error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+      ". Make sure the plugin description XML file has the correct name of the library.";
+    throw pluginlib::LibraryLoadException(error_msg.str());
   }
   ClassMapIterator it = classes_available_.find(lookup_name);
   std::string library_name = it->second.library_name_;
@@ -540,15 +444,18 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Iterating through all possible paths where %s could be located...",
     library_name.c_str());
-  for (auto it = paths_to_try.begin(); it != paths_to_try.end(); it++) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", it->c_str());
-    if (pluginlib::impl::fs::exists(*it)) {
+  for (auto path_it = paths_to_try.begin(); path_it != paths_to_try.end(); path_it++) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", path_it->c_str());
+    if (std::filesystem::exists(*path_it)) {
       RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
-        library_name.c_str(), it->c_str());
-      return *it;
+        library_name.c_str(), path_it->c_str());
+      return *path_it;
     }
   }
-  return "";
+  std::ostringstream error_msg;
+  error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+    ". Make sure that the library '" << library_name << "' actually exists.";
+  throw pluginlib::LibraryLoadException(error_msg.str());
 }
 
 template<class T>
@@ -619,21 +526,23 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 2. Extract name of package from package.xml
 
   std::string package_name;
-  pluginlib::impl::fs::path p(plugin_xml_file_path);
-  pluginlib::impl::fs::path parent = p.parent_path();
+  std::filesystem::path p(plugin_xml_file_path);
+  std::filesystem::path parent = p.parent_path();
 
   // Figure out exactly which package the passed XML file is exported by.
   while (true) {
-    if (pluginlib::impl::fs::exists(parent / "package.xml")) {
+    if (std::filesystem::exists(parent / "package.xml")) {
       std::string package_file_path = (parent / "package.xml").string();
       return extractPackageNameFromPackageXML(package_file_path);
     }
 
-    // Recursive case - hop one folder up
+    // Recursive case - hop one folder up and store current parent
+    // parent_path() returns the current path if we reached the root.
+    p = parent;
     parent = parent.parent_path();
 
     // Base case - reached root and cannot find what we're looking for
-    if (parent.string().empty()) {
+    if (parent.string().empty() || (p == parent)) {
       return "";
     }
   }
@@ -645,7 +554,7 @@ template<class T>
 std::string ClassLoader<T>::getPathSeparator()
 /***************************************************************************/
 {
-  return std::string(1, pluginlib::impl::fs::path::preferred_separator);
+  return std::string(1, std::filesystem::path::preferred_separator);
 }
 
 
@@ -679,7 +588,7 @@ template<class T>
 std::string ClassLoader<T>::joinPaths(const std::string & path1, const std::string & path2)
 /***************************************************************************/
 {
-  pluginlib::impl::fs::path p1(path1);
+  std::filesystem::path p1(path1);
   return (p1 / path2).string();
 }
 
@@ -696,16 +605,6 @@ void ClassLoader<T>::loadLibraryForClass(const std::string & lookup_name)
   }
 
   std::string library_path = getClassLibraryPath(lookup_name);
-  if ("" == library_path) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-      "No path could be found to the library containing %s.",
-      lookup_name.c_str());
-    std::ostringstream error_msg;
-    error_msg << "Could not find library corresponding to plugin " << lookup_name <<
-      ". Make sure the plugin description XML file has the correct name of the "
-      "library and that the library actually exists.";
-    throw pluginlib::LibraryLoadException(error_msg.str());
-  }
 
   try {
     lowlevel_class_loader_.loadLibrary(library_path);
@@ -736,8 +635,15 @@ void ClassLoader<T>::processSingleXMLPluginFile(
             "' has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
-  if (!(strcmp(config->Value(), "library") == 0 ||
-    strcmp(config->Value(), "class_libraries") == 0))
+  const char * config_value = config->Value();
+  if (NULL == config_value) {
+    throw pluginlib::InvalidXMLException(
+              "XML Document '" + xml_file +
+              "' has an invalid Root Element. This likely means the XML is malformed or missing.");
+    return;
+  }
+  if (!(strcmp(config_value, "library") == 0 ||
+    strcmp(config_value, "class_libraries") == 0))
   {
     throw pluginlib::InvalidXMLException(
             "The XML document '" + xml_file + "' given to add must have either \"library\" or "
@@ -745,16 +651,22 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     return;
   }
   // Step into the filter list if necessary
-  if (strcmp(config->Value(), "class_libraries") == 0) {
+  if (strcmp(config_value, "class_libraries") == 0) {
     config = config->FirstChildElement("library");
   }
 
   tinyxml2::XMLElement * library = config;
   while (library != NULL) {
-    std::string library_path = library->Attribute("path");
+    const char * path = library->Attribute("path");
+    if (NULL == path) {
+      RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+        "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
+      continue;
+    }
+    std::string library_path(path);
     if (0 == library_path.size()) {
       RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
-        "Failed to find Path Attirbute in library element in %s", xml_file.c_str());
+        "Failed to find Path Attribute in library element in %s", xml_file.c_str());
       continue;
     }
 
