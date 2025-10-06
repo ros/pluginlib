@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 project(pluginlib)
 
 # Default to C++17
@@ -29,6 +29,18 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
   rcutils::rcutils
   rcpputils::rcpputils
   tinyxml2::tinyxml2)
+
+add_executable(list_plugins src/list_plugins.cpp)
+target_include_directories(list_plugins PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(list_plugins
+  ${PROJECT_NAME}
+)
+install(TARGETS list_plugins
+        DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
 
