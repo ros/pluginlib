@@ -16,8 +16,7 @@ find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
 find_package(rcutils REQUIRED)
 find_package(rcpputils REQUIRED)
-find_package(tinyxml2_vendor REQUIRED)
-find_package(TinyXML2 REQUIRED)  # provided by tinyxml2 upstream, or tinyxml2_vendor
+find_package(TinyXML2 REQUIRED)
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
@@ -42,7 +41,7 @@ install(TARGETS list_plugins
         DESTINATION lib/${PROJECT_NAME}
 )
 
-ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils tinyxml2_vendor TinyXML2)
+ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils TinyXML2)
 
 ament_export_targets(export_${PROJECT_NAME})
 
