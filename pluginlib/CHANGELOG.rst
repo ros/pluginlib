@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.2 (2025-10-13)
+------------------
+* List plugins script (backport `#264 <https://github.com/ros/pluginlib/issues/264>`_) (`#278 <https://github.com/ros/pluginlib/issues/278>`_)
+* Fixed test_pluginlib maintainer and license (`#283 <https://github.com/ros/pluginlib/issues/283>`_)
+* Contributors: Alejandro Hernández Cordero, mergify[bot]
 
 5.1.1 (2025-03-25)
 ------------------
