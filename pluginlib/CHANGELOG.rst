@@ -3,6 +3,12 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.4.3 (2025-10-13)
+------------------
+* Fixed test_pluginlib maintainer and license (`#282 <https://github.com/ros/pluginlib/issues/282>`_)
+* List plugins script (backport `#264 <https://github.com/ros/pluginlib/issues/264>`_) (`#277 <https://github.com/ros/pluginlib/issues/277>`_)
+* Contributors: Alejandro Hernández Cordero, mergify[bot]
+
 5.4.2 (2024-03-28)
 ------------------
 * Switch from rcpputils::fs to std::filesystem (`#254 <https://github.com/ros/pluginlib/issues/254>`_)
