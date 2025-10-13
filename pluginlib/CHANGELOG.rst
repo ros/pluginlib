@@ -2,6 +2,12 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.6.1 (2025-10-13)
+------------------
+* Add ros2plugin (backport `#165 <https://github.com/ros/pluginlib/issues/165>`_) (`#279 <https://github.com/ros/pluginlib/issues/279>`_)
+* List plugins script (backport `#264 <https://github.com/ros/pluginlib/issues/264>`_) (`#276 <https://github.com/ros/pluginlib/issues/276>`_)
+* fix cmake deprecation (backport `#273 <https://github.com/ros/pluginlib/issues/273>`_) (`#275 <https://github.com/ros/pluginlib/issues/275>`_)
+* Contributors: mergify[bot]
 
 5.6.0 (2024-12-20)
 ------------------
