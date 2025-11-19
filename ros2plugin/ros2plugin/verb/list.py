@@ -65,8 +65,13 @@ class ListVerb(VerbExtension):
                 plugin_xml = os.path.join(package_prefix, package_plugin_resource)
                 if not os.path.isfile(plugin_xml):
                     print('XML manifest ' + os.path.basename(plugin_xml) + ' not found.')
-
-                tree = ET.parse(plugin_xml)
+                try:
+                    tree = ET.parse(plugin_xml)
+                except ET.ParseError as e:
+                    print(
+                        f'Failed to parse plugin XML file: {plugin_xml}\n'
+                        f'XML error: {e}'
+                    )
 
                 for e in tree.iter():
                     if e.tag == 'class':
