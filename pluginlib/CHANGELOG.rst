@@ -2,6 +2,9 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 5.6.1 (2025-10-13)
 ------------------
 * Add ros2plugin (backport `#165 <https://github.com/ros/pluginlib/issues/165>`_) (`#279 <https://github.com/ros/pluginlib/issues/279>`_)
