@@ -2,6 +2,9 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.8.1 (2025-11-28)
+------------------
+
 5.8.0 (2025-10-08)
 ------------------
 * refactor: replace regex with find_last_of to split plugin name (`#271 <https://github.com/ros/pluginlib/issues/271>`_)
