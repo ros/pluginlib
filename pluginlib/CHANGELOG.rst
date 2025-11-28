@@ -2,6 +2,9 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.3 (2025-11-28)
+------------------
+
 5.1.2 (2025-10-13)
 ------------------
 * List plugins script (backport `#264 <https://github.com/ros/pluginlib/issues/264>`_) (`#278 <https://github.com/ros/pluginlib/issues/278>`_)
