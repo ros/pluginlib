@@ -3,6 +3,9 @@ Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+5.4.4 (2025-11-28)
+------------------
+
 5.4.3 (2025-10-13)
 ------------------
 * Fixed test_pluginlib maintainer and license (`#282 <https://github.com/ros/pluginlib/issues/282>`_)
