@@ -368,10 +368,10 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
 
   for (auto && current_search_path : all_search_paths) {
     for (auto && current_library_path : all_relative_library_paths) {
-      all_paths.push_back(current_search_path / current_library_path);
+      all_paths.push_back((current_search_path / current_library_path).string());
     }
     for (auto && current_library_path : all_relative_debug_library_paths) {
-      all_paths.push_back(current_search_path / current_library_path);
+      all_paths.push_back((current_search_path / current_library_path).string());
     }
   }
 
