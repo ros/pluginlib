@@ -198,7 +198,7 @@ std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(
       // the ament resource file
       auto result = ament_index_cpp::get_resource(
         resource_name, package_prefix_pair.first);
-      if (result.first == std::nullopt) {
+      if (result.resourcePath == std::nullopt) {
         RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
           "unexpectedly not able to find ament resource '%s' for package '%s'",
           resource_name.c_str(),
@@ -207,7 +207,7 @@ std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(
         continue;
       }
       // the content may contain multiple plugin description files
-      std::stringstream ss(result.second);
+      std::stringstream ss(result.contents);
       std::string line;
       while (std::getline(ss, line, '\n')) {
         if (!line.empty()) {
