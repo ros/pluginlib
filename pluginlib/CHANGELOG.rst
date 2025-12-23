@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.8.2 (2025-12-23)
+------------------
+* Updated deprecated ament_index_cpp API (`#289 <https://github.com/ros/pluginlib/issues/289>`_)
+* Contributors: Alejandro Hernández Cordero
+
 5.8.1 (2025-11-28)
 ------------------
 
