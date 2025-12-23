@@ -5,7 +5,7 @@ package_name = 'ros2plugin'
 
 setup(
     name=package_name,
-    version='5.8.1',
+    version='5.8.2',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
