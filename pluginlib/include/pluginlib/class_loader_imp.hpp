@@ -80,7 +80,8 @@ ClassLoader<T>::ClassLoader(
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Creating ClassLoader, base = %s, address = %p",
     base_class.c_str(), static_cast<void *>(this));
   try {
-    ament_index_cpp::get_package_prefix(package_);
+    std::filesystem::path package_path;
+    ament_index_cpp::get_package_prefix(package_, package_path);
   } catch (const ament_index_cpp::PackageNotFoundError & exception) {
     // rethrow as class loader exception, package name is in the error message already.
     throw pluginlib::ClassLoaderException(exception.what());
@@ -190,30 +191,29 @@ std::vector<std::string> ClassLoader<T>::getPluginXmlPaths(
     // __ is used as the concatenation delimiter because it cannot be in a
     // package name
     std::string resource_name = package + "__pluginlib__" + attrib_name;
-    auto plugin_packages_with_prefixes = ament_index_cpp::get_resources(resource_name);
+    std::map<std::string, std::filesystem::path> plugin_packages_with_prefixes =
+      ament_index_cpp::get_resources_by_name(resource_name);
     for (const auto & package_prefix_pair : plugin_packages_with_prefixes) {
       // it is also convention to place the relative path to the plugin xml in
       // the ament resource file
-      std::string resource_content;
-      {
-        using ament_index_cpp::get_resource;
-        if (!get_resource(resource_name, package_prefix_pair.first, resource_content)) {
-          RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
-            "unexpectedly not able to find ament resource '%s' for package '%s'",
-            resource_name.c_str(),
-            package_prefix_pair.first.c_str()
-          );
-          continue;
-        }
+      auto result = ament_index_cpp::get_resource(
+        resource_name, package_prefix_pair.first);
+      if (result.resourcePath == std::nullopt) {
+        RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
+          "unexpectedly not able to find ament resource '%s' for package '%s'",
+          resource_name.c_str(),
+          package_prefix_pair.first.c_str()
+        );
+        continue;
       }
       // the content may contain multiple plugin description files
-      std::stringstream ss(resource_content);
+      std::stringstream ss(result.contents);
       std::string line;
       while (std::getline(ss, line, '\n')) {
         if (!line.empty()) {
           // store the prefix for the package with a plugin and the relative path
           // to the plugin xml file
-          paths.push_back(package_prefix_pair.second + "/" + line);
+          paths.push_back((package_prefix_pair.second / line).string());
         }
       }
     }
@@ -321,21 +321,20 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
   // relative path to the libraries in the ament index, since CMake knows it
   // at build time...
 
-  const std::string path_separator = getPathSeparator();
-
   std::vector<std::string> all_paths;  // result of all pairs to search
 
-  std::string package_prefix = ament_index_cpp::get_package_prefix(exporting_package_name);
+  std::filesystem::path package_prefix;
+  ament_index_cpp::get_package_prefix(exporting_package_name, package_prefix);
 
   // Setup the directories to look in.
-  std::vector<std::string> all_search_paths = {
+  std::vector<std::filesystem::path> all_search_paths = {
     // for now just try lib and lib64 (and their respective "libexec" directories)
-    package_prefix + path_separator + "lib",
-    package_prefix + path_separator + "lib64",
-    package_prefix + path_separator + "bin",  // also look in bin, for dll's on Windows
-    package_prefix + path_separator + "lib" + path_separator + exporting_package_name,
-    package_prefix + path_separator + "lib64" + path_separator + exporting_package_name,
-    package_prefix + path_separator + "bin" + path_separator + exporting_package_name,
+    package_prefix / "lib",
+    package_prefix / "lib64",
+    package_prefix / "bin",  // also look in bin, for dll's on Windows
+    package_prefix / "lib" / exporting_package_name,
+    package_prefix / "lib64" / exporting_package_name,
+    package_prefix / "bin" / exporting_package_name,
   };
 
   std::string stripped_library_name = stripAllButFileFromPath(library_name);
@@ -369,10 +368,10 @@ std::vector<std::string> ClassLoader<T>::getAllLibraryPathsToTry(
 
   for (auto && current_search_path : all_search_paths) {
     for (auto && current_library_path : all_relative_library_paths) {
-      all_paths.push_back(current_search_path + path_separator + current_library_path);
+      all_paths.push_back((current_search_path / current_library_path).string());
     }
     for (auto && current_library_path : all_relative_debug_library_paths) {
-      all_paths.push_back(current_search_path + path_separator + current_library_path);
+      all_paths.push_back((current_search_path / current_library_path).string());
     }
   }
 
