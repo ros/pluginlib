@@ -43,6 +43,10 @@ install(TARGETS list_plugins
 
 ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils TinyXML2)
 
+# Export old-style CMake variables
+ament_export_include_directories("include/${PROJECT_NAME}")
+
+# Export modern CMake targets
 ament_export_targets(export_${PROJECT_NAME})
 
 install(
