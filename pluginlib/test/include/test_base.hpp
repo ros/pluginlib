@@ -29,7 +29,10 @@
 #ifndef TEST_BASE_HPP_
 #define TEST_BASE_HPP_
 
+#include <memory>
+
 #include <visibility_control.hpp>
+#include <class_loader/interface_traits.hpp>
 
 namespace test_base
 {
@@ -43,5 +46,33 @@ public:
 protected:
   Fubar() {}
 };
+
+class TEST_PLUGINLIB_FIXTURE_PUBLIC FubarWithCtor
+{
+public:
+  virtual double result() = 0;
+  virtual ~FubarWithCtor() = default;
+
+protected:
+  FubarWithCtor() = default;
+};
 }  // namespace test_base
+
+template<>
+struct class_loader::InterfaceTraits<test_base::FubarWithCtor>
+{
+  // Using `std::unique_ptr<double>` to test forwarding of move-only types.
+  using constructor_parameters = class_loader::ConstructorParameters<std::unique_ptr<double>>;
+};
+
+static_assert(
+  class_loader::is_interface_constructible_v<test_base::FubarWithCtor, std::unique_ptr<double>>,
+  "BaseWithInterfaceCtor should be interface constructible with the specifed types."
+);
+
+static_assert(
+  class_loader::is_interface_constructible_v<test_base::FubarWithCtor, std::unique_ptr<double>&&>,
+  "BaseWithInterfaceCtor should be interface constructible with the specifed types."
+);
+
 #endif  // TEST_BASE_HPP_

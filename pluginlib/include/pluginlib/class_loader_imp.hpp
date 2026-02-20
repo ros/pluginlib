@@ -45,6 +45,7 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
+#include "class_loader/interface_traits.hpp"
 #include "class_loader/class_loader.hpp"
 #include "rcpputils/shared_library.hpp"
 #include "rcutils/logging_macros.h"
@@ -106,14 +107,20 @@ ClassLoader<T>::~ClassLoader()
 }
 
 template<class T>
-std::shared_ptr<T> ClassLoader<T>::createSharedInstance(const std::string & lookup_name)
+template<typename ... Args,
+  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+std::shared_ptr<T> ClassLoader<T>::createSharedInstance(
+  const std::string & lookup_name,
+  Args &&... args)
 /***************************************************************************/
 {
-  return createUniqueInstance(lookup_name);
+  return createUniqueInstance(lookup_name, std::forward<Args>(args)...);
 }
 
 template<class T>
-UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name)
+template<typename ... Args,
+  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name, Args &&... args)
 {
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Attempting to create managed (unique) instance for class %s.",
@@ -128,7 +135,8 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "%s maps to real class type %s",
       lookup_name.c_str(), class_type.c_str());
 
-    UniquePtr<T> obj = lowlevel_class_loader_.createUniqueInstance<T>(class_type);
+    UniquePtr<T> obj = lowlevel_class_loader_.createUniqueInstance<T>(class_type,
+        std::forward<Args>(args)...);
 
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
       "std::unique_ptr to object of real type %s created.",
@@ -145,7 +153,9 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
 }
 
 template<class T>
-T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name)
+template<typename ... Args,
+  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name, Args &&... args)
 /***************************************************************************/
 {
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
@@ -163,7 +173,8 @@ T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name)
     std::string class_type = getClassType(lookup_name);
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "%s maps to real class type %s",
       lookup_name.c_str(), class_type.c_str());
-    instance = lowlevel_class_loader_.createUnmanagedInstance<T>(class_type);
+    instance = lowlevel_class_loader_.createUnmanagedInstance<T>(class_type,
+        std::forward<Args>(args)...);
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
       "Instance of type %s created.",
       class_type.c_str());

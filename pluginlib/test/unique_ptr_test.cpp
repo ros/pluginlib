@@ -67,6 +67,23 @@ TEST(PluginlibUniquePtrTest, workingPlugin) {
   }
 }
 
+TEST(PluginlibUniquePtrTest, workingPluginCtor) {
+  pluginlib::ClassLoader<test_base::FubarWithCtor> test_loader("test_pluginlib",
+    "test_base::FubarWithCtor");
+
+  try {
+    pluginlib::UniquePtr<test_base::FubarWithCtor> foo =
+      test_loader.createUniqueInstance("test_pluginlib/foo_with_ctor",
+      std::make_unique<double>(10.0));
+    EXPECT_DOUBLE_EQ(100.0, foo->result());
+  } catch (pluginlib::PluginlibException & ex) {
+    FAIL() << "Throwing exception: " << ex.what();
+    return;
+  } catch (...) {
+    FAIL() << "Uncaught exception";
+  }
+}
+
 TEST(PluginlibUniquePtrTest, createUniqueInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
   pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib", "test_base::Fubar");

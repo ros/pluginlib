@@ -74,6 +74,23 @@ TEST(PluginlibTest, workingPlugin) {
   }
 }
 
+TEST(PluginlibTest, workingPluginCtor) {
+  pluginlib::ClassLoader<test_base::FubarWithCtor> test_loader("test_pluginlib",
+    "test_base::FubarWithCtor");
+
+  try {
+    std::shared_ptr<test_base::FubarWithCtor> foo =
+      test_loader.createSharedInstance("test_pluginlib/foo_with_ctor",
+      std::make_unique<double>(10.0));
+    EXPECT_DOUBLE_EQ(100.0, foo->result());
+  } catch (pluginlib::PluginlibException & ex) {
+    FAIL() << "Throwing exception: " << ex.what();
+    return;
+  } catch (...) {
+    FAIL() << "Uncaught exception";
+  }
+}
+
 TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
   pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib", "test_base::Fubar");
@@ -93,6 +110,33 @@ TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
   try {
     pl.unloadLibraryForClass("test_pluginlib/foo");
+  } catch (pluginlib::PluginlibException & e) {
+    FAIL() << "Could not unload library when I should be able to. " << e.what();
+  }
+  RCUTILS_LOG_INFO("Done.");
+}
+
+TEST(PluginlibTest, createUnmanagedInstanceCtorAndUnloadLibrary) {
+  RCUTILS_LOG_INFO("Making the ClassLoader...");
+  pluginlib::ClassLoader<test_base::FubarWithCtor> pl("test_pluginlib", "test_base::FubarWithCtor");
+
+  RCUTILS_LOG_INFO("Instantiating plugin...");
+  test_base::FubarWithCtor * inst = pl.createUnmanagedInstance("test_pluginlib/foo_with_ctor",
+    std::make_unique<double>(10.0));
+  EXPECT_DOUBLE_EQ(100.0, inst->result());
+
+  RCUTILS_LOG_INFO("Deleting plugin...");
+  delete inst;
+
+  RCUTILS_LOG_INFO("Checking if plugin is loaded with isClassLoaded...");
+  if (pl.isClassLoaded("test_pluginlib/foo_with_ctor")) {
+    RCUTILS_LOG_INFO("Class is loaded");
+  } else {
+    FAIL() << "Library containing class should be loaded but isn't.";
+  }
+  RCUTILS_LOG_INFO("Trying to unload class with unloadLibraryForClass...");
+  try {
+    pl.unloadLibraryForClass("test_pluginlib/foo_with_ctor");
   } catch (pluginlib::PluginlibException & e) {
     FAIL() << "Could not unload library when I should be able to. " << e.what();
   }

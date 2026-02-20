@@ -30,6 +30,7 @@
 #define TEST_PLUGINS_HPP_
 
 #include <cmath>
+#include <memory>
 
 #include <test_base.hpp>
 #include <visibility_control.hpp>
@@ -71,6 +72,21 @@ public:
   }
 
   double result()
+  {
+    return foo_ * foo_;
+  }
+
+private:
+  double foo_;
+};
+
+class TEST_PLUGINLIB_FIXTURE_PUBLIC FooWithCtor : public test_base::FubarWithCtor
+{
+public:
+  explicit FooWithCtor(std::unique_ptr<double> foo)
+  : foo_(*foo) {}
+
+  double result() override
   {
     return foo_ * foo_;
   }
