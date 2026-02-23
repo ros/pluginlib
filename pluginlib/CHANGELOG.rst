@@ -2,6 +2,12 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.8.3 (2026-02-23)
+------------------
+* Add support for passing arguments to constructors (`#291 <https://github.com/ros/pluginlib/issues/291>`_)
+* Export includes (`#290 <https://github.com/ros/pluginlib/issues/290>`_)
+* Contributors: Alejandro Hernández Cordero, pum1k
+
 5.8.2 (2025-12-23)
 ------------------
 * Updated deprecated ament_index_cpp API (`#289 <https://github.com/ros/pluginlib/issues/289>`_)
