@@ -24,7 +24,7 @@ from ros2plugin.api import get_registered_plugin_resources
 from ros2plugin.verb import VerbExtension
 
 
-PluginInfo = namedtuple('Plugin', ('name', 'type', 'base'))
+PluginInfo = namedtuple('PluginInfo', ('name', 'type', 'base'))
 
 
 class ListVerb(VerbExtension):
@@ -39,25 +39,23 @@ class ListVerb(VerbExtension):
             help='Name of the package to list plugins from')
 
     @staticmethod
-    def _print_package_resources(plugin_resources):
+    def _print_package_names(plugin_resources):
         """Print package names and their associated plugin resource paths."""
         for package_name, package_plugin_resources in sorted(plugin_resources):
-            print(f'{package_name}:')
-            if any(package_plugin_resources):
-                print(*[f'\t{r}' for r in package_plugin_resources], sep='\n')
+            print(f'{package_name}')
 
     def main(self, *, args):
         plugin_resources = get_registered_plugin_resources()
+
+        if args.packages:
+            self._print_package_names(plugin_resources)
+            return
 
         if args.package:
             plugin_resources = [
                 (pkg, res) for pkg, res in plugin_resources
                 if pkg == args.package
             ]
-
-        if args.packages or args.package:
-            self._print_package_resources(plugin_resources)
-            return
 
         for package_name, package_plugin_resources in sorted(plugin_resources):
             plugins = []
@@ -94,4 +92,4 @@ class ListVerb(VerbExtension):
                         )
 
             if any(plugins):
-                print(*[f'\t{p}' for p in plugins], sep='\n')
+                print(*[f'\t{p.name} [{p.type}] (base: {p.base})' for p in plugins], sep='\n')
