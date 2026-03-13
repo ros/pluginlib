@@ -42,7 +42,6 @@
 #include <vector>
 
 #include "ament_index_cpp/get_package_prefix.hpp"
-#include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_resource.hpp"
 #include "ament_index_cpp/get_resources.hpp"
 #include "class_loader/interface_traits.hpp"
@@ -51,12 +50,6 @@
 #include "rcutils/logging_macros.h"
 
 #include "./class_loader.hpp"
-
-#ifdef _WIN32
-#define CLASS_LOADER_IMPL_OS_PATHSEP ";"
-#else
-#define CLASS_LOADER_IMPL_OS_PATHSEP ":"
-#endif
 
 namespace pluginlib
 {
@@ -93,7 +86,7 @@ ClassLoader<T>::ClassLoader(
   }
   classes_available_ = determineAvailableClasses(plugin_xml_paths_);
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
-    "Finished constructring ClassLoader, base = %s, address = %p",
+    "Finished constructing ClassLoader, base = %s, address = %p",
     base_class.c_str(), static_cast<void *>(this));
 }
 
@@ -166,7 +159,7 @@ T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name, Arg
     loadLibraryForClass(lookup_name);
   }
 
-  T * instance = 0;
+  T * instance = nullptr;
   try {
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
       "Attempting to create instance through low level multi-library class loader.");
@@ -269,7 +262,7 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
   tinyxml2::XMLDocument document;
   document.LoadFile(package_xml_path.c_str());
   tinyxml2::XMLElement * doc_root_node = document.FirstChildElement("package");
-  if (NULL == doc_root_node) {
+  if (nullptr == doc_root_node) {
     RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
       "Could not find a root element for package manifest at %s.",
       package_xml_path.c_str());
@@ -279,7 +272,7 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
   assert(document.RootElement() == doc_root_node);
 
   tinyxml2::XMLElement * package_name_node = doc_root_node->FirstChildElement("name");
-  if (NULL == package_name_node) {
+  if (nullptr == package_name_node) {
     RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
       "package.xml at %s does not have a <name> tag! Cannot determine package "
       "which exports plugin.",
@@ -288,7 +281,7 @@ std::string ClassLoader<T>::extractPackageNameFromPackageXML(const std::string &
   }
 
   const char * package_name_node_txt = package_name_node->GetText();
-  if (NULL == package_name_node_txt) {
+  if (nullptr == package_name_node_txt) {
     RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
       "package.xml at %s has an invalid <name> tag! Cannot determine package "
       "which exports plugin.",
@@ -436,13 +429,13 @@ template<class T>
 std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
 /***************************************************************************/
 {
-  if (classes_available_.find(lookup_name) == classes_available_.end()) {
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it == classes_available_.end()) {
     std::ostringstream error_msg;
     error_msg << "Could not find library corresponding to plugin " << lookup_name <<
       ". Make sure the plugin description XML file has the correct name of the library.";
     throw pluginlib::LibraryLoadException(error_msg.str());
   }
-  ClassMapIterator it = classes_available_.find(lookup_name);
   std::string library_name = it->second.library_name_;
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Class %s maps to library %s in classes_available_.",
@@ -653,14 +646,14 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   tinyxml2::XMLDocument document;
   document.LoadFile(xml_file.c_str());
   tinyxml2::XMLElement * config = document.RootElement();
-  if (NULL == config) {
+  if (nullptr == config) {
     throw pluginlib::InvalidXMLException(
             "XML Document '" + xml_file +
             "' has no Root Element. This likely means the XML is malformed or missing.");
     return;
   }
   const char * config_value = config->Value();
-  if (NULL == config_value) {
+  if (nullptr == config_value) {
     throw pluginlib::InvalidXMLException(
               "XML Document '" + xml_file +
               "' has an invalid Root Element. This likely means the XML is malformed or missing.");
@@ -680,9 +673,9 @@ void ClassLoader<T>::processSingleXMLPluginFile(
   }
 
   tinyxml2::XMLElement * library = config;
-  while (library != NULL) {
+  while (library != nullptr) {
     const char * path = library->Attribute("path");
-    if (NULL == path) {
+    if (nullptr == path) {
       RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
         "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
       continue;
@@ -706,7 +699,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     tinyxml2::XMLElement * class_element = library->FirstChildElement("class");
     while (class_element) {
       std::string derived_class;
-      if (class_element->Attribute("type") != NULL) {
+      if (class_element->Attribute("type") != nullptr) {
         derived_class = std::string(class_element->Attribute("type"));
       } else {
         throw pluginlib::ClassLoaderException(
@@ -714,7 +707,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
       }
 
       std::string base_class_type;
-      if (class_element->Attribute("base_class_type") != NULL) {
+      if (class_element->Attribute("base_class_type") != nullptr) {
         base_class_type = std::string(class_element->Attribute("base_class_type"));
       } else {
         throw pluginlib::ClassLoaderException(
@@ -722,7 +715,7 @@ void ClassLoader<T>::processSingleXMLPluginFile(
       }
 
       std::string lookup_name;
-      if (class_element->Attribute("name") != NULL) {
+      if (class_element->Attribute("name") != nullptr) {
         lookup_name = class_element->Attribute("name");
         RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
           "XML file specifies lookup name (i.e. magic name) = %s.",
