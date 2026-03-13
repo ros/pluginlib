@@ -19,7 +19,6 @@ import xml.etree.ElementTree as ET
 
 from ament_index_python import get_package_prefix
 from ament_index_python import PackageNotFoundError
-from ros2cli.node.strategy import add_arguments
 
 from ros2plugin.api import get_registered_plugin_resources
 from ros2plugin.verb import VerbExtension
@@ -32,7 +31,6 @@ class ListVerb(VerbExtension):
     """Output a list of plugins."""
 
     def add_arguments(self, parser, cli_name):
-        add_arguments(parser)
         parser.add_argument(
             '--packages', action='store_true',
             help='List the packages that register plugins')
@@ -85,14 +83,14 @@ class ListVerb(VerbExtension):
                     )
                     continue
 
-                for e in tree.iter():
-                    if e.tag == 'class':
+                for elem in tree.iter():
+                    if elem.tag == 'class':
                         try:
-                            plugin_name = e.attrib['name']
+                            plugin_name = elem.attrib['name']
                         except KeyError:
-                            plugin_name = e.attrib['type']
+                            plugin_name = elem.attrib['type']
                         plugins.append(PluginInfo(
-                            plugin_name, e.attrib['type'], e.attrib['base_class_type'])
+                            plugin_name, elem.attrib['type'], elem.attrib['base_class_type'])
                         )
 
             if any(plugins):
