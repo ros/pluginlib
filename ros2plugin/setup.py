@@ -18,8 +18,8 @@ setup(
     author_email='jeremie.deray@canonical.com',
     maintainer='Jeremie Deray',
     maintainer_email='jeremie.deray@canonical.com',
-    url='https://github.com/ros2/ros2cli/tree/master/ros2plugin',
-    download_url='https://github.com/ros2/ros2cli/releases',
+    url='https://github.com/ros/pluginlib',
+    download_url='https://github.com/ros/pluginlib/releases',
     keywords=[],
     classifiers=[
         'Environment :: Console',
