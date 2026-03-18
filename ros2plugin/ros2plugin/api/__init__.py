@@ -36,9 +36,9 @@ def get_registered_plugin_resource_list():
     """
     Get all plugin resources registered in the ament index.
 
-    :return: a filtered list containing the plugin ressouce types.
+    :return: a filtered list containing the plugin resource types.
     """
-    return filter(is_plugin_resource_type, get_resource_types())
+    return list(filter(is_plugin_resource_type, get_resource_types()))
 
 
 def get_package_names_with_plugin_resource_types():
