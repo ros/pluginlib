@@ -45,7 +45,7 @@ TEST(PluginlibUniquePtrTest, misspelledPlugin) {
       "test_pluginlib/foo"), pluginlib::LibraryLoadException);
 }
 
-TEST(PluginlibTest, brokenPlugin) {
+TEST(PluginlibUniquePtrTest, brokenPlugin) {
   pluginlib::ClassLoader<test_base::Fubar> test_loader("test_pluginlib", "test_base::Fubar");
   ASSERT_THROW(
     test_loader.createUniqueInstance("test_pluginlib/none"), pluginlib::PluginlibException);
