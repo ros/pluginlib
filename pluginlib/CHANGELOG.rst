@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.8.4 (2026-03-26)
+------------------
+* Fix some minor issues (`#292 <https://github.com/ros/pluginlib/issues/292>`_)
+* Contributors: Alejandro Hernández Cordero
+
 5.8.3 (2026-02-23)
 ------------------
 * Add support for passing arguments to constructors (`#291 <https://github.com/ros/pluginlib/issues/291>`_)
