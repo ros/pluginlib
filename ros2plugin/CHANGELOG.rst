@@ -2,6 +2,9 @@
 Changelog for package ros2plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.0 (2026-05-06)
+------------------
+
 5.8.4 (2026-03-26)
 ------------------
 * Implement package option (`#293 <https://github.com/ros/pluginlib/issues/293>`_)
