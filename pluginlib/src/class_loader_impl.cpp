@@ -1,0 +1,661 @@
+// Copyright 2008, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+#include "pluginlib/class_loader_impl.hpp"
+
+#include <algorithm>
+#include <cassert>
+#include <cstring>
+#include <filesystem>
+#include <list>
+#include <map>
+#include <optional>
+#include <ranges>  // NOLINT(build/include_order) cpplint misclassifies <ranges> as a C header
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include "ament_index_cpp/get_package_prefix.hpp"
+#include "ament_index_cpp/get_resource.hpp"
+#include "ament_index_cpp/get_resources.hpp"
+#include "rcpputils/shared_library.hpp"
+#include "rcutils/logging_macros.h"
+#include "tinyxml2.h"  // NOLINT
+
+#include "pluginlib/exceptions.hpp"
+
+namespace pluginlib
+{
+
+ClassLoaderImpl::ClassLoaderImpl(
+  std::string package,
+  std::string base_class,
+  std::string attrib_name,
+  std::vector<std::string> plugin_xml_paths)
+: plugin_xml_paths_(std::move(plugin_xml_paths)),
+  package_(std::move(package)),
+  base_class_(std::move(base_class)),
+  attrib_name_(std::move(attrib_name)),
+  // NOTE: The parameter to the class loader enables/disables on-demand class
+  // loading/unloading.
+  // Leaving it off for now... libraries will be loaded immediately and won't
+  // be unloaded until class loader is destroyed or force unload.
+  lowlevel_class_loader_(false)
+{
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Creating ClassLoader, base = %s, address = %p",
+    base_class_.c_str(), static_cast<void *>(this));
+  try {
+    std::filesystem::path package_path;
+    ament_index_cpp::get_package_prefix(package_, package_path);
+  } catch (const ament_index_cpp::PackageNotFoundError & exception) {
+    // rethrow as class loader exception, package name is in the error message already.
+    throw pluginlib::ClassLoaderException(exception.what());
+  }
+
+  if (0 == plugin_xml_paths_.size()) {
+    plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
+  }
+  classes_available_ = determineAvailableClasses(plugin_xml_paths_);
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+    "Finished constructing ClassLoader, base = %s, address = %p",
+    base_class_.c_str(), static_cast<void *>(this));
+}
+
+ClassLoaderImpl::~ClassLoaderImpl()
+{
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+    "Destroying ClassLoader, base = %s, address = %p",
+    getBaseClassType().c_str(), static_cast<void *>(this));
+}
+
+std::vector<std::string> ClassLoaderImpl::getPluginXmlPaths(
+  const std::string & package,
+  const std::string & attrib_name)
+{
+  // Pull possible files from manifests of packages which depend on this package and export class
+  std::vector<std::string> paths;
+  {
+    // the convention is to create an ament resource which a concatenation of
+    // the package name, "pluginlib", and the attribute being exported
+    // __ is used as the concatenation delimiter because it cannot be in a
+    // package name
+    std::string resource_name = package + "__pluginlib__" + attrib_name;
+    std::map<std::string, std::filesystem::path> plugin_packages_with_prefixes =
+      ament_index_cpp::get_resources_by_name(resource_name);
+    for (const auto & package_prefix_pair : plugin_packages_with_prefixes) {
+      // it is also convention to place the relative path to the plugin xml in
+      // the ament resource file
+      auto result = ament_index_cpp::get_resource(
+        resource_name, package_prefix_pair.first);
+      if (result.resourcePath == std::nullopt) {
+        RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
+          "unexpectedly not able to find ament resource '%s' for package '%s'",
+          resource_name.c_str(),
+          package_prefix_pair.first.c_str()
+        );
+        continue;
+      }
+      // the content may contain multiple plugin description files
+      std::stringstream ss(result.contents);
+      std::string line;
+      while (std::getline(ss, line, '\n')) {
+        if (!line.empty()) {
+          // store the prefix for the package with a plugin and the relative path
+          // to the plugin xml file
+          paths.push_back((package_prefix_pair.second / line).string());
+        }
+      }
+    }
+  }
+  return paths;
+}
+
+std::map<std::string, ClassDesc> ClassLoaderImpl::determineAvailableClasses(
+  const std::vector<std::string> & plugin_xml_paths)
+{
+  // mas - This method requires major refactoring...
+  // not only is it really long and confusing but a lot of the comments do not
+  // seem to be correct.
+  // With time I keep correcting small things, but a good rewrite is needed.
+
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Entering determineAvailableClasses()...");
+  std::map<std::string, ClassDesc> classes_available;
+
+  // Walk the list of all plugin XML files (variable "paths") that are exported by the build system
+  for (const auto & xml_path : plugin_xml_paths) {
+    try {
+      processSingleXMLPluginFile(xml_path, classes_available);
+    } catch (const pluginlib::InvalidXMLException & e) {
+      RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+        "Skipped loading plugin with error: %s.",
+        e.what());
+    }
+  }
+
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Exiting determineAvailableClasses()...");
+  return classes_available;
+}
+
+std::string ClassLoaderImpl::extractPackageNameFromPackageXML(const std::string & package_xml_path)
+{
+  tinyxml2::XMLDocument document;
+  document.LoadFile(package_xml_path.c_str());
+  tinyxml2::XMLElement * doc_root_node = document.FirstChildElement("package");
+  if (nullptr == doc_root_node) {
+    RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+      "Could not find a root element for package manifest at %s.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  assert(document.RootElement() == doc_root_node);
+
+  tinyxml2::XMLElement * package_name_node = doc_root_node->FirstChildElement("name");
+  if (nullptr == package_name_node) {
+    RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+      "package.xml at %s does not have a <name> tag! Cannot determine package "
+      "which exports plugin.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  const char * package_name_node_txt = package_name_node->GetText();
+  if (nullptr == package_name_node_txt) {
+    RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+      "package.xml at %s has an invalid <name> tag! Cannot determine package "
+      "which exports plugin.",
+      package_xml_path.c_str());
+    return "";
+  }
+
+  return package_name_node_txt;
+}
+
+std::vector<std::string> ClassLoaderImpl::getAllLibraryPathsToTry(
+  const std::string & library_name,
+  const std::string & exporting_package_name)
+{
+  // To determine the common prefix of the paths to try, the prefix of the
+  // exporting package is retrieved.
+  // To that, various library folder names are added (lib, lib64, etc...)
+  // Additionally, "libexec" like folders are checked, using the package name
+  // as the libexec folder name within the library name.
+  // Finally the library name (just the file name, stripped of extra relative)
+  // with various extensions is concatenated to the various library directories.
+  //
+  // For example, if the package was 'rviz' and the library_name was
+  // 'librviz_default_plugins', these paths might be tried:
+  //
+  //   - <prefix for rviz>/lib/librviz_default_plugins.so
+  //   - <prefix for rviz>/lib64/librviz_default_plugins.so
+  //   - <prefix for rviz>/bin/rviz_default_plugins.dll
+  //   - <prefix for rviz>/lib/rviz/librviz_default_plugins.so
+  //   - <prefix for rviz>/lib64/rviz/librviz_default_plugins.so
+  //
+  // The extension, e.g. `.so`, might be different based on the operating
+  // system, e.g. it might be `.dylib` on macOS or `.dll` on Windows.
+  // Similarly, the library might have the `lib` prefix added or removed.
+  // Also, the library name might have a `d` added if the library is built
+  // debug, depending on the system.
+
+  // TODO(wjwwood): probably should avoid "searching" and just embed the
+  // relative path to the libraries in the ament index, since CMake knows it
+  // at build time...
+
+  std::vector<std::string> all_paths;  // result of all pairs to search
+
+  std::filesystem::path package_prefix;
+  ament_index_cpp::get_package_prefix(exporting_package_name, package_prefix);
+
+  // Setup the directories to look in.
+  std::vector<std::filesystem::path> all_search_paths = {
+    // for now just try lib and lib64 (and their respective "libexec" directories)
+    package_prefix / "lib",
+    package_prefix / "lib64",
+    package_prefix / "bin",  // also look in bin, for dll's on Windows
+    package_prefix / "lib" / exporting_package_name,
+    package_prefix / "lib64" / exporting_package_name,
+    package_prefix / "bin" / exporting_package_name,
+  };
+
+  std::string stripped_library_name = stripAllButFileFromPath(library_name);
+
+  std::string library_name_alternative;  // either lib<library> or <library> without lib prefix
+  const char * lib_prefix = "lib";
+  if (library_name.rfind(lib_prefix, 0) == 0) {
+    library_name_alternative = library_name.substr(strlen(lib_prefix));
+    RCUTILS_LOG_WARN_NAMED("pluginlib.ClassLoader",
+      "given plugin name '%s' should be '%s' for better portability",
+      library_name.c_str(),
+      library_name_alternative.c_str());
+  } else {
+    library_name_alternative = lib_prefix + library_name;
+  }
+  std::string stripped_library_name_alternative = stripAllButFileFromPath(library_name_alternative);
+
+  // Setup the relative file paths to pair with the search directories above.
+  std::vector<std::string> all_relative_library_paths = {
+    rcpputils::get_platform_library_name(library_name),
+    rcpputils::get_platform_library_name(library_name_alternative),
+    rcpputils::get_platform_library_name(stripped_library_name),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative)
+  };
+  std::vector<std::string> all_relative_debug_library_paths = {
+    rcpputils::get_platform_library_name(library_name, true),
+    rcpputils::get_platform_library_name(library_name_alternative, true),
+    rcpputils::get_platform_library_name(stripped_library_name, true),
+    rcpputils::get_platform_library_name(stripped_library_name_alternative, true)
+  };
+
+  for (auto && current_search_path : all_search_paths) {
+    for (auto && current_library_path : all_relative_library_paths) {
+      all_paths.push_back((current_search_path / current_library_path).string());
+    }
+    for (auto && current_library_path : all_relative_debug_library_paths) {
+      all_paths.push_back((current_search_path / current_library_path).string());
+    }
+  }
+
+  for (auto && path : all_paths) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+      "[search path for '%s']: '%s'",
+      library_name.c_str(),
+      path.c_str());
+  }
+
+  return all_paths;
+}
+
+std::string ClassLoaderImpl::getBaseClassType() const
+{
+  return base_class_;
+}
+
+std::string ClassLoaderImpl::getClassDescription(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it != classes_available_.end()) {
+    return it->second.description_;
+  }
+  return "";
+}
+
+std::string ClassLoaderImpl::getClassType(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it != classes_available_.end()) {
+    return it->second.derived_class_;
+  }
+  return "";
+}
+
+std::string ClassLoaderImpl::getClassLibraryPath(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it == classes_available_.end()) {
+    std::ostringstream error_msg;
+    error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+      ". Make sure the plugin description XML file has the correct name of the library.";
+    throw pluginlib::LibraryLoadException(error_msg.str());
+  }
+  std::string library_name = it->second.library_name_;
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+    "Class %s maps to library %s in classes_available_.",
+    lookup_name.c_str(), library_name.c_str());
+
+  std::vector<std::string> paths_to_try =
+    getAllLibraryPathsToTry(library_name, it->second.package_);
+
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+    "Iterating through all possible paths where %s could be located...",
+    library_name.c_str());
+  for (const auto & path : paths_to_try) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", path.c_str());
+    if (std::filesystem::exists(path)) {
+      RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
+        library_name.c_str(), path.c_str());
+      return path;
+    }
+  }
+  std::ostringstream error_msg;
+  error_msg << "Could not find library corresponding to plugin " << lookup_name <<
+    ". Make sure that the library '" << library_name << "' actually exists.";
+  throw pluginlib::LibraryLoadException(error_msg.str());
+}
+
+std::string ClassLoaderImpl::getClassPackage(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it != classes_available_.end()) {
+    return it->second.package_;
+  }
+  return "";
+}
+
+std::vector<std::string> ClassLoaderImpl::getPluginXmlPaths()
+{
+  return plugin_xml_paths_;
+}
+
+std::vector<std::string> ClassLoaderImpl::getDeclaredClasses()
+{
+  auto keys = classes_available_ | std::views::keys;
+  return {keys.begin(), keys.end()};
+}
+
+std::string ClassLoaderImpl::getErrorStringForUnknownClass(const std::string & lookup_name)
+{
+  std::string declared_types;
+  for (const auto & type : getDeclaredClasses()) {
+    declared_types += ' ' + type;
+  }
+  return "According to the loaded plugin descriptions the class " + lookup_name +
+         " with base class type " + base_class_ + " does not exist. Declared types are " +
+         declared_types;
+}
+
+std::string ClassLoaderImpl::getName(const std::string & lookup_name)
+{
+  // remove the package name to get the raw plugin name
+  auto last_slash = lookup_name.find_last_of('/');
+  auto last_colon = lookup_name.find_last_of(':');
+  if (last_slash == std::string::npos && last_colon == std::string::npos) {
+    // no matches
+    return lookup_name;
+  }
+  if (last_slash == std::string::npos) {
+    // only colon matched
+    return lookup_name.substr(last_colon + 1);
+  }
+  if (last_colon == std::string::npos) {
+    // only slash matched
+    return lookup_name.substr(last_slash + 1);
+  }
+  // both matched, return shorter suffix
+  return lookup_name.substr(std::max(last_slash, last_colon) + 1);
+}
+
+std::string
+ClassLoaderImpl::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_file_path)
+{
+  // Note: This method takes an input a path to a plugin xml file and must determine which
+  // package the XML file came from. This is not necessarily the same thing as the member
+  // variable "package_". The plugin xml file can be located anywhere in the source tree for a
+  // package
+
+  // catkin and ament:
+  // 1. Find nearest encasing package.xml
+  // 2. Extract name of package from package.xml
+
+  std::filesystem::path p(plugin_xml_file_path);
+  std::filesystem::path parent = p.parent_path();
+
+  // Figure out exactly which package the passed XML file is exported by.
+  while (true) {
+    if (std::filesystem::exists(parent / "package.xml")) {
+      std::string package_file_path = (parent / "package.xml").string();
+      return extractPackageNameFromPackageXML(package_file_path);
+    }
+
+    // Recursive case - hop one folder up and store current parent
+    // parent_path() returns the current path if we reached the root.
+    p = parent;
+    parent = parent.parent_path();
+
+    // Base case - reached root and cannot find what we're looking for
+    if (parent.string().empty() || (p == parent)) {
+      return "";
+    }
+  }
+}
+
+std::string ClassLoaderImpl::getPathSeparator()
+{
+  return std::string(1, std::filesystem::path::preferred_separator);
+}
+
+std::string ClassLoaderImpl::getPluginManifestPath(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it != classes_available_.end()) {
+    return it->second.plugin_manifest_path_;
+  }
+  return "";
+}
+
+std::vector<std::string> ClassLoaderImpl::getRegisteredLibraries()
+{
+  return lowlevel_class_loader_.getRegisteredLibraries();
+}
+
+bool ClassLoaderImpl::isClassAvailable(const std::string & lookup_name)
+{
+  return classes_available_.contains(lookup_name);
+}
+
+std::string ClassLoaderImpl::joinPaths(const std::string & path1, const std::string & path2)
+{
+  std::filesystem::path p1(path1);
+  return (p1 / path2).string();
+}
+
+void ClassLoaderImpl::loadLibraryForClass(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it == classes_available_.end()) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+      "Class %s has no mapping in classes_available_.",
+      lookup_name.c_str());
+    throw pluginlib::LibraryLoadException(getErrorStringForUnknownClass(lookup_name));
+  }
+
+  std::string library_path = getClassLibraryPath(lookup_name);
+
+  try {
+    lowlevel_class_loader_.loadLibrary(library_path);
+    it->second.resolved_library_path_ = library_path;
+  } catch (const class_loader::LibraryLoadException & ex) {
+    std::string error_string =
+      "Failed to load library " + library_path + ". "
+      "Make sure that you are calling the PLUGINLIB_EXPORT_CLASS macro in the "
+      "library code, and that names are consistent between this macro and your XML. "
+      "Error string: " + ex.what();
+    throw pluginlib::LibraryLoadException(error_string);
+  }
+}
+
+void ClassLoaderImpl::processSingleXMLPluginFile(
+  const std::string & xml_file,
+  std::map<std::string, ClassDesc> & classes_available)
+{
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Processing xml file %s...", xml_file.c_str());
+  tinyxml2::XMLDocument document;
+  document.LoadFile(xml_file.c_str());
+  tinyxml2::XMLElement * config = document.RootElement();
+  if (nullptr == config) {
+    throw pluginlib::InvalidXMLException(
+            "XML Document '" + xml_file +
+            "' has no Root Element. This likely means the XML is malformed or missing.");
+  }
+  const char * config_value = config->Value();
+  if (nullptr == config_value) {
+    throw pluginlib::InvalidXMLException(
+              "XML Document '" + xml_file +
+              "' has an invalid Root Element. This likely means the XML is malformed or missing.");
+  }
+  const std::string_view root_tag{config_value};
+  if (root_tag != "library" && root_tag != "class_libraries") {
+    throw pluginlib::InvalidXMLException(
+            "The XML document '" + xml_file + "' given to add must have either \"library\" or "
+            "\"class_libraries\" as the root tag");
+  }
+  // Step into the filter list if necessary
+  if (root_tag == "class_libraries") {
+    config = config->FirstChildElement("library");
+  }
+
+  tinyxml2::XMLElement * library = config;
+  while (library != nullptr) {
+    const char * path = library->Attribute("path");
+    if (nullptr == path) {
+      RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+        "Attribute 'path' in 'library' tag is missing in %s.", xml_file.c_str());
+      continue;
+    }
+    std::string library_path(path);
+    if (0 == library_path.size()) {
+      RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+        "Failed to find Path Attribute in library element in %s", xml_file.c_str());
+      continue;
+    }
+
+    std::string package_name = getPackageFromPluginXMLFilePath(xml_file);
+    if ("" == package_name) {
+      RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
+        "Could not find package manifest (neither package.xml or deprecated "
+        "manifest.xml) at same directory level as the plugin XML file %s. "
+        "Plugins will likely not be exported properly.\n)",
+        xml_file.c_str());
+    }
+
+    tinyxml2::XMLElement * class_element = library->FirstChildElement("class");
+    while (class_element) {
+      std::string derived_class;
+      if (class_element->Attribute("type") != nullptr) {
+        derived_class = std::string(class_element->Attribute("type"));
+      } else {
+        throw pluginlib::ClassLoaderException(
+                "Class could not be loaded. Attribute 'type' in class tag is missing.");
+      }
+
+      std::string base_class_type;
+      if (class_element->Attribute("base_class_type") != nullptr) {
+        base_class_type = std::string(class_element->Attribute("base_class_type"));
+      } else {
+        throw pluginlib::ClassLoaderException(
+                "Class could not be loaded. Attribute 'base_class_type' in class tag is missing.");
+      }
+
+      std::string lookup_name;
+      if (class_element->Attribute("name") != nullptr) {
+        lookup_name = class_element->Attribute("name");
+        RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+          "XML file specifies lookup name (i.e. magic name) = %s.",
+          lookup_name.c_str());
+      } else {
+        RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+          "XML file has no lookup name (i.e. magic name) for class %s, "
+          "assuming lookup_name == real class name.",
+          derived_class.c_str());
+        lookup_name = derived_class;
+      }
+
+      // make sure that this class is of the right type before registering it
+      if (base_class_type == base_class_) {
+        // register class here
+        tinyxml2::XMLElement * description = class_element->FirstChildElement("description");
+        std::string description_str;
+        if (description) {
+          description_str = description->GetText() ? description->GetText() : "";
+        } else {
+          description_str = "No 'description' tag for this plugin in plugin description file.";
+        }
+
+        // try_emplace keeps the first entry for a duplicate lookup name, matching the
+        // previous insert(), but builds the ClassDesc only when the key is new.
+        classes_available.try_emplace(lookup_name,
+          lookup_name, derived_class, base_class_type, package_name, description_str,
+          library_path, xml_file);
+      }
+
+      // step to next class_element
+      class_element = class_element->NextSiblingElement("class");
+    }
+    library = library->NextSiblingElement("library");
+  }
+}
+
+void ClassLoaderImpl::refreshDeclaredClasses()
+{
+  RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Refreshing declared classes.");
+  // determine classes not currently loaded for removal
+  // The registered library list is fixed for the duration of this scan, so query it once
+  // rather than rebuilding the vector for every declared class.
+  const std::vector<std::string> open_libs = lowlevel_class_loader_.getRegisteredLibraries();
+  std::list<std::string> remove_classes;
+  for (const auto & [lookup_name, desc] : classes_available_) {
+    if (std::ranges::find(open_libs, desc.resolved_library_path_) != open_libs.end()) {
+      remove_classes.push_back(lookup_name);
+    }
+  }
+
+  while (!remove_classes.empty()) {
+    classes_available_.erase(remove_classes.front());
+    remove_classes.pop_front();
+  }
+
+  // add new classes
+  plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
+  std::map<std::string, ClassDesc> updated_classes = determineAvailableClasses(plugin_xml_paths_);
+  // Range insert keeps any entry already present, which is what the previous
+  // contains()-guarded insert did one lookup at a time.
+  classes_available_.insert(updated_classes.begin(), updated_classes.end());
+}
+
+std::string ClassLoaderImpl::stripAllButFileFromPath(const std::string & path)
+{
+  size_t c = path.find_last_of(getPathSeparator());
+  if (std::string::npos == c) {
+    return path;
+  } else {
+    return path.substr(c, path.size());
+  }
+}
+
+int ClassLoaderImpl::unloadLibraryForClass(const std::string & lookup_name)
+{
+  ClassMapIterator it = classes_available_.find(lookup_name);
+  if (it != classes_available_.end() && it->second.resolved_library_path_ != "UNRESOLVED") {
+    std::string library_path = it->second.resolved_library_path_;
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
+      "Attempting to unload library %s for class %s",
+      library_path.c_str(), lookup_name.c_str());
+    return unloadClassLibraryInternal(library_path);
+  } else {
+    throw pluginlib::LibraryUnloadException(getErrorStringForUnknownClass(lookup_name));
+  }
+}
+
+int ClassLoaderImpl::unloadClassLibraryInternal(const std::string & library_path)
+{
+  return lowlevel_class_loader_.unloadLibrary(library_path);
+}
+
+}  // namespace pluginlib

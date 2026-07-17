@@ -1,4 +1,4 @@
-// Copyright 2008, Willow Garage, Inc. All rights reserved.
+// Copyright 2012, Willow Garage, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,45 +26,29 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PLUGINLIB__CLASS_DESC_HPP_
-#define PLUGINLIB__CLASS_DESC_HPP_
+#include "pluginlib/exceptions.hpp"
 
 #include <string>
-
-#include "pluginlib/visibility_control.hpp"
 
 namespace pluginlib
 {
 
-/// Storage for information about a given class.
-class PLUGINLIB_PUBLIC ClassDesc
-{
-public:
-  /**
-   * \param lookup_name The lookup name of the class
-   * \param derived_class The type of the derived class of the class
-   * \param base_class The type of the class, corresponds to the type of the base class
-   * \param package The package the class lives in
-   * \param description A description for the class
-   * \param library_name The name of the containing library for the class (not a full path!)
-   * \param plugin_manifest_path The path to the plugin manifest file
-   */
-  ClassDesc(
-    const std::string & lookup_name, const std::string & derived_class,
-    const std::string & base_class, const std::string & package,
-    const std::string & description, const std::string & library_name,
-    const std::string & plugin_manifest_path);
+PluginlibException::PluginlibException(const std::string & error_desc)
+: std::runtime_error(error_desc) {}
 
-  std::string lookup_name_;
-  std::string derived_class_;
-  std::string base_class_;
-  std::string package_;
-  std::string description_;
-  std::string library_name_;
-  std::string resolved_library_path_;  // This is set by pluginlib::ClassLoader at load time.
-  std::string plugin_manifest_path_;
-};
+InvalidXMLException::InvalidXMLException(const std::string & error_desc)
+: PluginlibException(error_desc) {}
+
+LibraryLoadException::LibraryLoadException(const std::string & error_desc)
+: PluginlibException(error_desc) {}
+
+ClassLoaderException::ClassLoaderException(const std::string & error_desc)
+: PluginlibException(error_desc) {}
+
+LibraryUnloadException::LibraryUnloadException(const std::string & error_desc)
+: PluginlibException(error_desc) {}
+
+CreateClassException::CreateClassException(const std::string & error_desc)
+: PluginlibException(error_desc) {}
 
 }  // namespace pluginlib
-
-#endif  // PLUGINLIB__CLASS_DESC_HPP_
