@@ -32,73 +32,74 @@
 #include <stdexcept>
 #include <string>
 
+#include "pluginlib/visibility_control.hpp"
+
 namespace pluginlib
 {
+
+// Note: each of these types defines its constructor out of line, in exceptions.cpp.
+// That gives the class a key function, so its vtable and typeinfo are emitted once in
+// libpluginlib instead of weakly in every consumer. Exceptions must be catchable across
+// shared library boundaries, which relies on a single exported typeinfo.
 
 /// A base class for all pluginlib exceptions that inherits from std::runtime_exception.
 /**
  * \class PluginlibException
  */
-class PluginlibException : public std::runtime_error
+class PLUGINLIB_PUBLIC PluginlibException : public std::runtime_error
 {
 public:
-  explicit PluginlibException(const std::string & error_desc)
-  : std::runtime_error(error_desc) {}
+  explicit PluginlibException(const std::string & error_desc);
 };
 
 /// Thrown when pluginlib is unable to load a plugin XML file.
 /**
  * \class InvalidXMLException
  */
-class InvalidXMLException : public PluginlibException
+class PLUGINLIB_PUBLIC InvalidXMLException : public PluginlibException
 {
 public:
-  explicit InvalidXMLException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
+  explicit InvalidXMLException(const std::string & error_desc);
 };
 
 /// Thrown when pluginlib is unable to load the library associated with a given plugin.
 /**
  * \class LibraryLoadException
  */
-class LibraryLoadException : public PluginlibException
+class PLUGINLIB_PUBLIC LibraryLoadException : public PluginlibException
 {
 public:
-  explicit LibraryLoadException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
+  explicit LibraryLoadException(const std::string & error_desc);
 };
 
 /// Thrown when pluginlib is unable to instantiate a class loader.
 /**
  * \class ClassLoaderException
  */
-class ClassLoaderException : public PluginlibException
+class PLUGINLIB_PUBLIC ClassLoaderException : public PluginlibException
 {
 public:
-  explicit ClassLoaderException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
+  explicit ClassLoaderException(const std::string & error_desc);
 };
 
 /// Thrown when pluginlib is unable to unload the library associated with a given plugin.
 /**
  * \class LibraryUnloadException
  */
-class LibraryUnloadException : public PluginlibException
+class PLUGINLIB_PUBLIC LibraryUnloadException : public PluginlibException
 {
 public:
-  explicit LibraryUnloadException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
+  explicit LibraryUnloadException(const std::string & error_desc);
 };
 
 /// Thrown when pluginlib is unable to create the class associated with a given plugin.
 /**
  * \class CreateClassException
  */
-class CreateClassException : public PluginlibException
+class PLUGINLIB_PUBLIC CreateClassException : public PluginlibException
 {
 public:
-  explicit CreateClassException(const std::string & error_desc)
-  : PluginlibException(error_desc) {}
+  explicit CreateClassException(const std::string & error_desc);
 };
 
 }  // namespace pluginlib

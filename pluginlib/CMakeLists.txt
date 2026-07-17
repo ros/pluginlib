@@ -13,16 +13,27 @@ find_package(rcutils REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
-add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE
+# Everything that does not depend on the plugin base class T is compiled once here,
+# rather than re-instantiated in every consumer for every ClassLoader<T>. Only the
+# genuinely T-dependent members remain in the headers.
+add_library(${PROJECT_NAME} SHARED
+  src/class_desc.cpp
+  src/class_loader_base.cpp
+  src/class_loader_impl.cpp
+  src/exceptions.cpp)
+target_compile_definitions(${PROJECT_NAME} PRIVATE "PLUGINLIB_BUILDING_LIBRARY")
+target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-target_link_libraries(${PROJECT_NAME} INTERFACE
+target_link_libraries(${PROJECT_NAME} PUBLIC
   ament_cmake_ros_core::ament_ros_defaults
   ament_index_cpp::ament_index_cpp
   class_loader::class_loader
   rcutils::rcutils
-  rcpputils::rcpputils
+  rcpputils::rcpputils)
+# tinyxml2 is only used by the XML parsing in class_loader_impl.cpp; it is no longer
+# reachable from any public header, so consumers do not need it.
+target_link_libraries(${PROJECT_NAME} PRIVATE
   tinyxml2::tinyxml2)
 
 add_executable(list_plugins src/list_plugins.cpp)
@@ -48,6 +59,9 @@ ament_export_targets(export_${PROJECT_NAME})
 
 install(
   TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(

@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 
+#include "pluginlib/visibility_control.hpp"
+
 namespace pluginlib
 {
 /// Pure virtual base class of pluginlib::ClassLoader which is not templated.
@@ -40,11 +42,11 @@ namespace pluginlib
  * which can call all the administrative functions of ClassLoaders -
  * everything except createInstance() and createUnmanagedInstance().
  */
-class ClassLoaderBase
+class PLUGINLIB_PUBLIC ClassLoaderBase
 {
 public:
   /// Empty virtual destructor.
-  virtual ~ClassLoaderBase() {}
+  virtual ~ClassLoaderBase();
 
   /// Return a list of all available plugin manifest paths.
   /**
