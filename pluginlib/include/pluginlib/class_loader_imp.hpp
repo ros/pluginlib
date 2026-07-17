@@ -35,9 +35,11 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <ranges>  // NOLINT(build/include_order) cpplint misclassifies <ranges> as a C header
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -100,8 +102,8 @@ ClassLoader<T>::~ClassLoader()
 }
 
 template<class T>
-template<typename ... Args,
-  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+template<typename ... Args>
+requires InterfaceConstructible<T, Args...>
 std::shared_ptr<T> ClassLoader<T>::createSharedInstance(
   const std::string & lookup_name,
   Args &&... args)
@@ -111,8 +113,8 @@ std::shared_ptr<T> ClassLoader<T>::createSharedInstance(
 }
 
 template<class T>
-template<typename ... Args,
-  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+template<typename ... Args>
+requires InterfaceConstructible<T, Args...>
 UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name, Args &&... args)
 {
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
@@ -146,8 +148,8 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
 }
 
 template<class T>
-template<typename ... Args,
-  std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool>>
+template<typename ... Args>
+requires InterfaceConstructible<T, Args...>
 T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name, Args &&... args)
 /***************************************************************************/
 {
@@ -239,11 +241,9 @@ std::map<std::string, ClassDesc> ClassLoader<T>::determineAvailableClasses(
   std::map<std::string, ClassDesc> classes_available;
 
   // Walk the list of all plugin XML files (variable "paths") that are exported by the build system
-  for (std::vector<std::string>::const_iterator it = plugin_xml_paths.begin();
-    it != plugin_xml_paths.end(); ++it)
-  {
+  for (const auto & xml_path : plugin_xml_paths) {
     try {
-      processSingleXMLPluginFile(*it, classes_available);
+      processSingleXMLPluginFile(xml_path, classes_available);
     } catch (const pluginlib::InvalidXMLException & e) {
       RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
         "Skipped loading plugin with error: %s.",
@@ -447,12 +447,12 @@ std::string ClassLoader<T>::getClassLibraryPath(const std::string & lookup_name)
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
     "Iterating through all possible paths where %s could be located...",
     library_name.c_str());
-  for (auto path_it = paths_to_try.begin(); path_it != paths_to_try.end(); path_it++) {
-    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", path_it->c_str());
-    if (std::filesystem::exists(*path_it)) {
+  for (const auto & path : paths_to_try) {
+    RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Checking path %s ", path.c_str());
+    if (std::filesystem::exists(path)) {
       RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Library %s found at explicit path %s.",
-        library_name.c_str(), path_it->c_str());
-      return *path_it;
+        library_name.c_str(), path.c_str());
+      return path;
     }
   }
   std::ostringstream error_msg;
@@ -483,12 +483,8 @@ template<class T>
 std::vector<std::string> ClassLoader<T>::getDeclaredClasses()
 /***************************************************************************/
 {
-  std::vector<std::string> lookup_names;
-  for (ClassMapIterator it = classes_available_.begin(); it != classes_available_.end(); ++it) {
-    lookup_names.push_back(it->first);
-  }
-
-  return lookup_names;
+  auto keys = classes_available_ | std::views::keys;
+  return {keys.begin(), keys.end()};
 }
 
 template<class T>
@@ -496,9 +492,8 @@ std::string ClassLoader<T>::getErrorStringForUnknownClass(const std::string & lo
 /***************************************************************************/
 {
   std::string declared_types;
-  std::vector<std::string> types = getDeclaredClasses();
-  for (unsigned int i = 0; i < types.size(); i++) {
-    declared_types = declared_types + std::string(" ") + types[i];
+  for (const auto & type : getDeclaredClasses()) {
+    declared_types += ' ' + type;
   }
   return "According to the loaded plugin descriptions the class " + lookup_name +
          " with base class type " + base_class_ + " does not exist. Declared types are " +
@@ -598,7 +593,7 @@ template<class T>
 bool ClassLoader<T>::isClassAvailable(const std::string & lookup_name)
 /***************************************************************************/
 {
-  return classes_available_.find(lookup_name) != classes_available_.end();
+  return classes_available_.contains(lookup_name);
 }
 
 template<class T>
@@ -659,16 +654,15 @@ void ClassLoader<T>::processSingleXMLPluginFile(
               "' has an invalid Root Element. This likely means the XML is malformed or missing.");
     return;
   }
-  if (!(strcmp(config_value, "library") == 0 ||
-    strcmp(config_value, "class_libraries") == 0))
-  {
+  const std::string_view root_tag{config_value};
+  if (root_tag != "library" && root_tag != "class_libraries") {
     throw pluginlib::InvalidXMLException(
             "The XML document '" + xml_file + "' given to add must have either \"library\" or "
             "\"class_libraries\" as the root tag");
     return;
   }
   // Step into the filter list if necessary
-  if (strcmp(config_value, "class_libraries") == 0) {
+  if (root_tag == "class_libraries") {
     config = config->FirstChildElement("library");
   }
 
@@ -739,9 +733,11 @@ void ClassLoader<T>::processSingleXMLPluginFile(
           description_str = "No 'description' tag for this plugin in plugin description file.";
         }
 
-        classes_available.insert(std::pair<std::string, ClassDesc>(lookup_name,
-          ClassDesc(lookup_name, derived_class, base_class_type, package_name, description_str,
-          library_path, xml_file)));
+        // try_emplace keeps the first entry for a duplicate lookup name, matching the
+        // previous insert(), but builds the ClassDesc only when the key is new.
+        classes_available.try_emplace(lookup_name,
+          lookup_name, derived_class, base_class_type, package_name, description_str,
+          library_path, xml_file);
       }
 
       // step to next class_element
@@ -757,14 +753,13 @@ void ClassLoader<T>::refreshDeclaredClasses()
 {
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "Refreshing declared classes.");
   // determine classes not currently loaded for removal
+  // The registered library list is fixed for the duration of this scan, so query it once
+  // rather than rebuilding the vector for every declared class.
+  const std::vector<std::string> open_libs = lowlevel_class_loader_.getRegisteredLibraries();
   std::list<std::string> remove_classes;
-  for (std::map<std::string, ClassDesc>::const_iterator it = classes_available_.begin();
-    it != classes_available_.end(); it++)
-  {
-    std::string resolved_library_path = it->second.resolved_library_path_;
-    std::vector<std::string> open_libs = lowlevel_class_loader_.getRegisteredLibraries();
-    if (std::find(open_libs.begin(), open_libs.end(), resolved_library_path) != open_libs.end()) {
-      remove_classes.push_back(it->first);
+  for (const auto & [lookup_name, desc] : classes_available_) {
+    if (std::ranges::find(open_libs, desc.resolved_library_path_) != open_libs.end()) {
+      remove_classes.push_back(lookup_name);
     }
   }
 
@@ -776,13 +771,9 @@ void ClassLoader<T>::refreshDeclaredClasses()
   // add new classes
   plugin_xml_paths_ = getPluginXmlPaths(package_, attrib_name_);
   std::map<std::string, ClassDesc> updated_classes = determineAvailableClasses(plugin_xml_paths_);
-  for (std::map<std::string, ClassDesc>::const_iterator it = updated_classes.begin();
-    it != updated_classes.end(); it++)
-  {
-    if (classes_available_.find(it->first) == classes_available_.end()) {
-      classes_available_.insert(std::pair<std::string, ClassDesc>(it->first, it->second));
-    }
-  }
+  // Range insert keeps any entry already present, which is what the previous
+  // contains()-guarded insert did one lookup at a time.
+  classes_available_.insert(updated_classes.begin(), updated_classes.end());
 }
 
 template<class T>

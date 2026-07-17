@@ -47,12 +47,20 @@ namespace pluginlib
 template<typename T>
 using UniquePtr = class_loader::ClassLoader::UniquePtr<T>;
 
+/// Satisfied when interface T can be constructed from Args according to its InterfaceTraits.
+/**
+ * Replaces the std::enable_if_t<class_loader::is_interface_constructible_v<...>> SFINAE guard
+ * on the create*Instance() methods with a named constraint, yielding clearer diagnostics.
+ */
+template<typename T, typename ... Args>
+concept InterfaceConstructible = class_loader::is_interface_constructible_v<T, Args...>;
+
 /// A class to help manage and load classes.
 template<class T>
 class ClassLoader : public ClassLoaderBase
 {
 public:
-  typedef typename std::map<std::string, ClassDesc>::iterator ClassMapIterator;
+  using ClassMapIterator = typename std::map<std::string, ClassDesc>::iterator;
 
   /**
    * \param package The package containing the base class
@@ -84,8 +92,8 @@ public:
    * \throws pluginlib::CreateClassException when the class cannot be instantiated
    * \return An instance of the class
    */
-  template<typename ... Args,
-    std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool> = true>
+  template<typename ... Args>
+  requires InterfaceConstructible<T, Args...>
   std::shared_ptr<T> createSharedInstance(const std::string & lookup_name, Args && ... args);
 
   /// Create an instance of a desired class.
@@ -106,8 +114,8 @@ public:
    * \throws pluginlib::CreateClassException when the class cannot be instantiated
    * \return An instance of the class
    */
-  template<typename ... Args,
-    std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool> = true>
+  template<typename ... Args>
+  requires InterfaceConstructible<T, Args...>
   UniquePtr<T> createUniqueInstance(const std::string & lookup_name, Args && ... args);
 
   /// Create an instance of a desired class.
@@ -126,8 +134,8 @@ public:
    * \throws pluginlib::CreateClassException when the class cannot be instantiated
    * \return An instance of the class
    */
-  template<typename ... Args,
-    std::enable_if_t<class_loader::is_interface_constructible_v<T, Args...>, bool> = true>
+  template<typename ... Args>
+  requires InterfaceConstructible<T, Args...>
   T * createUnmanagedInstance(const std::string & lookup_name, Args && ... args);
 
   /// Return a list of all available plugin manifest paths for this ClassLoader's base class type.
