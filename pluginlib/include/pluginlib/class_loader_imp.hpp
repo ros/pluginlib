@@ -565,7 +565,6 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 1. Find nearest encasing package.xml
   // 2. Extract name of package from package.xml
 
-  std::string package_name;
   std::filesystem::path p(plugin_xml_file_path);
   std::filesystem::path parent = p.parent_path();
 
@@ -586,8 +585,6 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
       return "";
     }
   }
-
-  return package_name;
 }
 
 template<class T>
@@ -673,14 +670,12 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     throw pluginlib::InvalidXMLException(
             "XML Document '" + xml_file +
             "' has no Root Element. This likely means the XML is malformed or missing.");
-    return;
   }
   const char* config_value = config->Value();
   if (NULL == config_value) {
       throw pluginlib::InvalidXMLException(
               "XML Document '" + xml_file +
               "' has an invalid Root Element. This likely means the XML is malformed or missing.");
-      return;
   }
   if (!(strcmp(config_value, "library") == 0 ||
     strcmp(config_value, "class_libraries") == 0))
@@ -688,7 +683,6 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     throw pluginlib::InvalidXMLException(
             "The XML document '" + xml_file + "' given to add must have either \"library\" or "
             "\"class_libraries\" as the root tag");
-    return;
   }
   // Step into the filter list if necessary
   if (strcmp(config_value, "class_libraries") == 0) {
@@ -812,7 +806,6 @@ template<class T>
 std::string ClassLoader<T>::stripAllButFileFromPath(const std::string & path)
 /***************************************************************************/
 {
-  std::string only_file;
   size_t c = path.find_last_of(getPathSeparator());
   if (std::string::npos == c) {
     return path;
