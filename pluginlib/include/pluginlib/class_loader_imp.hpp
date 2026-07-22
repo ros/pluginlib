@@ -676,10 +676,6 @@ void ClassLoader<T>::processSingleXMLPluginFile(
       throw pluginlib::InvalidXMLException(
               "XML Document '" + xml_file +
               "' has an invalid Root Element. This likely means the XML is malformed or missing.");
-<<<<<<< HEAD
-      return;
-=======
->>>>>>> 0bf4e86 (Removed dead code (#299))
   }
   if (!(strcmp(config_value, "library") == 0 ||
     strcmp(config_value, "class_libraries") == 0))
