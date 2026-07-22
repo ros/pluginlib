@@ -569,8 +569,8 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 1. Find nearest encasing package.xml
   // 2. Extract name of package from package.xml
 
-  std::filesystem::path p(plugin_xml_file_path);
-  std::filesystem::path parent = p.parent_path();
+  rcpputils::fs::path p(plugin_xml_file_path);
+  rcpputils::fs::path parent = p.parent_path();
 
   // Figure out exactly which package the passed XML file is exported by.
   while (true) {
