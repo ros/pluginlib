@@ -1,17 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(pluginlib)
 
-# Default to C++17
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros_core REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(class_loader REQUIRED)
 find_package(rcutils REQUIRED)
@@ -23,6 +18,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 target_link_libraries(${PROJECT_NAME} INTERFACE
+  ament_cmake_ros_core::ament_ros_defaults
   ament_index_cpp::ament_index_cpp
   class_loader::class_loader
   rcutils::rcutils
@@ -41,7 +37,8 @@ install(TARGETS list_plugins
         DESTINATION lib/${PROJECT_NAME}
 )
 
-ament_export_dependencies(ament_index_cpp class_loader rcutils rcpputils TinyXML2)
+ament_export_dependencies(
+  ament_cmake_ros_core ament_index_cpp class_loader rcutils rcpputils TinyXML2)
 
 # Export old-style CMake variables
 ament_export_include_directories("include/${PROJECT_NAME}")
