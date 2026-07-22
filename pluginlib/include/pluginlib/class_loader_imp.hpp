@@ -569,14 +569,8 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // 1. Find nearest encasing package.xml
   // 2. Extract name of package from package.xml
 
-<<<<<<< HEAD
-  std::string package_name;
-  rcpputils::fs::path p(plugin_xml_file_path);
-  rcpputils::fs::path parent = p.parent_path();
-=======
   std::filesystem::path p(plugin_xml_file_path);
   std::filesystem::path parent = p.parent_path();
->>>>>>> 0bf4e86 (Removed dead code (#299))
 
   // Figure out exactly which package the passed XML file is exported by.
   while (true) {
@@ -686,10 +680,6 @@ void ClassLoader<T>::processSingleXMLPluginFile(
       throw pluginlib::InvalidXMLException(
               "XML Document '" + xml_file +
               "' has an invalid Root Element. This likely means the XML is malformed or missing.");
-<<<<<<< HEAD
-      return;
-=======
->>>>>>> 0bf4e86 (Removed dead code (#299))
   }
   if (!(strcmp(config_value, "library") == 0 ||
     strcmp(config_value, "class_libraries") == 0))
