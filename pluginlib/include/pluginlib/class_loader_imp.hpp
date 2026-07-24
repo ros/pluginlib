@@ -103,7 +103,7 @@ ClassLoader<T>::~ClassLoader()
 
 template<class T>
 template<typename ... Args>
-requires InterfaceConstructible<T, Args...>
+requires class_loader::InterfaceConstructible<T, Args...>
 std::shared_ptr<T> ClassLoader<T>::createSharedInstance(
   const std::string & lookup_name,
   Args &&... args)
@@ -114,7 +114,7 @@ std::shared_ptr<T> ClassLoader<T>::createSharedInstance(
 
 template<class T>
 template<typename ... Args>
-requires InterfaceConstructible<T, Args...>
+requires class_loader::InterfaceConstructible<T, Args...>
 UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_name, Args &&... args)
 {
   RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
@@ -149,7 +149,7 @@ UniquePtr<T> ClassLoader<T>::createUniqueInstance(const std::string & lookup_nam
 
 template<class T>
 template<typename ... Args>
-requires InterfaceConstructible<T, Args...>
+requires class_loader::InterfaceConstructible<T, Args...>
 T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name, Args &&... args)
 /***************************************************************************/
 {
