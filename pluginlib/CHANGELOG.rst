@@ -2,6 +2,13 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.1 (2026-07-28)
+------------------
+* std::format, concepts, range-for using and string_view (`#298 <https://github.com/ros/pluginlib/issues/298>`_)
+* use C++ 20 in default (`#297 <https://github.com/ros/pluginlib/issues/297>`_)
+* Removed dead code (`#299 <https://github.com/ros/pluginlib/issues/299>`_)
+* Contributors: Alejandro Hernández Cordero
+
 6.0.0 (2026-05-06)
 ------------------
 
