@@ -39,6 +39,9 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 #
 # CMake macros provided by ament_cmake for creating tests have an argument
 # called APPEND_ENV that should be used for modifying `AMENT_PREFIX_PATH`.
+# The APPEND_ENV value must not be wrapped in double quotes; they would be
+# passed through as literal characters in the environment variable value, and
+# the mock install path would then not be found at test time.
 # `add_dependencies()` must be used to ensure the test runs after the mock
 # install environment has been created.
 #
@@ -47,7 +50,7 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 #     AMENT_PREFIX_PATH_VAR mock_install_path
 #     ...)
 #   ament_add_[some kind of test](some_test_target ...
-#     APPEND_ENV AMENT_PREFIX_PATH="${mock_install_path}"
+#     APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
 #     ...)
 #   add_dependencies(some_test_target "${mock_install_target}")
 #
@@ -62,6 +65,13 @@ set(PLUGINLIB_ENABLE_PLUGIN_TESTING_DIR "${CMAKE_CURRENT_LIST_DIR}")
 # :type AMENT_PREFIX_PATH_VAR: string
 # :param PACKAGE_NAME: the name of the mock package to install.
 #   If unspecified this defaults to "${PROJECT_NAME}"
+#   If a package with the same name is also installed in a prefix which comes
+#   earlier in `AMENT_PREFIX_PATH` than the mock install path (which is the
+#   case for "${PROJECT_NAME}" itself when a package's tests run against its
+#   own install space), pluginlib resolves the plugin library relative to that
+#   prefix instead of the mock install and fails to find it.  Use a distinct
+#   name, together with a matching PACKAGE_XML, to avoid shadowing an
+#   installed package.
 # :type PACKAGE_NAME: string
 # :param PACKAGE_XML: the path to a package.xml to install.
 #   If unspecified this defaults to "${CMAKE_SOURCE_DIR}/package.xml".
