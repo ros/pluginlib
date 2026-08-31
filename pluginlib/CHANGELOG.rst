@@ -2,6 +2,12 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.5 (2026-08-31)
+------------------
+* Fix pluginlib_enable_plugin_testing() docstring pitfalls. (`#305 <https://github.com/ros/pluginlib/issues/305>`_) (`#309 <https://github.com/ros/pluginlib/issues/309>`_)
+* Removed dead code (backport `#299 <https://github.com/ros/pluginlib/issues/299>`_) (`#304 <https://github.com/ros/pluginlib/issues/304>`_)
+* Contributors: Alejandro Hernández Cordero, mergify[bot]
+
 5.1.4 (2026-03-26)
 ------------------
 
