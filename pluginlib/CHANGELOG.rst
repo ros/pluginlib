@@ -2,6 +2,11 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.2 (2026-08-31)
+------------------
+* Fix pluginlib_enable_plugin_testing() docstring pitfalls. (`#305 <https://github.com/ros/pluginlib/issues/305>`_)
+* Contributors: Chris Lalancette
+
 6.0.1 (2026-07-28)
 ------------------
 * std::format, concepts, range-for using and string_view (`#298 <https://github.com/ros/pluginlib/issues/298>`_)
