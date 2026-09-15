@@ -7,7 +7,7 @@
     The plugin command for ROS 2 command line tools.
   </description>
   <maintainer email="jeremie.deray@canonical.com">Jeremie Deray</maintainer>
-  <license>Apache License 2.0</license>
+  <license>Apache-2.0</license>
 
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>rclpy</exec_depend>
