@@ -2,6 +2,9 @@
 Changelog for package pluginlib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.3 (2026-10-22)
+------------------
+
 6.0.2 (2026-08-31)
 ------------------
 * Fix pluginlib_enable_plugin_testing() docstring pitfalls. (`#305 <https://github.com/ros/pluginlib/issues/305>`_)

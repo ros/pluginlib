@@ -2,6 +2,12 @@
 Changelog for package ros2plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.3 (2026-10-22)
+------------------
+* Clean ros2plugin dependencies (`#310 <https://github.com/ros/pluginlib/issues/310>`_)
+* Use the SPDX identifier Apache-2.0 in license declarations (`#311 <https://github.com/ros/pluginlib/issues/311>`_)
+* Contributors: Alejandro Hernández Cordero, Michael Carroll
+
 6.0.2 (2026-08-31)
 ------------------
 
