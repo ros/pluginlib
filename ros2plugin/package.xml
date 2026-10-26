@@ -10,9 +10,7 @@
   <license>Apache License 2.0</license>
 
   <exec_depend>ament_index_python</exec_depend>
-  <exec_depend>rclpy</exec_depend>
   <exec_depend>ros2cli</exec_depend>
-  <exec_depend>ros2pkg</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
