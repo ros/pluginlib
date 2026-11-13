@@ -105,6 +105,16 @@ if(BUILD_TESTING)
       "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}_list_plugins_test
+    test/list_plugins_test.cpp
+    APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
+  )
+  if(TARGET ${PROJECT_NAME}_list_plugins_test)
+    target_compile_definitions(${PROJECT_NAME}_list_plugins_test PRIVATE
+      "LIST_PLUGINS_EXECUTABLE=\"$<TARGET_FILE:list_plugins>\"")
+    add_dependencies(${PROJECT_NAME}_list_plugins_test list_plugins "${mock_install_target}")
+  endif()
+
 endif()
 
 ament_package(
