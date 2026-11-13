@@ -49,7 +49,8 @@ def get_package_names_with_plugin_resource_types():
     """
     packages = []
     for plugin in get_registered_plugin_resource_list():
-        packages += list(get_resources(plugin).keys())
+        # A package exporting plugins for several base classes is listed only once.
+        packages += [name for name in get_resources(plugin) if name not in packages]
     return packages
 
 
