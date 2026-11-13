@@ -660,8 +660,11 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     config = config->FirstChildElement("library");
   }
 
-  tinyxml2::XMLElement * library = config;
-  while (library != nullptr) {
+  // Advance to the next <library> in the loop statement so that the error
+  // paths below, which `continue`, cannot loop forever on the same element.
+  for (tinyxml2::XMLElement * library = config; library != nullptr;
+    library = library->NextSiblingElement("library"))
+  {
     const char * path = library->Attribute("path");
     if (nullptr == path) {
       RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
@@ -737,7 +740,6 @@ void ClassLoader<T>::processSingleXMLPluginFile(
       // step to next class_element
       class_element = class_element->NextSiblingElement("class");
     }
-    library = library->NextSiblingElement("library");
   }
 }
 
@@ -774,12 +776,11 @@ template<class T>
 std::string ClassLoader<T>::stripAllButFileFromPath(const std::string & path)
 /***************************************************************************/
 {
-  size_t c = path.find_last_of(getPathSeparator());
-  if (std::string::npos == c) {
-    return path;
-  } else {
-    return path.substr(c, path.size());
-  }
+  // Return only the file name, without a leading separator. Keeping the
+  // separator produces names such as "lib/foo.so" (or "/foo.dll" on Windows)
+  // once the platform prefix and suffix are added, which never match a file in
+  // the search directories.
+  return std::filesystem::path(path).filename().string();
 }
 
 template<class T>
