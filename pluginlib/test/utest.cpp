@@ -28,7 +28,10 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
+#include <fstream>
 #include <memory>
+#include <string>
 #include <pluginlib/class_loader.hpp>  // NOLINT
 
 #include "rcutils/logging_macros.h"  // NOLINT
@@ -189,6 +192,72 @@ TEST(PluginlibTest, Splitting) {
   EXPECT_EQ(pl.getName("foo:bar/baz"), "baz");
   EXPECT_EQ(pl.getName("foo"), "foo");
   EXPECT_EQ(pl.getName(""), "");
+}
+
+// Writes a plugin description XML next to a package.xml for 'test_pluginlib'
+// in a fresh temporary directory, so that libraries are looked up in the
+// mock install prefix of 'test_pluginlib'. Returns the path to the plugin XML.
+static std::string writePluginXml(const std::string & test_name, const std::string & content)
+{
+  const std::filesystem::path dir =
+    std::filesystem::temp_directory_path() / ("pluginlib_utest_" + test_name);
+  std::filesystem::remove_all(dir);
+  std::filesystem::create_directories(dir);
+  std::ofstream(dir / "package.xml") <<
+    "<package format=\"2\"><name>test_pluginlib</name></package>\n";
+  const std::filesystem::path xml_path = dir / "plugins.xml";
+  std::ofstream(xml_path) << content;
+  return xml_path.string();
+}
+
+TEST(PluginlibTest, libraryWithoutPathIsSkipped) {
+  // A <library> without a usable 'path' attribute must be skipped, and the
+  // remaining libraries must still be parsed (this used to loop forever).
+  const std::string xml_path = writePluginXml(
+    "libraryWithoutPathIsSkipped",
+    "<class_libraries>\n"
+    "  <library>\n"
+    "    <class name=\"test_pluginlib/no_path\" type=\"test_plugins::Foo\""
+    " base_class_type=\"test_base::Fubar\"/>\n"
+    "  </library>\n"
+    "  <library path=\"\">\n"
+    "    <class name=\"test_pluginlib/empty_path\" type=\"test_plugins::Foo\""
+    " base_class_type=\"test_base::Fubar\"/>\n"
+    "  </library>\n"
+    "  <library path=\"test_plugins\">\n"
+    "    <class name=\"test_pluginlib/foo\" type=\"test_plugins::Foo\""
+    " base_class_type=\"test_base::Fubar\"/>\n"
+    "  </library>\n"
+    "</class_libraries>\n");
+
+  pluginlib::ClassLoader<test_base::Fubar> loader(
+    "test_pluginlib", "test_base::Fubar", "plugin", {xml_path});
+
+  EXPECT_FALSE(loader.isClassAvailable("test_pluginlib/no_path"));
+  EXPECT_FALSE(loader.isClassAvailable("test_pluginlib/empty_path"));
+  ASSERT_TRUE(loader.isClassAvailable("test_pluginlib/foo"));
+
+  std::shared_ptr<test_base::Fubar> foo = loader.createSharedInstance("test_pluginlib/foo");
+  foo->initialize(10.0);
+  EXPECT_EQ(100.0, foo->result());
+}
+
+TEST(PluginlibTest, libraryPathWithDirectories) {
+  // The library is found by its file name when the 'path' attribute also
+  // contains directories that do not exist in the search paths.
+  const std::string xml_path = writePluginXml(
+    "libraryPathWithDirectories",
+    "<library path=\"some/dir/test_plugins\">\n"
+    "  <class name=\"test_pluginlib/foo\" type=\"test_plugins::Foo\""
+    " base_class_type=\"test_base::Fubar\"/>\n"
+    "</library>\n");
+
+  pluginlib::ClassLoader<test_base::Fubar> loader(
+    "test_pluginlib", "test_base::Fubar", "plugin", {xml_path});
+
+  std::shared_ptr<test_base::Fubar> foo = loader.createSharedInstance("test_pluginlib/foo");
+  foo->initialize(10.0);
+  EXPECT_EQ(100.0, foo->result());
 }
 
 // Run all the tests that were declared with TEST()
