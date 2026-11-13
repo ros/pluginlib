@@ -105,6 +105,17 @@ if(BUILD_TESTING)
       "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}_xml_parsing_test
+    test/xml_parsing_test.cpp
+    APPEND_ENV AMENT_PREFIX_PATH=${mock_install_path}
+  )
+  if(TARGET ${PROJECT_NAME}_xml_parsing_test)
+    target_link_libraries(${PROJECT_NAME}_xml_parsing_test ${PROJECT_NAME})
+    add_dependencies(${PROJECT_NAME}_xml_parsing_test "${mock_install_target}")
+    target_include_directories(${PROJECT_NAME}_xml_parsing_test PRIVATE
+      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>")
+  endif()
+
 endif()
 
 ament_package(
