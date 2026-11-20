@@ -533,7 +533,6 @@ ClassLoader<T>::getPackageFromPluginXMLFilePath(const std::string & plugin_xml_f
   // variable "package_". The plugin xml file can be located anywhere in the source tree for a
   // package
 
-  // catkin and ament:
   // 1. Find nearest encasing package.xml
   // 2. Extract name of package from package.xml
 
@@ -678,8 +677,8 @@ void ClassLoader<T>::processSingleXMLPluginFile(
     std::string package_name = getPackageFromPluginXMLFilePath(xml_file);
     if ("" == package_name) {
       RCUTILS_LOG_ERROR_NAMED("pluginlib.ClassLoader",
-        "Could not find package manifest (neither package.xml or deprecated "
-        "manifest.xml) at same directory level as the plugin XML file %s. "
+        "Could not find package manifest (package.xml) at same directory level "
+        "as the plugin XML file %s. "
         "Plugins will likely not be exported properly.\n)",
         xml_file.c_str());
     }
