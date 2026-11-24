@@ -57,9 +57,10 @@ public:
   /**
    * \param package The package containing the base class
    * \param base_class The type of the base class for classes to be loaded
-   * \param attrib_name The attribute to search for in manifest.xml files, defaults to "plugin"
-   * \param plugin_xml_paths The list of paths of plugin.xml files, defaults to be crawled via
-   *   ros::package::getPlugins()
+   * \param attrib_name The attribute being exported in the ament resource index, defaults to
+   *   "plugin"
+   * \param plugin_xml_paths The list of paths of plugin.xml files, defaults to be looked up in
+   *   the ament resource index
    * \throws pluginlib::ClassLoaderException if package manifest cannot be found
    */
   ClassLoader(
@@ -265,9 +266,8 @@ private:
 
   /// Get a list of paths to try to find a library.
   /**
-   * As we transition from rosbuild to Catkin build systems, plugins can be
-   * found in the old rosbuild place (pkg_name/lib usually) or somewhere in the
-   * Catkin build space.
+   * Plugin libraries can be found in the library directories of the exporting
+   * package's install prefix.
    */
   std::vector<std::string> getAllLibraryPathsToTry(
     const std::string & library_name,
