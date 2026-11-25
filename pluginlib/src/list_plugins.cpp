@@ -37,13 +37,18 @@ int main(int argc, char ** argv)
     std::cerr << "Requires two arguments!" << std::endl;
     std::cerr << "Usage: " << argv[0];
     std::cerr << " [package] [base_class]" << std::endl;
-    return -1;
+    return 1;
   }
 
-  // Note: You cannot use void if you want to use the templated createSharedInstance methods
-  pluginlib::ClassLoader<void> cl(argv[1], argv[2]);
-  for (const auto & declared : cl.getDeclaredClasses()) {
-    std::cout << declared << std::endl;
+  try {
+    // Note: You cannot use void if you want to use the templated createSharedInstance methods
+    pluginlib::ClassLoader<void> cl(argv[1], argv[2]);
+    for (const auto & declared : cl.getDeclaredClasses()) {
+      std::cout << declared << std::endl;
+    }
+  } catch (const pluginlib::PluginlibException & ex) {
+    std::cerr << "Error: " << ex.what() << std::endl;
+    return 1;
   }
   return 0;
 }
