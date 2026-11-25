@@ -81,15 +81,17 @@ class ListVerb(VerbExtension):
                     )
                     continue
 
-                for elem in tree.iter():
-                    if elem.tag == 'class':
-                        try:
-                            plugin_name = elem.attrib['name']
-                        except KeyError:
-                            plugin_name = elem.attrib['type']
-                        plugins.append(PluginInfo(
-                            plugin_name, elem.attrib['type'], elem.attrib['base_class_type'])
+                for elem in tree.iter('class'):
+                    plugin_type = elem.get('type')
+                    base_class_type = elem.get('base_class_type')
+                    if plugin_type is None or base_class_type is None:
+                        print(
+                            f"Skipping class without 'type' or 'base_class_type' "
+                            f'in {plugin_xml}.'
                         )
+                        continue
+                    plugins.append(PluginInfo(
+                        elem.get('name', plugin_type), plugin_type, base_class_type))
 
             if any(plugins):
                 print(*[f'\t{p.name} [{p.type}] (base: {p.base})' for p in plugins], sep='\n')
