@@ -91,6 +91,15 @@ TEST(PluginlibTest, workingPluginCtor) {
   }
 }
 
+// createUnmanagedInstance() is deprecated, these tests cover it until it is removed.
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 TEST(PluginlibTest, createUnmanagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
   pluginlib::ClassLoader<test_base::Fubar> pl("test_pluginlib", "test_base::Fubar");
@@ -142,6 +151,12 @@ TEST(PluginlibTest, createUnmanagedInstanceCtorAndUnloadLibrary) {
   }
   RCUTILS_LOG_INFO("Done.");
 }
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 TEST(PluginlibTest, createManagedInstanceAndUnloadLibrary) {
   RCUTILS_LOG_INFO("Making the ClassLoader...");
