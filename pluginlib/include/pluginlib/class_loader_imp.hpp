@@ -168,8 +168,21 @@ T * ClassLoader<T>::createUnmanagedInstance(const std::string & lookup_name, Arg
     std::string class_type = getClassType(lookup_name);
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader", "%s maps to real class type %s",
       lookup_name.c_str(), class_type.c_str());
+    // This function is deprecated itself, don't warn about the call it forwards to.
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
     instance = lowlevel_class_loader_.createUnmanagedInstance<T>(class_type,
         std::forward<Args>(args)...);
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
     RCUTILS_LOG_DEBUG_NAMED("pluginlib.ClassLoader",
       "Instance of type %s created.",
       class_type.c_str());

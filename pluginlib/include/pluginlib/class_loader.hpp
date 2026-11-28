@@ -117,8 +117,11 @@ public:
    *
    * \attention The ownership is transferred to the caller, which is responsible
    *   for deleting the instance and calling unloadLibraryForClass()
-   *   (in order to decrement the associated library counter and unloading it
-   *   if it is no more used).
+   *   (in order to decrement the associated library counter).
+   *   class_loader cannot tell when the instance is destroyed, so once any unmanaged
+   *   instance has been created the library stays loaded until the process exits,
+   *   and no library is unloaded on demand anymore in this process.
+   * \deprecated Use createUniqueInstance() or createSharedInstance() instead.
    * \param lookup_name The name of the class to load
    * \param args Arguments passed to the constructor of the plugin.
    *   Plugin parameters must be declared using class_loader::InterfaceTraits.
@@ -129,6 +132,10 @@ public:
    */
   template<typename ... Args>
   requires class_loader::InterfaceConstructible<T, Args...>
+  [[deprecated(
+    "createUnmanagedInstance() is deprecated: class_loader cannot tell when the instance is "
+    "destroyed, so its library stays loaded until the process exits. "
+    "Use createUniqueInstance() or createSharedInstance() instead.")]]
   T * createUnmanagedInstance(const std::string & lookup_name, Args && ... args);
 
   /// Return a list of all available plugin manifest paths for this ClassLoader's base class type.
